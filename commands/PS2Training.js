@@ -13,7 +13,7 @@ class Event {
         this.trainingSignups.push(name);
     }
 
-    removeTrainingSignup(name) {
+    removeTrainingSignups(name) {
         const isUsername = (element) => element === name;
         this.trainingSignups.splice(this.trainingSignups.findIndex(isUsername) ,1);
     }
@@ -28,7 +28,7 @@ let didSetupListeners = false;
 
 const botUserId = '706985785529860147';
 
-const emoji = '✅';
+const signupEmoji = '✅';
 
 module.exports = {
     name: 'PS2Training',
@@ -92,7 +92,7 @@ module.exports = {
                     events[embed.id] = event;
 
                     try {
-                        await embed.react(emoji);
+                        await embed.react(signupEmoji);
                     } catch (error) {
                         console.log(error);
                     }
@@ -164,9 +164,9 @@ function messageReactionAdded(reaction, user) {
 
     console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
     
-    if (emoji.name === emoji && !event.trainingSignups.includes(username)) {
-        event.addTrainingSignups(username);
-        console.log(trainingSignups);
+    if (emoji.name === signupEmoji && !event.trainingSignups.includes(username)) {
+        event.addTrainingSignup(username);
+        
     }
 
     updateEmbedForEvent(message, event);
@@ -183,7 +183,7 @@ function messageReactionRemoved(reaction, user) {
 
     console.log('Event: ' + event.name + ', Signoff: ' + emoji.name + ', User: ' + username);
     
-    if (emoji.name === emoji && event.trainingSignups.includes(username)) {
+    if (emoji.name === signupEmoji && event.trainingSignups.includes(username)) {
         event.removeTrainingSignups(username);
     }
 
