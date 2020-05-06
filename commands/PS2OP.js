@@ -216,7 +216,7 @@ function messageReactionAdded(reaction, user, bot) {
     let username = user.username;
 
     console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-    console.log('emoji identifier: ', bot.emojis.resolveIdentifier(armorEmoji)/*.substring().split(":", 1).toString()*/);
+    //console.log('emoji identifier: ', bot.emojis.resolveIdentifier(armorEmoji)/*.substring().split(":", 1).toString()*/);
 
     if (emoji.name === bot.emojis.resolveIdentifier(infantryEmoji).substring().split(":", 1).toString() && !event.infantrySignups.includes(username)) {
         event.addInfantrySignup(username);
