@@ -24,7 +24,7 @@ class Event {
 }
 
 const events = {};
-let didSetupListeners = false;
+let didSetupListeners1 = false;
 
 const botUserId = '706985785529860147';
 
@@ -141,7 +141,7 @@ async function updateEmbedForEvent(message, event) {
 }
 
 function setupListeners(bot) {
-    if (didSetupListeners) return;
+    if (didSetupListeners1) return;
 
     bot.on('messageReactionAdd', (reaction, user) => {
         messageReactionAdded(reaction, user);
@@ -150,7 +150,7 @@ function setupListeners(bot) {
         messageReactionRemoved(reaction, user);
     })
 
-    didSetupListeners = true;
+    didSetupListeners1 = true;
 }
 
 function messageReactionAdded(reaction, user) {
