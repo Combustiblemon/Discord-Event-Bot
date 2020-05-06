@@ -1,2 +1,2 @@
 # Discord-Event-Bot
-An event bot made for teh BRTD dsicord server
+An event bot made for the BRTD discord server
