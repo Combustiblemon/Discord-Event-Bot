@@ -61,8 +61,8 @@ let didSetupListeners = false;
 const botUserId = '706985785529860147';
 
 const infantryEmoji = "707719532721995883";
-const airEmoji = "707719532617269280";
-const armorEmoji = "707719532785172581";
+const airEmoji = "707719532785172581";
+const armorEmoji = "707719532617269280";
 const slEmoji = '⭐';
 
 
@@ -216,7 +216,7 @@ function messageReactionAdded(reaction, user, bot) {
     let username = user.username;
 
     console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-    console.log('emoji identifier: ', bot.emojis.resolveIdentifier(armorEmoji)/*.substring().split(":", 1).toString()*/);
+    //console.log('emoji identifier: ', bot.emojis.resolveIdentifier(armorEmoji)/*.substring().split(":", 1).toString()*/);
 
     if (emoji.name === bot.emojis.resolveIdentifier(infantryEmoji).substring().split(":", 1).toString() && !event.infantrySignups.includes(username)) {
         event.addInfantrySignup(username);
