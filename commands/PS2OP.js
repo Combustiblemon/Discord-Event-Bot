@@ -60,10 +60,11 @@ let didSetupListeners = false;
 
 const botUserId = '706985785529860147';
 
-const infantryEmoji = '🔫';
-const airEmoji = '✈';
-const armorEmoji = '🚌';
+const infantryEmoji = "707719532721995883";
+const airEmoji = "707719532617269280";
+const armorEmoji = "707719532785172581";
 const slEmoji = '⭐';
+
 
 module.exports = {
     name: 'PS2OP',
@@ -71,6 +72,13 @@ module.exports = {
     execute(bot, message, args, token){
 
         setupListeners(bot);
+
+        //console.log('pepeL emote: ', bot.emojis.resolveIdentifier("440825903426043924"));
+        //const emojiTest = bot.emoji.resolve("440825903426043924");
+        /*const infantryEmoji = bot.emojis.resolve("440825903426043924");
+        const airEmoji = bot.emojis.resolve("440825903426043924");
+        const armorEmoji = bot.emojis.resolve("440825903426043924");
+        const slEmoji = '⭐';*/
 
         // bot.login(token);
        
@@ -82,17 +90,17 @@ module.exports = {
         message.channel.bulkDelete(1).catch(console.error);
         
         message.channel.send('What is the name of the OP?').then(() => {
-            message.channel.awaitMessages(filter, {max:1, time: 60000, errors:['time'] })
+            message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
             .then(collected =>{
                 eventName = collected.first().content;
                 message.channel.bulkDelete(2).catch(console.error);
                 message.channel.send('What time is the OP?').then(() =>{
-                    message.channel.awaitMessages(filter, {max:1, time: 60000, errors:['time'] })
+                    message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
                         .then(collected => {
                             eventTime = collected.first().content
                             message.channel.bulkDelete(2).catch(console.error);
                             message.channel.send('Write a short description of the OP.').then(() =>{
-                                message.channel.awaitMessages(filter, {max:1, time: 60000, errors:['time'] })
+                                message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
                                     .then(collected =>{
                                         eventDescription = collected.first().content;
                                         message.channel.bulkDelete(2).catch(console.error);
@@ -119,67 +127,7 @@ module.exports = {
 
         });
 
-    
-        //console.log(message.channel.fetch());
         message.channel.fetch();
-        
-        // bot.on('messageReactionAdd', (reaction, user) =>{
-        //     let message = reaction.message;
-        //     let emoji = reaction.emoji;
-        //     let tempEmbed = message.embeds;
-
-        //     console.log('bot: ' + eventName + ', message: ' + message.embeds[0].title);
-            
-        //     //let messageState = message.fetch();
-           
-        //     reactUsernameAdd = user.username;
-        //     console.log('in: ', user.username);
-            
-        //     if (emoji.name === airEmoji){
-        //         if(message.guild.member(user.id) != botUserId){
-        //             if(!airSignups.includes(reactUsernameAdd)){
-        //                 //console.log('add: ', reactUsernameAdd);
-        //                 airSignups.push(reactUsernameAdd);
-        //                 console.log('array: ', airSignups);
-        //                 airCount ++;
-
-                        
-        //                 updateEmbed('add', message, airSignups, airCount, 2);
-        //             }
-        //         }
-        //     }
-        //  })
-        //  bot.on('messageReactionRemove', (reaction, user) =>{
-        //     let message = reaction.message;
-        //     let emoji = reaction.emoji;
-
-        //     reactUsernameRemove = user.username;
-        //     //console.log('out: ', user.username);
-        //     if (emoji.name === airEmoji){
-        //         if(message.guild.member(user.id) != botUserId){
-        //             if(airSignups.includes(reactUsernameRemove)){
-        //                 //console.log('remove: ', reactUsernameRemove);
-        //                 const isUsername = (element) => element === reactUsernameRemove;
-        //                 airSignups.splice(airSignups.findIndex(isUsername) ,1);
-        //                 console.log('array: ', airSignups);
-        //                 airCount--;
-
-        //                 updateEmbed('remove', message, airSignups, airCount, 2);
-        //             }
-                    
-        //         }
-        //     }else if (emoji.name === armorEmoji){
-        //         if(message.guild.member(user.id) != botUserId){
-        //             if(armorSignups.includes(reactUsernameRemove)){
-        //                 //console.log('remove: ', reactUsernameRemove);
-        //                 const isUsername = (element) => element === reactUsernameRemove;
-        //                 armorSignups.splice(armorSignups.findIndex(isUsername) ,1);
-        //                 //console.log('array: ', airSignups);
-        //             }
-                    
-        //         }
-        //     }
-        //  })
         
         async function drawEmbed(event){
             const embed = createEmbedForEvent(event);
@@ -189,59 +137,15 @@ module.exports = {
                     events[embed.id] = event;
 
                     try {
-                        await embed.react(airEmoji);
-                        await embed.react(armorEmoji);
                         await embed.react(infantryEmoji);
+                        await embed.react(armorEmoji);
+                        await embed.react(airEmoji);
                         await embed.react(slEmoji);
                     } catch (error) {
                         console.log(error);
                     }
-
-                    //bot.message.reactionAdd()
                 })
-        }
-
-        // async function updateEmbed(operation, passedMessage, passedArray, index, fieldIndex){
-            
-        //     if (operation === 'add'){
-        //         //console.log('passed embed: ', passedMessage.embeds[0]);
-        //         //console.log('passed embed field: ', passedMessage.embeds[0].fields[0]);                
-                
-        //         var members = 'empty';
-        //         if(index != 0){
-        //             members = ' ';
-        //             for (let i =0; i < index; i++){
-        //             members += passedArray[i] + '\n ';
-        //             }
-        //         }
-                
-        //         var tempEmbed = await new Discord.MessageEmbed().addField('Air (' + airCount + ')', members, true)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(fieldIndex, 1, tempEmbed.fields[0]));
-        //         //console.log('passed embed field edit: ', passedEmbed[0].fields[0]);
-
-        //         tempEmbed = await new Discord.MessageEmbed().addField('Total number of signups:', infantryCount + armorCount + airCount + slCount)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(4, 1, tempEmbed.fields[0]));
-
-        //     }else if(operation === 'remove'){
-
-        //         var members = 'empty';
-        //         if(index != 0){
-        //             members = ' ';
-        //             for (let i =0; i < index; i++){
-        //             members += passedArray[i] + '\n ';
-        //             }
-        //         }
-
-        //         var tempEmbed = await new Discord.MessageEmbed().addField('Air (' + airCount + ')', members, true)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(fieldIndex, 1, tempEmbed.fields[0]));
-
-        //         tempEmbed = await new Discord.MessageEmbed().addField('Total number of signups:', infantryCount + armorCount + airCount + slCount)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(4, 1, tempEmbed.fields[0]));
-        //     } 
-
-        // }
-         
-          
+        }      
          
     }
 }
@@ -293,16 +197,16 @@ function setupListeners(bot) {
     if (didSetupListeners) return;
 
     bot.on('messageReactionAdd', (reaction, user) => {
-        messageReactionAdded(reaction, user);
+        messageReactionAdded(reaction, user, bot);
     })
     bot.on('messageReactionRemove', (reaction, user) => {
-        messageReactionRemoved(reaction, user);
+        messageReactionRemoved(reaction, user, bot);
     })
 
     didSetupListeners = true;
 }
 
-function messageReactionAdded(reaction, user) {
+function messageReactionAdded(reaction, user, bot) {
     let message = reaction.message;
 
     if (message.guild.member(user.id) == botUserId) return;
@@ -312,14 +216,15 @@ function messageReactionAdded(reaction, user) {
     let username = user.username;
 
     console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-    
-    if (emoji.name === infantryEmoji && !event.infantrySignups.includes(username)) {
+    console.log('emoji identifier: ', bot.emojis.resolveIdentifier(armorEmoji)/*.substring().split(":", 1).toString()*/);
+
+    if (emoji.name === bot.emojis.resolveIdentifier(infantryEmoji).substring().split(":", 1).toString() && !event.infantrySignups.includes(username)) {
         event.addInfantrySignup(username);
     }
-    else if (emoji.name === armorEmoji && !event.armorSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(armorEmoji).substring().split(":", 1).toString() && !event.armorSignups.includes(username)) {
         event.addArmorSignup(username);
     }
-    else if (emoji.name === airEmoji && !event.airSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(airEmoji).substring().split(":", 1).toString() && !event.airSignups.includes(username)) {
         event.addAirSignup(username);
     }
     else if (emoji.name === slEmoji && !event.slSignups.includes(username)) {
@@ -329,7 +234,7 @@ function messageReactionAdded(reaction, user) {
     updateEmbedForEvent(message, event);
 }
 
-function messageReactionRemoved(reaction, user) {
+function messageReactionRemoved(reaction, user, bot) {
     let message = reaction.message;
 
     if (message.guild.member(user.id) == botUserId) return;
@@ -340,13 +245,13 @@ function messageReactionRemoved(reaction, user) {
 
     console.log('Event: ' + event.name + ', Signoff: ' + emoji.name + ', User: ' + username);
     
-    if (emoji.name === infantryEmoji && event.infantrySignups.includes(username)) {
+    if (emoji.name === bot.emojis.resolveIdentifier(infantryEmoji).substring().split(":", 1).toString() && event.infantrySignups.includes(username)) {
         event.removeInfantrySignup(username);
     }
-    else if (emoji.name === armorEmoji && event.armorSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(armorEmoji).substring().split(":", 1).toString() && event.armorSignups.includes(username)) {
         event.removeArmorSignup(username);
     }
-    else if (emoji.name === airEmoji && event.airSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(airEmoji).substring().split(":", 1).toString() && event.airSignups.includes(username)) {
         event.removeAirSignup(username);
     }
     else if (emoji.name === slEmoji && event.slSignups.includes(username)) {
@@ -356,7 +261,3 @@ function messageReactionRemoved(reaction, user) {
     updateEmbedForEvent(message, event);
 }
 
-//bot id 706985785529860147
-/*So the index param is the total number of fields the embed has minus 1 (arrays start at 0 - fields are just an array of fields). 
-The deleteCount is the amount of fields you want to remove, in your case 1. 
-The fields is the fields you want to insert in the position you you deleted at*/

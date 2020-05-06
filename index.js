@@ -34,15 +34,12 @@ bot.on('message', message=>{
                 message.channel.bulkDelete(1);
                 message.author.send('```List of current events: \n PS2 Ops ($event PS2OP)```' );
             }
-            else if(args[1] === 'help') {
-                bot.commands.get('help').execute(message, args);
-            }
             else if(args[1] === 'PS2OP'){
                 bot.commands.get('PS2OP').execute(bot, message, args, token);
+            }else if(args[1] === 'PS2Training'){
+                bot.commands.get('PS2Training').execute(bot, message, args, token);
             }
-
-            //message.author.send('List of events:');
-            //message.channel.send(embed);
+            
         break;
 
 
