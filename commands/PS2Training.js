@@ -6,52 +6,20 @@ class Event {
         this.name = name;
         this.time = time;
         this.description = description;
-        this.infantrySignups = [];
-        this.armorSignups = [];
-        this.airSignups= [];
-        this.slSignups = [];
+        this.trainingSignups = [];
     }
 
-    addInfantrySignup(name) {
-        this.infantrySignups.push(name);
+    addTrainingSignup(name) {
+        this.trainingSignups.push(name);
     }
 
-    removeInfantrySignup(name) {
+    removeTrainingSignup(name) {
         const isUsername = (element) => element === name;
-        this.infantrySignups.splice(this.infantrySignups.findIndex(isUsername) ,1);
-    }
-
-    addArmorSignup(name) {
-        this.armorSignups.push(name);
-    }
-
-    removeArmorSignup(name) {
-        const isUsername = (element) => element === name;
-        this.armorSignups.splice(this.armorSignups.findIndex(isUsername) ,1);
-    }
-
-    addAirSignup(name) {
-        this.airSignups.push(name);
-    }
-
-    removeAirSignup(name) {
-        const isUsername = (element) => element === name;
-        this.airSignups.splice(this.airSignups.findIndex(isUsername) ,1);
-    }
-
-    addSlSignup(name) {
-        this.slSignups.push(name);
-    }
-
-    removeSlSignup(name) {
-        const isUsername = (element) => element === name;
-        this.slSignups.splice(this.slSignups.findIndex(isUsername) ,1);
+        this.trainingSignups.splice(this.trainingSignups.findIndex(isUsername) ,1);
     }
 
     getTotalSignups() {
-        return this.infantrySignups.length 
-            + this.armorSignups.length 
-            + this.airSignups.length;
+        return this.trainingSignups.length;
     }
 }
 
@@ -60,23 +28,15 @@ let didSetupListeners = false;
 
 const botUserId = '706985785529860147';
 
-
-
+const emoji = '✅';
 
 module.exports = {
-    name: 'PS2OP',
-    description: 'Sets up an OP for PS2.',
+    name: 'PS2Training',
+    description: 'Sets up a training for PS2.',
     execute(bot, message, args, token){
 
         setupListeners(bot);
 
-        const infantryEmoji = bot.emojis.resolve("440825903426043924");
-        const airEmoji = bot.emojis.resolve("440825903426043924");
-        const armorEmoji = bot.emojis.resolve("440825903426043924");
-        const slEmoji = '⭐';
-
-        // bot.login(token);
-       
         eventName = ' ';
         eventTime = ' ';
         eventDescription = ' ';
@@ -84,17 +44,17 @@ module.exports = {
         const filter = m => m.author.id === message.author.id;
         message.channel.bulkDelete(1).catch(console.error);
         
-        message.channel.send('What is the name of the OP?').then(() => {
+        message.channel.send('What is the name of the training?').then(() => {
             message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
             .then(collected =>{
                 eventName = collected.first().content;
                 message.channel.bulkDelete(2).catch(console.error);
-                message.channel.send('What time is the OP?').then(() =>{
+                message.channel.send('What time is the training?').then(() =>{
                     message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
                         .then(collected => {
                             eventTime = collected.first().content
                             message.channel.bulkDelete(2).catch(console.error);
-                            message.channel.send('Write a short description of the OP.').then(() =>{
+                            message.channel.send('Write a short description of the Training.').then(() =>{
                                 message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
                                     .then(collected =>{
                                         eventDescription = collected.first().content;
@@ -123,7 +83,7 @@ module.exports = {
         });
 
         message.channel.fetch();
-        
+
         async function drawEmbed(event){
             const embed = createEmbedForEvent(event);
 
@@ -132,16 +92,19 @@ module.exports = {
                     events[embed.id] = event;
 
                     try {
-                        await embed.react(infantryEmoji);
-                        await embed.react(armorEmoji);
-                        await embed.react(airEmoji);
-                        await embed.react(slEmoji);
+                        await embed.react(emoji);
                     } catch (error) {
                         console.log(error);
                     }
                 })
-        }      
-         
+        }
+
+
+
+
+
+
+
     }
 }
 
@@ -150,20 +113,9 @@ function createEmbedForEvent(event) {
         .setTitle(event.name)
         .setDescription(event.description)
         .addField(
-            'Infantry (' + event.infantrySignups.length + ')', 
-            createMembersListFromSignups(event.infantrySignups), 
+            'Training Signups (' + event.trainingSignups.length + ')', 
+            createMembersListFromSignups(event.trainingSignups), 
             true)
-        .addField(
-            'Armor (' + event.armorSignups.length + ')', 
-            createMembersListFromSignups(event.armorSignups), 
-            true)
-        .addField(
-            'Air (' + event.airSignups.length + ')', 
-            createMembersListFromSignups(event.airSignups), 
-            true)
-        .addField(
-            'Squad Leaders (' + event.slSignups.length + ')', 
-            createMembersListFromSignups(event.slSignups))
         .addField(
             'Total number of signups:', event.getTotalSignups())
         .setFooter(event.time)
@@ -212,17 +164,9 @@ function messageReactionAdded(reaction, user) {
 
     console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
     
-    if (emoji.name === infantryEmoji && !event.infantrySignups.includes(username)) {
-        event.addInfantrySignup(username);
-    }
-    else if (emoji.name === armorEmoji && !event.armorSignups.includes(username)) {
-        event.addArmorSignup(username);
-    }
-    else if (emoji.name === airEmoji && !event.airSignups.includes(username)) {
-        event.addAirSignup(username);
-    }
-    else if (emoji.name === slEmoji && !event.slSignups.includes(username)) {
-        event.addSlSignup(username);
+    if (emoji.name === emoji && !event.trainingSignups.includes(username)) {
+        event.addTrainingSignups(username);
+        console.log(trainingSignups);
     }
 
     updateEmbedForEvent(message, event);
@@ -239,17 +183,8 @@ function messageReactionRemoved(reaction, user) {
 
     console.log('Event: ' + event.name + ', Signoff: ' + emoji.name + ', User: ' + username);
     
-    if (emoji.name === infantryEmoji && event.infantrySignups.includes(username)) {
-        event.removeInfantrySignup(username);
-    }
-    else if (emoji.name === armorEmoji && event.armorSignups.includes(username)) {
-        event.removeArmorSignup(username);
-    }
-    else if (emoji.name === airEmoji && event.airSignups.includes(username)) {
-        event.removeAirSignup(username);
-    }
-    else if (emoji.name === slEmoji && event.slSignups.includes(username)) {
-        event.removeSlSignup(username);
+    if (emoji.name === emoji && event.trainingSignups.includes(username)) {
+        event.removeTrainingSignups(username);
     }
 
     updateEmbedForEvent(message, event);
