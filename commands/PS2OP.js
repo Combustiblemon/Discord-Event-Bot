@@ -61,8 +61,8 @@ let didSetupListeners = false;
 const botUserId = '706985785529860147';
 
 const infantryEmoji = "707719532721995883";
-const airEmoji = "707719532617269280";
-const armorEmoji = "707719532785172581";
+const airEmoji = "707719532785172581";
+const armorEmoji = "707719532617269280";
 const slEmoji = '⭐';
 
 
