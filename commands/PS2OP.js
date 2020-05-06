@@ -82,17 +82,17 @@ module.exports = {
         message.channel.bulkDelete(1).catch(console.error);
         
         message.channel.send('What is the name of the OP?').then(() => {
-            message.channel.awaitMessages(filter, {max:1, time: 60000, errors:['time'] })
+            message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
             .then(collected =>{
                 eventName = collected.first().content;
                 message.channel.bulkDelete(2).catch(console.error);
                 message.channel.send('What time is the OP?').then(() =>{
-                    message.channel.awaitMessages(filter, {max:1, time: 60000, errors:['time'] })
+                    message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
                         .then(collected => {
                             eventTime = collected.first().content
                             message.channel.bulkDelete(2).catch(console.error);
                             message.channel.send('Write a short description of the OP.').then(() =>{
-                                message.channel.awaitMessages(filter, {max:1, time: 60000, errors:['time'] })
+                                message.channel.awaitMessages(filter, {max:1, time: 300000, errors:['time'] })
                                     .then(collected =>{
                                         eventDescription = collected.first().content;
                                         message.channel.bulkDelete(2).catch(console.error);
@@ -119,67 +119,7 @@ module.exports = {
 
         });
 
-    
-        //console.log(message.channel.fetch());
         message.channel.fetch();
-        
-        // bot.on('messageReactionAdd', (reaction, user) =>{
-        //     let message = reaction.message;
-        //     let emoji = reaction.emoji;
-        //     let tempEmbed = message.embeds;
-
-        //     console.log('bot: ' + eventName + ', message: ' + message.embeds[0].title);
-            
-        //     //let messageState = message.fetch();
-           
-        //     reactUsernameAdd = user.username;
-        //     console.log('in: ', user.username);
-            
-        //     if (emoji.name === airEmoji){
-        //         if(message.guild.member(user.id) != botUserId){
-        //             if(!airSignups.includes(reactUsernameAdd)){
-        //                 //console.log('add: ', reactUsernameAdd);
-        //                 airSignups.push(reactUsernameAdd);
-        //                 console.log('array: ', airSignups);
-        //                 airCount ++;
-
-                        
-        //                 updateEmbed('add', message, airSignups, airCount, 2);
-        //             }
-        //         }
-        //     }
-        //  })
-        //  bot.on('messageReactionRemove', (reaction, user) =>{
-        //     let message = reaction.message;
-        //     let emoji = reaction.emoji;
-
-        //     reactUsernameRemove = user.username;
-        //     //console.log('out: ', user.username);
-        //     if (emoji.name === airEmoji){
-        //         if(message.guild.member(user.id) != botUserId){
-        //             if(airSignups.includes(reactUsernameRemove)){
-        //                 //console.log('remove: ', reactUsernameRemove);
-        //                 const isUsername = (element) => element === reactUsernameRemove;
-        //                 airSignups.splice(airSignups.findIndex(isUsername) ,1);
-        //                 console.log('array: ', airSignups);
-        //                 airCount--;
-
-        //                 updateEmbed('remove', message, airSignups, airCount, 2);
-        //             }
-                    
-        //         }
-        //     }else if (emoji.name === armorEmoji){
-        //         if(message.guild.member(user.id) != botUserId){
-        //             if(armorSignups.includes(reactUsernameRemove)){
-        //                 //console.log('remove: ', reactUsernameRemove);
-        //                 const isUsername = (element) => element === reactUsernameRemove;
-        //                 armorSignups.splice(armorSignups.findIndex(isUsername) ,1);
-        //                 //console.log('array: ', airSignups);
-        //             }
-                    
-        //         }
-        //     }
-        //  })
         
         async function drawEmbed(event){
             const embed = createEmbedForEvent(event);
@@ -196,52 +136,8 @@ module.exports = {
                     } catch (error) {
                         console.log(error);
                     }
-
-                    //bot.message.reactionAdd()
                 })
-        }
-
-        // async function updateEmbed(operation, passedMessage, passedArray, index, fieldIndex){
-            
-        //     if (operation === 'add'){
-        //         //console.log('passed embed: ', passedMessage.embeds[0]);
-        //         //console.log('passed embed field: ', passedMessage.embeds[0].fields[0]);                
-                
-        //         var members = 'empty';
-        //         if(index != 0){
-        //             members = ' ';
-        //             for (let i =0; i < index; i++){
-        //             members += passedArray[i] + '\n ';
-        //             }
-        //         }
-                
-        //         var tempEmbed = await new Discord.MessageEmbed().addField('Air (' + airCount + ')', members, true)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(fieldIndex, 1, tempEmbed.fields[0]));
-        //         //console.log('passed embed field edit: ', passedEmbed[0].fields[0]);
-
-        //         tempEmbed = await new Discord.MessageEmbed().addField('Total number of signups:', infantryCount + armorCount + airCount + slCount)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(4, 1, tempEmbed.fields[0]));
-
-        //     }else if(operation === 'remove'){
-
-        //         var members = 'empty';
-        //         if(index != 0){
-        //             members = ' ';
-        //             for (let i =0; i < index; i++){
-        //             members += passedArray[i] + '\n ';
-        //             }
-        //         }
-
-        //         var tempEmbed = await new Discord.MessageEmbed().addField('Air (' + airCount + ')', members, true)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(fieldIndex, 1, tempEmbed.fields[0]));
-
-        //         tempEmbed = await new Discord.MessageEmbed().addField('Total number of signups:', infantryCount + armorCount + airCount + slCount)
-        //         await passedMessage.edit(passedMessage.embeds[0].spliceFields(4, 1, tempEmbed.fields[0]));
-        //     } 
-
-        // }
-         
-          
+        }      
          
     }
 }
