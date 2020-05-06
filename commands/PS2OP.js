@@ -60,7 +60,10 @@ let didSetupListeners = false;
 
 const botUserId = '706985785529860147';
 
-
+const infantryEmoji = "707719532721995883";
+const airEmoji = "707719532617269280";
+const armorEmoji = "707719532785172581";
+const slEmoji = '⭐';
 
 
 module.exports = {
@@ -70,10 +73,12 @@ module.exports = {
 
         setupListeners(bot);
 
-        const infantryEmoji = bot.emojis.resolve("440825903426043924");
+        //console.log('pepeL emote: ', bot.emojis.resolveIdentifier("440825903426043924"));
+        //const emojiTest = bot.emoji.resolve("440825903426043924");
+        /*const infantryEmoji = bot.emojis.resolve("440825903426043924");
         const airEmoji = bot.emojis.resolve("440825903426043924");
         const armorEmoji = bot.emojis.resolve("440825903426043924");
-        const slEmoji = '⭐';
+        const slEmoji = '⭐';*/
 
         // bot.login(token);
        
@@ -192,16 +197,16 @@ function setupListeners(bot) {
     if (didSetupListeners) return;
 
     bot.on('messageReactionAdd', (reaction, user) => {
-        messageReactionAdded(reaction, user);
+        messageReactionAdded(reaction, user, bot);
     })
     bot.on('messageReactionRemove', (reaction, user) => {
-        messageReactionRemoved(reaction, user);
+        messageReactionRemoved(reaction, user, bot);
     })
 
     didSetupListeners = true;
 }
 
-function messageReactionAdded(reaction, user) {
+function messageReactionAdded(reaction, user, bot) {
     let message = reaction.message;
 
     if (message.guild.member(user.id) == botUserId) return;
@@ -211,14 +216,15 @@ function messageReactionAdded(reaction, user) {
     let username = user.username;
 
     console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-    
-    if (emoji.name === infantryEmoji && !event.infantrySignups.includes(username)) {
+    console.log('emoji identifier: ', bot.emojis.resolveIdentifier(armorEmoji)/*.substring().split(":", 1).toString()*/);
+
+    if (emoji.name === bot.emojis.resolveIdentifier(infantryEmoji).substring().split(":", 1).toString() && !event.infantrySignups.includes(username)) {
         event.addInfantrySignup(username);
     }
-    else if (emoji.name === armorEmoji && !event.armorSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(armorEmoji).substring().split(":", 1).toString() && !event.armorSignups.includes(username)) {
         event.addArmorSignup(username);
     }
-    else if (emoji.name === airEmoji && !event.airSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(airEmoji).substring().split(":", 1).toString() && !event.airSignups.includes(username)) {
         event.addAirSignup(username);
     }
     else if (emoji.name === slEmoji && !event.slSignups.includes(username)) {
@@ -228,7 +234,7 @@ function messageReactionAdded(reaction, user) {
     updateEmbedForEvent(message, event);
 }
 
-function messageReactionRemoved(reaction, user) {
+function messageReactionRemoved(reaction, user, bot) {
     let message = reaction.message;
 
     if (message.guild.member(user.id) == botUserId) return;
@@ -239,13 +245,13 @@ function messageReactionRemoved(reaction, user) {
 
     console.log('Event: ' + event.name + ', Signoff: ' + emoji.name + ', User: ' + username);
     
-    if (emoji.name === infantryEmoji && event.infantrySignups.includes(username)) {
+    if (emoji.name === bot.emojis.resolveIdentifier(infantryEmoji).substring().split(":", 1).toString() && event.infantrySignups.includes(username)) {
         event.removeInfantrySignup(username);
     }
-    else if (emoji.name === armorEmoji && event.armorSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(armorEmoji).substring().split(":", 1).toString() && event.armorSignups.includes(username)) {
         event.removeArmorSignup(username);
     }
-    else if (emoji.name === airEmoji && event.airSignups.includes(username)) {
+    else if (emoji.name === bot.emojis.resolveIdentifier(airEmoji).substring().split(":", 1).toString() && event.airSignups.includes(username)) {
         event.removeAirSignup(username);
     }
     else if (emoji.name === slEmoji && event.slSignups.includes(username)) {
