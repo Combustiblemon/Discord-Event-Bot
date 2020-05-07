@@ -9,6 +9,7 @@
   "author": "CombustibleLemon",
   "license": "ISC",
   "dependencies": {
+    "csv": "^5.3.2",
     "discord.js": "^12.2.0"
   }
 }
