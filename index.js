@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
-const token = 'NzA2OTg1Nzg1NTI5ODYwMTQ3.XrCOMg.7yEAj4qRpayf5W0QhOKyBed_-Yo';
+const token = 'NzA3NTk0OTMxMjg3NDkwNjEx.XrQNew.wAatEjUmwlBafHtHm0z7t-e_CI4';
 const PREFIX = '$';
 
 const fs = require('fs');
@@ -36,8 +36,12 @@ bot.on('message', message=>{
             }
             else if(args[1] === 'PS2OP'){
                 bot.commands.get('PS2OP').execute(bot, message, args, token);
-            }else if(args[1] === 'PS2Training'){
+            }
+            else if(args[1] === 'PS2Training'){
                 bot.commands.get('PS2Training').execute(bot, message, args, token);
+            }
+            else if(args[1] === 'TestOp'){
+                bot.commands.get('TestOp').execute(bot, message, args, token);
             }
             
         break;
