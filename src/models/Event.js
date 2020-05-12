@@ -31,6 +31,6 @@ module.exports = class Event {
      * @returns {SignupOption}
      */
     getSingupOptionForEmoji(emoji) {
-        return this.signupOptions.find(s => s.emoji == emoji);
+        return this.signupOptions.find(s => s.emoji == emoji.name || s.emoji == emoji.id);
     }
 }
