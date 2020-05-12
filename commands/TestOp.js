@@ -35,7 +35,7 @@ module.exports = {
                                         
                                         let event = createTestEvent(eventName, eventTime, eventDescription);
 
-                                        new EventService().newEvent(bot, message.channel, event);
+                                        EventService.newEvent(bot, message.channel, event);
                                     }).catch(error =>{
                                         console.log(error);
                                         message.channel.send('No description was entered.');

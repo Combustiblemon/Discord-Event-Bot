@@ -3,12 +3,7 @@ const Discord = require('discord.js');
 
 const botUserId = '707594931287490611';
 
-module.exports = class EventService {
-
-    /**
-     * @type {EventService}
-     */
-    static sharedInstance;
+class EventService {
 
     /**
      * @type {Object}
@@ -19,12 +14,6 @@ module.exports = class EventService {
      * @type {boolean}
      */
     didSetupListeners = false;
-
-    constructor() {
-        if (sharedInstance) return sharedInstance;
-        
-        sharedInstance = this;
-    }
 
     /**
      * 
@@ -235,4 +224,4 @@ module.exports = class EventService {
     }
 }
 
-const sharedInstance = new EventService();
+module.exports = new EventService();
