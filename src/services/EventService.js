@@ -1,9 +1,12 @@
 const BotEvent = require('../models/Event');
+const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 
 const botUserId = '706985785529860147';
 
 class EventService {
+
+    
 
     /**
      * @type {Object}
@@ -56,7 +59,26 @@ class EventService {
      */
     async editEmbedForEvent(message, event) {
         const embed = this.createEmbedForEvent(event);
-        console.log(message);
+        //console.log(message.embeds[0].title);
+        //console.log(event.signupOptions[0].signups);
+        var testArray = new Array(event.signupOptions.length);
+
+        for(let i = 0; i <= event.signupOptions.length-1; i++){
+            testArray[i] = [[event.signupOptions[i].name],['\"' + event.signupOptions[i].signups + '\"']]; 
+        }
+
+        
+        const csvWriter = createCsvWriter({
+            header: ['Aspect', 'Names'],
+            path: ('csv_files/' + event.name + '.csv')
+        });
+
+        csvWriter.writeRecords(testArray)
+            .then(() => {
+                console.log('Done writing file ' + event.name + '.csv');
+            });
+
+        console.log(testArray);
     
         await message.edit(message.embeds[0] = embed);
     }
@@ -74,6 +96,7 @@ class EventService {
             .setColor(0xF1C40F);
 
         let embedCount = 0;
+        
 
         event.signupOptions.forEach(signupOption => {
             // Additional roles are displayed on a separate line

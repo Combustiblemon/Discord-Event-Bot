@@ -48,15 +48,15 @@ bot.on('message', message=>{
         break;
 
         case 'csvTest':
-            let filename = ' '
-            let eventTest = 'Test Event'
+            let filename = ' ';
+            let eventTest = 'Test Event';
 
-            filename = 'csv_files/'+eventTest+'\'';
-            console.out(filename);
+            filename = 'csv_files/' + eventTest + '.csv';
+            console.log(filename);
 
             const csvWriter = createCsvWriter({
                 header: ['NAME', 'LANGUAGE'],
-                path: 'csv_files/test.csv'
+                path: filename
             });
 
             const records = [
