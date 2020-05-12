@@ -1,7 +1,7 @@
 const BotEvent = require('../models/Event');
 const Discord = require('discord.js');
 
-const botUserId = '707594931287490611';
+const botUserId = '706985785529860147';
 
 class EventService {
 

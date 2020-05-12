@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
+const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const bot = new Discord.Client();
-const token = 'NzA3NTk0OTMxMjg3NDkwNjEx.XrQNew.wAatEjUmwlBafHtHm0z7t-e_CI4';
+const token = 'NzA2OTg1Nzg1NTI5ODYwMTQ3.XrqCmQ.idV_gV8ZErJF1ehrfruAFLkd_AE';
 const PREFIX = '$';
 
 const fs = require('fs');
@@ -44,6 +45,29 @@ bot.on('message', message=>{
                 bot.commands.get('TestOp').execute(bot, message, args, token);
             }
             
+        break;
+
+        case 'csvTest':
+            let filename = ' '
+            let eventTest = 'Test Event'
+
+            filename = 'csv_files/'+eventTest+'\'';
+            console.out(filename);
+
+            const csvWriter = createCsvWriter({
+                header: ['NAME', 'LANGUAGE'],
+                path: 'csv_files/test.csv'
+            });
+
+            const records = [
+                ['Bob',  'French, English'],
+                ['Mary', 'English']
+            ];
+
+            csvWriter.writeRecords(records)       // returns a promise
+                .then(() => {
+                    console.log('...Done');
+                });
         break;
 
 
