@@ -73,9 +73,10 @@ function createTestEvent(name, description, time) {
         time, 
         description, 
         [
-            new SignupOption('🔫', 'Infantry', false, []),
-            new SignupOption('🚌', 'Armor', false, []),
-            new SignupOption('✈️', 'Air', false, []),
+            new SignupOption('707719532721995883', 'Infantry', false, []),
+            new SignupOption('707719532617269280', 'Armor', false, []),
+            new SignupOption('707719532785172581', 'Air', false, []),
             new SignupOption('⭐', 'Squad Leaders', true, [])
-        ])
+        ]
+    )
 }

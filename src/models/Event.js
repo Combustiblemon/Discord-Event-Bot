@@ -1,4 +1,5 @@
 const SignupOption = require('./SignupOption');
+const Discord = require('discord.js');
 
 module.exports = class Event {
 
@@ -27,10 +28,10 @@ module.exports = class Event {
     }
 
     /**
-     * @param {string} emoji
+     * @param {Discord.Emoji} emoji
      * @returns {SignupOption}
      */
     getSingupOptionForEmoji(emoji) {
-        return this.signupOptions.find(s => s.emoji == emoji);
+        return this.signupOptions.find(s => s.emoji == emoji.name || s.emoji == emoji.id);
     }
 }

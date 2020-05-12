@@ -167,10 +167,10 @@ class EventService {
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
-        let signupOption = event.getSingupOptionForEmoji(emoji.name);
+        let signupOption = event.getSingupOptionForEmoji(emoji);
 
         if (!signupOption) {
-            console.log('No signup option for emoji: ' + emoji.name);
+            console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
             return;
         }
 
@@ -206,7 +206,7 @@ class EventService {
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
-        let signupOption = event.getSingupOptionForEmoji(emoji.name);
+        let signupOption = event.getSingupOptionForEmoji(emoji);
 
         if (!signupOption) {
             console.log('No signup option for emoji: ' + emoji.name);
