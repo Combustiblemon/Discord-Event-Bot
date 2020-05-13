@@ -1,10 +1,11 @@
 const BotEvent = require('../models/Event');
+const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
 class EventService {
-
+    
     /**
      * @type {Object}
      */
@@ -56,8 +57,29 @@ class EventService {
      */
     async editEmbedForEvent(message, event) {
         const embed = this.createEmbedForEvent(event);
+        //console.log(message.embeds[0].title);
+        //console.log(event.signupOptions[0].signups);
+        var testArray = new Array(event.signupOptions.length);
+
+        for(let i = 0; i <= event.signupOptions.length-1; i++){
+            testArray[i] = [[event.signupOptions[i].name],['\"' + event.signupOptions[i].signups + '\"']]; 
+        }
+
+        
+        const csvWriter = createCsvWriter({
+            header: event.getHeader(),
+            path: ('csv_files/' + event.name + '.csv')
+        });
+
+        
+
+        //console.log(testArray);
     
         await message.edit(message.embeds[0] = embed);
+        await csvWriter.writeRecords(testArray)
+            .then(() => {
+                console.log('Done writing file: ' + event.name + '.csv');
+            });
     }
 
     /**
@@ -71,23 +93,45 @@ class EventService {
             .setDescription(event.description)
             .setFooter(event.time)
             .setColor(0xF1C40F);
+            
 
         let embedCount = 0;
+        let signupOptionsField = ' ';
+        
+        
 
         event.signupOptions.forEach(signupOption => {
             // Additional roles are displayed on a separate line
-            const isInline = !signupOption.isAdditionalRole;
-
-            embed.addField(
-                signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
-                this.createMembersListFromSignups(signupOption.signups),
-                isInline
-            );
+            
+            if(!signupOption.isAdditionalRole){
+                signupOptionsField += signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')\n';
+            }/*else {
+                embed.addField(
+                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
+                    this.createMembersListFromSignups(signupOption.signups)
+                );
+            }*/
+            
 
             embedCount++;
         })
 
-        embed.addField('Total number of signups:', event.getTotalSignups());
+        embed.addField('Total number of signups:' + event.getTotalSignups(), signupOptionsField);
+
+        event.signupOptions.forEach(signupOption => {
+            
+            
+            if(signupOption.isAdditionalRole){
+                embed.addField(
+                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
+                    this.createMembersListFromSignups(signupOption.signups)
+                );
+            }
+            
+
+            embedCount++;
+        })
+                
 
         return embed;
     }
@@ -209,7 +253,7 @@ class EventService {
         let signupOption = event.getSingupOptionForEmoji(emoji);
 
         if (!signupOption) {
-            console.log('No signup option for emoji: ' + emoji.name);
+            console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
             return;
         }
 

@@ -21,24 +21,24 @@ module.exports = {
                 eventName = collected.first().content;
 
                 message.channel.bulkDelete(2).catch(console.error);
-                message.channel.send('What time is the OP?').then(() =>{
+                message.channel.send('Write a short description of the OP.').then(() =>{
                     message.channel.awaitMessages(filter, {max: 1, time: 300000, errors: ['time'] })
                         .then(collected => {
-                            eventTime = collected.first().content;
+                            eventDescription = collected.first().content;
 
                             message.channel.bulkDelete(2).catch(console.error);
-                            message.channel.send('Write a short description of the OP.').then(() =>{
+                            message.channel.send('What time is the OP?').then(() =>{
                                 message.channel.awaitMessages(filter, {max: 1, time: 300000, errors: ['time'] })
                                     .then(collected =>{
-                                        eventDescription = collected.first().content;
+                                        eventTime = collected.first().content;
                                         message.channel.bulkDelete(2).catch(console.error);
                                         
-                                        let event = createTestEvent(eventName, eventTime, eventDescription);
+                                        let event = createTestEvent(eventName, eventDescription, eventTime, 'Aspect Test', 'Name Test');
 
                                         EventService.newEvent(bot, message.channel, event);
                                     }).catch(error =>{
                                         console.log(error);
-                                        message.channel.send('No description was entered.');
+                                        message.channel.send('No time was entered.');
                                         message.channel.bulkDelete(2).catch(console.error);
                                     })
                                 })
@@ -46,7 +46,7 @@ module.exports = {
 
                     }).catch(error =>{
                         console.log(error);
-                        message.channel.send('No time was entered.');
+                        message.channel.send('No description was entered.');
                         message.channel.bulkDelete(2).catch(console.error);
                     })
                 })
@@ -67,16 +67,17 @@ module.exports = {
 /**
  * @returns {Event}
  */
-function createTestEvent(name, description, time) {
+function createTestEvent(name, description, time, header1, header2) {
     return new Event(
         name, 
         time, 
-        description, 
+        description,
+        header1,
+        header2, 
         [
             new SignupOption('707719532721995883', 'Infantry', false, []),
-            new SignupOption('707719532617269280', 'Armor', false, []),
+            new SignupOption('707719532617269280', 'Armour', false, []),
             new SignupOption('707719532785172581', 'Air', false, []),
             new SignupOption('⭐', 'Squad Leaders', true, [])
-        ]
-    )
+        ])
 }
