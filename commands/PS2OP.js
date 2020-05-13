@@ -2,76 +2,43 @@ const Discord = require('discord.js');
 const Event = require('../src/models/Event');
 const SignupOption = require('../src/models/SignupOption');
 const EventService = require('../src/services/EventService');
+const EventDetailsService = require('../src/services/EventDetailsService');
 
 module.exports = {
     name: 'PS2OP',
     description: 'Sets up a PS2 op',
-    execute(bot, message, args, token) {
-       
-        eventName = ' ';
-        eventTime = ' ';
-        eventDescription = ' ';
+    /**
+     * 
+     * @param {Discord.Client} bot 
+     * @param {Discord.Message} message 
+     * @param {any} args
+     * @param {string} token 
+     */
+    async execute(bot, message, args, token) {
 
-        const filter = m => m.author.id === message.author.id;
-        message.channel.bulkDelete(1).catch(console.error);
-        
-        message.channel.send('What is the name of the OP?').then(() => {
-            message.channel.awaitMessages(filter, {max: 1, time: 600000, errors :['time'] })
-            .then(collected => {
-                eventName = collected.first().content;
+        let textChannel = message.channel;
 
-                message.channel.bulkDelete(2).catch(console.error);
-                message.channel.send('Write a short description of the OP.').then(() =>{
-                    message.channel.awaitMessages(filter, {max: 1, time: 600000, errors: ['time'] })
-                        .then(collected => {
-                            eventDescription = collected.first().content;
+        // Delete the command message
+        textChannel.bulkDelete(1).catch(console.error);
 
-                            message.channel.bulkDelete(2).catch(console.error);
-                            message.channel.send('What time is the OP?').then(() =>{
-                                message.channel.awaitMessages(filter, {max: 1, time: 600000, errors: ['time'] })
-                                    .then(collected =>{
-                                        eventTime = collected.first().content;
-                                        message.channel.bulkDelete(2).catch(console.error);
-                                        
-                                        let event = createEvent(eventName, eventDescription, eventTime, 'Position', 'Name');
+        let eventDetailsService = new EventDetailsService('OP', textChannel, message.author.id);
+        let eventDetails = await eventDetailsService.requestEventDetails();
 
-                                        EventService.newEvent(bot, message.channel, event);
-                                    }).catch(error =>{
-                                        console.log(error);
-                                        message.channel.send('No time was entered.');
-                                        message.channel.bulkDelete(2).catch(console.error);
-                                    })
-                                })
-                            
+        let event = createEvent(eventDetails, 'Position', 'Name');
 
-                    }).catch(error =>{
-                        console.log(error);
-                        message.channel.send('No description was entered.');
-                        message.channel.bulkDelete(2).catch(console.error);
-                    })
-                })
-            }).catch(error =>{
-                console.log(error);
-                message.channel.send('No name was entered.');
-                message.channel.bulkDelete(2).catch(console.error);
-            })
-
-        });
-
-        message.channel.fetch();
+        EventService.newEvent(bot, textChannel, event);
     }
-
-    
 }
 
 /**
+ * @param {EventDetails} eventDetails
+ * @param {string} header1
+ * @param {string} header2
  * @returns {Event}
  */
-function createEvent(name, description, time, header1, header2) {
+function createEvent(eventDetails, header1, header2) {
     return new Event(
-        name, 
-        time, 
-        description,
+        eventDetails,
         header1,
         header2, 
         [

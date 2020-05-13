@@ -12,7 +12,8 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"dbaeumer.vscode-eslint",
-		"mhutchie.git-graph"
+		"mhutchie.git-graph",
+		"grapecity.gc-excelviewer"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
