@@ -69,18 +69,19 @@ class EventService {
 
         
         const csvWriter = createCsvWriter({
-            header: ['Aspect', 'Names'],
+            header: event.getHeader(),
             path: ('csv_files/' + event.name + '.csv')
         });
 
-        csvWriter.writeRecords(testArray)
-            .then(() => {
-                console.log('Done writing file ' + event.name + '.csv');
-            });
+        
 
-        console.log(testArray);
+        //console.log(testArray);
     
         await message.edit(message.embeds[0] = embed);
+        await csvWriter.writeRecords(testArray)
+            .then(() => {
+                console.log('Done writing file: ' + event.name + '.csv');
+            });
     }
 
     /**
@@ -94,24 +95,45 @@ class EventService {
             .setDescription(event.description)
             .setFooter(event.time)
             .setColor(0xF1C40F);
+            
 
         let embedCount = 0;
+        let signupOptionsField = ' ';
+        
         
 
         event.signupOptions.forEach(signupOption => {
             // Additional roles are displayed on a separate line
-            const isInline = !signupOption.isAdditionalRole;
-
-            embed.addField(
-                signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
-                this.createMembersListFromSignups(signupOption.signups),
-                isInline
-            );
+            
+            if(!signupOption.isAdditionalRole){
+                signupOptionsField += signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')\n';
+            }/*else {
+                embed.addField(
+                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
+                    this.createMembersListFromSignups(signupOption.signups)
+                );
+            }*/
+            
 
             embedCount++;
         })
 
-        embed.addField('Total number of signups:', event.getTotalSignups());
+        embed.addField('Total number of signups:' + event.getTotalSignups(), signupOptionsField);
+
+        event.signupOptions.forEach(signupOption => {
+            
+            
+            if(signupOption.isAdditionalRole){
+                embed.addField(
+                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
+                    this.createMembersListFromSignups(signupOption.signups)
+                );
+            }
+            
+
+            embedCount++;
+        })
+                
 
         return embed;
     }

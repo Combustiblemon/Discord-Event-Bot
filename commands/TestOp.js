@@ -33,7 +33,7 @@ module.exports = {
                                         eventTime = collected.first().content;
                                         message.channel.bulkDelete(2).catch(console.error);
                                         
-                                        let event = createTestEvent(eventName, eventDescription, eventTime);
+                                        let event = createTestEvent(eventName, eventDescription, eventTime, 'Aspect Test', 'Name Test');
 
                                         EventService.newEvent(bot, message.channel, event);
                                     }).catch(error =>{
@@ -67,11 +67,13 @@ module.exports = {
 /**
  * @returns {Event}
  */
-function createTestEvent(name, description, time) {
+function createTestEvent(name, description, time, header1, header2) {
     return new Event(
         name, 
         time, 
-        description, 
+        description,
+        header1,
+        header2, 
         [
             new SignupOption('707719532721995883', 'Infantry', false, []),
             new SignupOption('707719532617269280', 'Armour', false, []),
