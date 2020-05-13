@@ -31,34 +31,25 @@ bot.on('message', message=>{
     //args is what a person types after the prefix. args[0] is the first word($ping)
     switch(args[0]){
         case 'event':
-            if(!args[1]) {
-                if(!message.guild === null){
-                    message.channel.bulkDelete(1);
+            if(!(message.guild === null)){
+                if(!args[1]) {
+                        message.channel.bulkDelete(1);
+                    message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5) \n\n'
+                                        + 'List of current events: \n' 
+                                        + 'PS2 Ops ($event PS2OP)```' );
                 }
-                message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5) \n\n'
-                                    + 'List of current events: \n' 
-                                    + 'PS2 Ops ($event PS2OP)```' );
-            }
-            else if(args[1] === 'PS2OP'){
-                if(!message.guild === null){
-                    bot.commands.get('PS2OP').execute(bot, message, args, token);
-                }else {
-                    message.author.send('Please use the command in a server channel.');
+                else if(args[1] === 'PS2OP'){
+                        bot.commands.get('PS2OP').execute(bot, message, args, token);
                 }
-            }
-            else if(args[1] === 'PS2Training'){
-                if(!message.guild === null){
-                    bot.commands.get('PS2Training').execute(bot, message, args, token);
-                }else {
-                    message.author.send('Please use the command in a server channel.');
+                else if(args[1] === 'PS2Training'){
+                        bot.commands.get('PS2Training').execute(bot, message, args, token);
                 }
-            }
-            else if(args[1] === 'TestOp'){
-                if(!message.guild === null){
-                    bot.commands.get('TestOp').execute(bot, message, args, token);
-                }else {
-                    message.author.send('Please use the command in a server channel.');
+                else if(args[1] === 'TestOp'){
+                        bot.commands.get('TestOp').execute(bot, message, args, token); 
                 }
+                
+            }else {
+                message.author.send('Please use the command in a server channel.');
             }
             
         break;
