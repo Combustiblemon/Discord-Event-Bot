@@ -34,9 +34,8 @@ bot.on('message', message=>{
             if(!(message.guild === null)){
                 if(!args[1]) {
                         message.channel.bulkDelete(1);
-                    message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5) \n\n'
-                                        + 'List of current events: \n' 
-                                        + 'PS2 Ops ($event PS2OP)```' );
+                        message.author.send('You need to enter a second argument. For a list of commands write $help.');
+                    
                 }
                 else if(args[1] === 'PS2OP'){
                         bot.commands.get('PS2OP').execute(bot, message, args, token);
@@ -46,35 +45,25 @@ bot.on('message', message=>{
                 }
                 else if(args[1] === 'TestOp'){
                         bot.commands.get('TestOp').execute(bot, message, args, token); 
+                }else{
+                    message.channel.bulkDelete(1);
+                    message.author.send('No command with name \"' + args[1] + '\". For a list of commands write $help.')
                 }
-                
+
             }else {
                 message.author.send('Please use the command in a server channel.');
             }
             
         break;
 
-        case 'csvTest':
-            let filename = ' ';
-            let eventTest = 'Test Event';
-
-            filename = 'csv_files/' + eventTest + '.csv';
-            console.log(filename);
-
-            const csvWriter = createCsvWriter({
-                header: ['NAME', 'LANGUAGE'],
-                path: filename
-            });
-
-            const records = [
-                ['Bob',  'French, English'],
-                ['Mary', 'English']
-            ];
-
-            csvWriter.writeRecords(records)       // returns a promise
-                .then(() => {
-                    console.log('...Done');
-                });
+        case 'help':
+            if(!(message.guild === null)){
+                message.channel.bulkDelete(1);
+            }
+            message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5) \n\n'
+                                            + 'List of current events: \n' 
+                                            + 'PS2 Ops ($event PS2OP)\n'
+                                            + 'PS2 Training ($event PS2Training)```' );
         break;
 
 
