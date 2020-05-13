@@ -2,14 +2,12 @@ const BotEvent = require('../models/Event');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 
-const botUserId = '706985785529860147';
+const botUserId = process.env.DISCORD_BOT_USER_ID;
 
 let csvEmoji = '📋';
 
 class EventService {
-
     
-
     /**
      * @type {Object}
      */
