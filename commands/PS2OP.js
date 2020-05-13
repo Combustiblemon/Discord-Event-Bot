@@ -16,19 +16,19 @@ module.exports = {
         message.channel.bulkDelete(1).catch(console.error);
         
         message.channel.send('What is the name of the OP?').then(() => {
-            message.channel.awaitMessages(filter, {max: 1, time: 300000, errors :['time'] })
+            message.channel.awaitMessages(filter, {max: 1, time: 600000, errors :['time'] })
             .then(collected => {
                 eventName = collected.first().content;
 
                 message.channel.bulkDelete(2).catch(console.error);
                 message.channel.send('Write a short description of the OP.').then(() =>{
-                    message.channel.awaitMessages(filter, {max: 1, time: 300000, errors: ['time'] })
+                    message.channel.awaitMessages(filter, {max: 1, time: 600000, errors: ['time'] })
                         .then(collected => {
                             eventDescription = collected.first().content;
 
                             message.channel.bulkDelete(2).catch(console.error);
                             message.channel.send('What time is the OP?').then(() =>{
-                                message.channel.awaitMessages(filter, {max: 1, time: 300000, errors: ['time'] })
+                                message.channel.awaitMessages(filter, {max: 1, time: 600000, errors: ['time'] })
                                     .then(collected =>{
                                         eventTime = collected.first().content;
                                         message.channel.bulkDelete(2).catch(console.error);
