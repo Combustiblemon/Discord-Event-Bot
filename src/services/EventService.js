@@ -63,29 +63,28 @@ class EventService {
      */
     async editEmbedForEvent(message, event) {
         const embed = this.createEmbedForEvent(event);
-        //console.log(message.embeds[0].title);
-        //console.log(event.signupOptions[0].signups);
-        var testArray = new Array(event.signupOptions.length);
+        
+        var testArray = new Array();
+        
+        event.signupOptions.forEach(signupOption => {
+            signupOption.signups.forEach(signup => {
+                testArray.push([signupOption.name, signup]);
+            });
+        });
 
-        for(let i = 0; i <= event.signupOptions.length-1; i++){
-            testArray[i] = [[event.signupOptions[i].name],['\"' + event.signupOptions[i].signups + '\"']]; 
-        }
-
+        // for(let i = 0; i <= event.signupOptions.length-1; i++){
+        //     testArray[i] = [[event.signupOptions[i].name],['\"' + event.signupOptions[i].signups + '\"']]; 
+        // }
         
         const csvWriter = createCsvWriter({
             header: event.getHeader(),
             path: ('csv_files/' + event.name + '.csv')
         });
-
-        
-
-        //console.log(testArray);
     
         await message.edit(message.embeds[0] = embed);
-        await csvWriter.writeRecords(testArray)
-            .then(() => {
-                console.log('Done writing file: ' + event.name + '.csv');
-            });
+        await csvWriter.writeRecords(testArray);
+
+        console.log('Done writing file: ' + event.name + '.csv');
     }
 
     /**
