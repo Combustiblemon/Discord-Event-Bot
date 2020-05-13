@@ -21,9 +21,8 @@ module.exports = {
         // Delete the command message
         textChannel.bulkDelete(1).catch(console.error);
 
-        let eventDetailsService = new EventDetailsService();
-        let eventDetails = await eventDetailsService
-            .requestEventDetailsInChannel('TestOp', textChannel, message.author.id);
+        let eventDetailsService = new EventDetailsService('TestOp', textChannel, message.author.id);
+        let eventDetails = await eventDetailsService.requestEventDetails();
 
         let event = createTestEvent(
             eventDetails.name, 
