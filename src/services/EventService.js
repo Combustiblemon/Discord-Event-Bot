@@ -71,10 +71,6 @@ class EventService {
                 testArray.push([signupOption.name, signup]);
             });
         });
-
-        // for(let i = 0; i <= event.signupOptions.length-1; i++){
-        //     testArray[i] = [[event.signupOptions[i].name],['\"' + event.signupOptions[i].signups + '\"']]; 
-        // }
         
         const csvWriter = createCsvWriter({
             header: event.getHeader(),
