@@ -4,6 +4,8 @@ const Discord = require('discord.js');
 
 const botUserId = '706985785529860147';
 
+let csvEmoji = '📋';
+
 class EventService {
 
     
@@ -38,6 +40,8 @@ class EventService {
     async postEmbedForEvent(channel, event) {
         const embed = this.createEmbedForEvent(event);
 
+        let csvEmoji = '📋';
+
         await channel.send(embed)
             .then(async embed => {
                 this.saveEventForMessageId(event, embed.id);
@@ -46,6 +50,8 @@ class EventService {
                     await event.signupOptions.forEach(signupOption => {
                         embed.react(signupOption.emoji);
                     });
+
+                    await embed.react(csvEmoji);
                 } catch (error) {
                     console.log(error);
                 }
@@ -214,6 +220,16 @@ class EventService {
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
+        //console.log(signupOption);
+
+        if(signupOption == csvEmoji){
+            user.send('CSV file for ' + event.name +'.\n', {files: [
+                ('./csv_files/' + event.name + '.csv')
+            ]});
+            message.reactions.resolve(csvEmoji).users.remove(user.id);
+            
+            return;
+        }
 
         if (!signupOption) {
             console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
@@ -224,6 +240,8 @@ class EventService {
             console.log('User ' + username + ' is already signed up for ' + event.name);
             return;
         }
+
+        
 
         signupOption.addSignup(username);
     
@@ -253,6 +271,10 @@ class EventService {
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
+        
+        if(signupOption == csvEmoji){
+            return;
+        }
 
         if (!signupOption) {
             console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
