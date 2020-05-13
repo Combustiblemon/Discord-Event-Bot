@@ -1,24 +1,22 @@
 const SignupOption = require('./SignupOption');
+const EventDetails = require('./EventDetails');
 
 module.exports = class Event {
 
     /**
      * 
-     * @param {string} name 
-     * @param {string} time 
-     * @param {string} description
+     * @param {EventDetails} eventDetails
      * @param {string} header1
      * @param {string} header2 
      * @param {SignupOption[]} signupOptions
      */
-    constructor(name, time, description, header1, header2, signupOptions) {
-        this.name = name;
-        this.time = time;
-        this.description = description;
+    constructor(eventDetails, header1, header2, signupOptions) {
+        this.name = eventDetails.name;
+        this.description = eventDetails.description;
+        this.date = eventDetails.date;
         this.header1 = header1;
         this.header2 = header2;
         this.signupOptions = signupOptions;
-        
     }
 
     /**

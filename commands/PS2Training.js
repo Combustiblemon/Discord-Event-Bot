@@ -24,30 +24,24 @@ module.exports = {
         let eventDetailsService = new EventDetailsService('Training', textChannel, message.author.id);
         let eventDetails = await eventDetailsService.requestEventDetails();
 
-        let event = createEvent(
-            eventDetails.name, 
-            eventDetails.description, 
-            eventDetails.time, 
-            '', 
-            'Name'
-        );
+        let event = createEvent(eventDetails, 'Position', 'Name');
 
         EventService.newEvent(bot, textChannel, event);
     }
 }
 
 /**
+ * @param {EventDetails} eventDetails
+ * @param {string} header1
+ * @param {string} header2
  * @returns {Event}
  */
-function createEvent(name, description, time, header1, header2) {
+function createEvent(eventDetails, header1, header2) {
     return new Event(
-        name, 
-        time, 
-        description,
+        eventDetails,
         header1,
         header2, 
         [
-            new SignupOption('✅', 'Signups', false, []),
-            
+            new SignupOption('✅', 'Trainee', false, [])
         ])
 }

@@ -5,11 +5,11 @@ module.exports = class Event {
      * 
      * @param {string} name
      * @param {string} description
-     * @param {string} time 
+     * @param {Date} date 
      */
-    constructor(name, description, time) {
+    constructor(name, description, date) {
         this.name = name;
         this.description = description; 
-        this.time = time;       
+        this.date = date;       
     }
 }

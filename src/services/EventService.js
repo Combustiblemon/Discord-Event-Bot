@@ -97,47 +97,50 @@ class EventService {
         let embed = new Discord.MessageEmbed()
             .setTitle(event.name)
             .setDescription(event.description)
-            .setFooter(event.time)
             .setColor(0xF1C40F);
-            
 
-        let embedCount = 0;
-        let signupOptionsField = ' ';
+        let dateOptions = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        }
+
+        embed.addField('Date', event.date.toLocaleDateString('en-US', dateOptions));
+
+        let timeOptions = {
+            timeZone: 'UTC',
+            timeZoneName: 'short',
+            hourCycle: 'h23'
+        }
+
+        let startTime = event.date.toLocaleTimeString('en-GB', timeOptions);
+
+        let startTimeField = `${startTime}\nhttps://google.com/search?q=${encodeURI(startTime)}`
         
+        embed.addField('Start time', startTimeField);
         
-
+        let signupOptionsField = '';
+        
         event.signupOptions.forEach(signupOption => {
-            // Additional roles are displayed on a separate line
-            
-            if(!signupOption.isAdditionalRole){
-                signupOptionsField += signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')\n';
-            }/*else {
-                embed.addField(
-                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
-                    this.createMembersListFromSignups(signupOption.signups)
-                );
-            }*/
-            
-
-            embedCount++;
-        })
-
-        embed.addField('Total number of signups:' + event.getTotalSignups(), signupOptionsField);
-
-        event.signupOptions.forEach(signupOption => {
-            
-            
-            if(signupOption.isAdditionalRole){
-                embed.addField(
-                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
-                    this.createMembersListFromSignups(signupOption.signups)
-                );
-            }
-            
-
-            embedCount++;
-        })
+            if (signupOption.isAdditionalRole) return;
                 
+            signupOptionsField += `${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
+        });
+
+        embed.addField(
+            `Total number of signups: ${ event.getTotalSignups()}`, 
+            signupOptionsField
+        );
+
+        event.signupOptions.forEach(signupOption => {
+            if (!signupOption.isAdditionalRole) return;
+
+            embed.addField(
+                `${signupOption.name}: ${signupOption.getNumberOfSignups()}`,
+                this.createMembersListFromSignups(signupOption.signups)
+            );
+        });
 
         return embed;
     }
@@ -218,7 +221,6 @@ class EventService {
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
-        //console.log(signupOption);
 
         if(signupOption == csvEmoji){
             user.send('CSV file for ' + event.name +'.\n', {files: [
@@ -238,8 +240,6 @@ class EventService {
             console.log('User ' + username + ' is already signed up for ' + event.name);
             return;
         }
-
-        
 
         signupOption.addSignup(username);
     
