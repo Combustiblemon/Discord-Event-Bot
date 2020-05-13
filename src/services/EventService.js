@@ -38,8 +38,6 @@ class EventService {
     async postEmbedForEvent(channel, event) {
         const embed = this.createEmbedForEvent(event);
 
-        let csvEmoji = '📋';
-
         await channel.send(embed)
             .then(async embed => {
                 this.saveEventForMessageId(event, embed.id);
