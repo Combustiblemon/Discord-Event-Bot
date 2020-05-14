@@ -6,16 +6,14 @@ module.exports = class Event {
     /**
      * 
      * @param {EventDetails} eventDetails
-     * @param {string} header1
-     * @param {string} header2 
+     * @param {Array} header
      * @param {SignupOption[]} signupOptions
      */
-    constructor(eventDetails, header1, header2, signupOptions) {
+    constructor(eventDetails, header, signupOptions) {
         this.name = eventDetails.name;
         this.description = eventDetails.description;
         this.date = eventDetails.date;
-        this.header1 = header1;
-        this.header2 = header2;
+        this.header = header;
         this.signupOptions = signupOptions;
     }
 
@@ -44,8 +42,6 @@ module.exports = class Event {
      * @returns {Header[]}
      */
     getHeader(){
-        let header = [this.header1, this.header2]; 
-
-        return header;
+        return this.header;
     }
 }
