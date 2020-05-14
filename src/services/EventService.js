@@ -219,8 +219,7 @@ class EventService {
             user.send('CSV file for ' + event.name +'.\n', {files: [
                 ('./csv_files/' + event.name + '.csv')
             ]});
-            message.reactions.resolve(csvEmoji).users.remove(user.id);
-            
+            reaction.users.remove(user.id);
             return;
         }
 
@@ -229,9 +228,23 @@ class EventService {
             return;
         }
 
-        if (signupOption.signups.find(s => s == username)) {
-            console.log('User ' + username + ' is already signed up for ' + event.name);
-            return;
+        if (signupOption.isAdditionalRole) {
+            if (signupOption.signups.find(s => s == username)) {
+                console.log(`User ${username} is already signed up for ${event.name} as ${signupOption.name}`);
+                return;
+            }
+        }   
+        else {
+            let allSignups = event.signupOptions
+                .filter(so => !so.isAdditionalRole)
+                .map(so => so.signups)
+                .flat(1);
+
+            if (allSignups.find(s => s == username)) {
+                console.log('User ' + username + ' is already signed up for ' + event.name);
+                reaction.users.remove(user.id);
+                return;
+            }
         }
 
         signupOption.addSignup(username);
