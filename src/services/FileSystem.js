@@ -80,6 +80,16 @@ class FileSystem{
     async getEmbedID(name){
         let message = await this.readJSON(name);
         return message.id;
+
+    }
+
+    /**
+     * 
+     * @param {string} name 
+     * @return {Promise<boolean>}
+     */
+    embedNameExists(name){
+        return embedsInMemoryName.includes(name);
     }
 }
 

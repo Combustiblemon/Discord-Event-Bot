@@ -19,9 +19,14 @@ module.exports = {
 
         let question = '```Which of the following events would you like to delete?\n     ' + FileSystem.getEmbedNames().join('\n     ') + '```';
 
-        let answer = await requestDetail(question, message);
         
-        deleteMessage(answer, originalChannel);
+
+        let answer = await requestDetail(question, message);
+        if(FileSystem.embedNameExists(answer)){
+            deleteEmbed(answer, originalChannel);
+        }else{
+            message.author.send('Invalid name.');
+        }
     },   
 }
 
@@ -30,7 +35,7 @@ module.exports = {
  * @param {string} answer
  * @param {TextChannel} channel 
  */
-async function deleteMessage(answer, channel){
+async function deleteEmbed(answer, channel){
     fs.unlink('./embeds/' + answer + '.json', (err) => {
         if (err) throw err;
         console.log(answer + '.json was deleted.');
@@ -58,7 +63,7 @@ async function deleteMessage(answer, channel){
         });
 
         let answer = collected.first().content;
-        console.log(answer)
+        
 
         return answer;
     }

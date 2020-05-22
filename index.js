@@ -53,7 +53,8 @@ bot.on('message', message => {
                 }
                 else if(args[1] === 'TestOp') {
                         bot.commands.get('TestOp').execute(bot, message); 
-                }else if(args[1] === 'delete'){
+                }
+                else if(args[1] === 'delete'){
                     bot.commands.get('delete').execute(bot, message);
                 }
                 else {
