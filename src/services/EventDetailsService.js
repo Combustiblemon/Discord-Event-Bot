@@ -24,9 +24,9 @@ class EventDetailsService {
     async requestEventDetails() {
         let name = await this.requestEventName();
         let description = await this.requestEventDescription();
-        let time = await this.requestEventTime();
+        let date = await this.requestEventDate();
 
-        return new EventDetails(name, description, time);
+        return new EventDetails(name, description, date);
     }
 
     /**
@@ -55,14 +55,20 @@ class EventDetailsService {
 
     /**
      * 
-     * @returns {Promise<string>} The time for the event as answered by author
+     * @returns {Promise<Date>} The date for the event as answered by author
      */
-    async requestEventTime() {
-        let question = `What time is the ${this.eventType}?`;
+    async requestEventDate() {
+        let question = `When (in UTC and YYYY-MM-DD hh:mm format) is the ${this.eventType}?`;
 
-        let answer = await this.requestSingleDetail(question);
+        let date;
 
-        return answer;
+        // Ask for date while no valid date has been given
+        while (!date || isNaN(date.getTime())) {
+            let answer = await this.requestSingleDetail(question);
+            date = new Date(answer);
+        }
+
+        return date;
     }
 
     /**

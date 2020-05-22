@@ -1,6 +1,8 @@
 const BotEvent = require('../models/Event');
+const FileSystem = require('../services/FileSystem');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
+const fs = require('fs');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
@@ -37,12 +39,14 @@ class EventService {
      */
     async postEmbedForEvent(channel, event) {
         const embed = this.createEmbedForEvent(event);
-
-        let csvEmoji = '📋';
+        
+        
 
         await channel.send(embed)
             .then(async embed => {
                 this.saveEventForMessageId(event, embed.id);
+                FileSystem.writeJSON(event, embed);
+                FileSystem.addEmbedID(embed.id);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
@@ -63,29 +67,23 @@ class EventService {
      */
     async editEmbedForEvent(message, event) {
         const embed = this.createEmbedForEvent(event);
-        //console.log(message.embeds[0].title);
-        //console.log(event.signupOptions[0].signups);
-        var testArray = new Array(event.signupOptions.length);
-
-        for(let i = 0; i <= event.signupOptions.length-1; i++){
-            testArray[i] = [[event.signupOptions[i].name],['\"' + event.signupOptions[i].signups + '\"']]; 
-        }
-
         
-        const csvWriter = createCsvWriter({
-            header: event.getHeader(),
-            path: ('csv_files/' + event.name + '.csv')
-        });
-
+        var testArray = new Array();
         
-
-        //console.log(testArray);
-    
-        await message.edit(message.embeds[0] = embed);
-        await csvWriter.writeRecords(testArray)
-            .then(() => {
-                console.log('Done writing file: ' + event.name + '.csv');
+        event.signupOptions.forEach(signupOption => {
+            signupOption.signups.forEach(signup => {
+                testArray.push([signupOption.name, signup]);
             });
+        });
+        
+
+        
+        await message.edit(message.embeds[0] = embed);
+        
+        await FileSystem.createCSV(event.getHeader(), event.name, testArray)
+        console.log('Done writing file: ' + event.name + '.csv');
+
+
     }
 
     /**
@@ -97,47 +95,50 @@ class EventService {
         let embed = new Discord.MessageEmbed()
             .setTitle(event.name)
             .setDescription(event.description)
-            .setFooter(event.time)
             .setColor(0xF1C40F);
-            
 
-        let embedCount = 0;
-        let signupOptionsField = ' ';
+        let dateOptions = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        }
+
+        embed.addField('Date', event.date.toLocaleDateString('en-US', dateOptions));
+
+        let timeOptions = {
+            timeZone: 'UTC',
+            timeZoneName: 'short',
+            hourCycle: 'h23'
+        }
+
+        let startTime = event.date.toLocaleTimeString('en-GB', timeOptions);
+
+        let startTimeField = `${startTime}\nhttps://google.com/search?q=${encodeURI(startTime)}`
         
+        embed.addField('Start time', startTimeField);
         
-
+        let signupOptionsField = '';
+        
         event.signupOptions.forEach(signupOption => {
-            // Additional roles are displayed on a separate line
-            
-            if(!signupOption.isAdditionalRole){
-                signupOptionsField += signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')\n';
-            }/*else {
-                embed.addField(
-                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
-                    this.createMembersListFromSignups(signupOption.signups)
-                );
-            }*/
-            
-
-            embedCount++;
-        })
-
-        embed.addField('Total number of signups:' + event.getTotalSignups(), signupOptionsField);
-
-        event.signupOptions.forEach(signupOption => {
-            
-            
-            if(signupOption.isAdditionalRole){
-                embed.addField(
-                    signupOption.name + ' (' + signupOption.getNumberOfSignups() + ')',
-                    this.createMembersListFromSignups(signupOption.signups)
-                );
-            }
-            
-
-            embedCount++;
-        })
+            if (signupOption.isAdditionalRole) return;
                 
+            signupOptionsField += `${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
+        });
+
+        embed.addField(
+            `Total number of signups: ${ event.getTotalSignups()}`, 
+            signupOptionsField
+        );
+
+        event.signupOptions.forEach(signupOption => {
+            if (!signupOption.isAdditionalRole) return;
+
+            embed.addField(
+                `${signupOption.name}: ${signupOption.getNumberOfSignups()}`,
+                this.createMembersListFromSignups(signupOption.signups)
+            );
+        });
 
         return embed;
     }
@@ -218,14 +219,12 @@ class EventService {
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
-        //console.log(signupOption);
 
         if(signupOption == csvEmoji){
             user.send('CSV file for ' + event.name +'.\n', {files: [
                 ('./csv_files/' + event.name + '.csv')
             ]});
-            message.reactions.resolve(csvEmoji).users.remove(user.id);
-            
+            reaction.users.remove(user.id);
             return;
         }
 
@@ -234,12 +233,24 @@ class EventService {
             return;
         }
 
-        if (signupOption.signups.find(s => s == username)) {
-            console.log('User ' + username + ' is already signed up for ' + event.name);
-            return;
-        }
+        if (signupOption.isAdditionalRole) {
+            if (signupOption.signups.find(s => s == username)) {
+                console.log(`User ${username} is already signed up for ${event.name} as ${signupOption.name}`);
+                return;
+            }
+        }   
+        else {
+            let allSignups = event.signupOptions
+                .filter(so => !so.isAdditionalRole)
+                .map(so => so.signups)
+                .flat(1);
 
-        
+            if (allSignups.find(s => s == username)) {
+                console.log('User ' + username + ' is already signed up for ' + event.name);
+                reaction.users.remove(user.id);
+                return;
+            }
+        }
 
         signupOption.addSignup(username);
     
