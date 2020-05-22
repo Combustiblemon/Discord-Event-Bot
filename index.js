@@ -20,11 +20,9 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
-//console.log(embedFiles);
-//console.log(commandFiles);
+
 for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
-    //console.log(embed.embeds[0].title);
 
     FileSystem.addEmbedID(embed.id);
     FileSystem.addEmbedName(embed.embeds[0].title);
@@ -55,7 +53,8 @@ bot.on('message', message => {
                 }
                 else if(args[1] === 'TestOp') {
                         bot.commands.get('TestOp').execute(bot, message); 
-                        bot.commands.get('TestOp').execute(bot, message, args, token); 
+                }else if(args[1] === 'delete'){
+                    bot.commands.get('delete').execute(bot, message);
                 }
                 else {
                     message.channel.bulkDelete(1);

@@ -2,7 +2,8 @@ const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
 
-let embedsInMemory = [];
+let embedsInMemoryID = [];
+let embedsInMemoryName = [];
 
 class FileSystem{
 
@@ -20,11 +21,12 @@ class FileSystem{
 
     /**
      * @param {string} name
-     * @returns {Discord.MessageEmbed}
+     * @returns {Discord.Message}
      */
     readJSON(name){
         let rawdata = fs.readFileSync('embeds/' + name + '.json');
-        return JSON.parse(rawdata);
+        let message = JSON.parse(rawdata);
+        return message;
     }
 
     /**
@@ -46,8 +48,38 @@ class FileSystem{
      * @param {string} id 
      */
     addEmbedID(id){
-        embedsInMemory.push(id);
-        console.log(embedsInMemory);
+        embedsInMemoryID.push(id);
+    }
+
+    /**
+     * @param {string} name
+     */
+    addEmbedName(name){
+        embedsInMemoryName.push(name);
+    }
+
+    /**
+     * @returns {Array}
+     */
+    getEmbedIDs(){
+        return embedsInMemoryID;
+    }
+
+    /**
+     * @returns {Array}
+     */
+    getEmbedNames(){
+        return embedsInMemoryName;
+    }
+
+    /**
+     * 
+     * @param  {string} name
+     * @return {string} 
+     */
+    async getEmbedID(name){
+        let message = await this.readJSON(name);
+        return message.id;
     }
 }
 

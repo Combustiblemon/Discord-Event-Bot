@@ -47,6 +47,7 @@ class EventService {
                 this.saveEventForMessageId(event, embed.id);
                 FileSystem.writeJSON(event, embed);
                 FileSystem.addEmbedID(embed.id);
+                FileSystem.addEmbedName(embed.embeds[0].title);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
