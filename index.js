@@ -20,12 +20,14 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
-console.log(embedFiles);
-console.log(commandFiles);
+//console.log(embedFiles);
+//console.log(commandFiles);
 for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
+    //console.log(embed.embeds[0].title);
 
     FileSystem.addEmbedID(embed.id);
+    FileSystem.addEmbedName(embed.embeds[0].title);
 }
 
 bot.on("ready", () => {
@@ -46,12 +48,13 @@ bot.on('message', message => {
                     
                 }
                 else if(args[1] === 'PS2OP') {
-                        bot.commands.get('PS2OP').execute(bot, message, args, token);
+                        bot.commands.get('PS2OP').execute(bot, message);
                 }
                 else if(args[1] === 'PS2Training') {
-                        bot.commands.get('PS2Training').execute(bot, message, args, token);
+                        bot.commands.get('PS2Training').execute(bot, message);
                 }
                 else if(args[1] === 'TestOp') {
+                        bot.commands.get('TestOp').execute(bot, message); 
                         bot.commands.get('TestOp').execute(bot, message, args, token); 
                 }
                 else {
