@@ -222,7 +222,7 @@ class EventService {
         let username = user.username;
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-        console.log(emoji);
+        
         let signupOption = event.getSingupOptionForEmoji(emoji);
 
         if(signupOption == csvEmoji){
