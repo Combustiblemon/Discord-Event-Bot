@@ -17,10 +17,10 @@ class FileSystem{
             if(mode == 'embed'){
                 this.writeData(embed, event.name, 'embeds');
             }else if(mode == 'event'){
-                this.writeData(event, event.name, 'event');
+                this.writeData(event, event.name, 'events');
             }else if(mode == 'both'){
                 await this.writeData(embed, event.name, 'embeds');
-                await this.writeData(event, event.name, 'event');
+                await this.writeData(event, event.name, 'events');
             }
     }
 
@@ -42,13 +42,13 @@ class FileSystem{
      * @param {string} name
      * @returns {Discord.Message}
      */
-    readJSON(name){
+    readJSON(name, folder){
         if(name.includes('.json')){
-            let rawdata = fs.readFileSync('embeds/' + name);
+            let rawdata = fs.readFileSync(folder + '/' + name);
             let message = JSON.parse(rawdata);
             return message;
         }else{
-            let rawdata = fs.readFileSync('embeds/' + name + '.json');
+            let rawdata = fs.readFileSync(folder + '/' + name + '.json');
             let message = JSON.parse(rawdata);
             return message;
         }
@@ -78,10 +78,29 @@ class FileSystem{
     }
 
     /**
+     * 
+     * @param {string} id 
+     */
+    removeEmbedID(id){
+        const isName = (element) => element === id;
+        embedsInMemoryName.splice(embedsInMemoryName.findIndex(isName), 1)
+    }
+
+    /**
      * @param {string} name
      */
     addEmbedName(name){
         embedsInMemoryName.push(name);
+    }
+
+
+    /**
+     * 
+     * @param {string} name 
+     */
+    removeEmbedName(name){
+        const isName = (element) => element === name;
+        embedsInMemoryName.splice(embedsInMemoryName.findIndex(isName), 1)
     }
 
     /**
@@ -104,7 +123,7 @@ class FileSystem{
      * @return {string} 
      */
     async getEmbedID(name){
-        let message = await this.readJSON(name);
+        let message = await this.readJSON(name, 'embeds');
         return message.id;
 
     }

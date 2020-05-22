@@ -6,6 +6,8 @@ const Discord = require('discord.js');
 const FileSystem = require('./src/services/FileSystem');
 const EventService = require('./src/services/EventService');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
+const EventDetails = require('./src/models/EventDetails');
+const SignupOption = require('./src/models/SignupOption');
 const bot = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 const Event = require('./src/models/Event');
 const token = process.env.DISCORD_BOT_TOKEN;
@@ -28,11 +30,18 @@ for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
     const event = require(`./events/${file}`);
     
-    console.log(event);
+    
     FileSystem.addEmbedID(embed.id);
     FileSystem.addEmbedName(embed.embeds[0].title);
-    tempEvent = new Event(event);
-    EventService.saveEventForMessageId(event, embed.id);
+    let tempSignupOption = [];
+    for (let position of event.signupOptions) {
+        tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.signups));
+    }
+    //console.log(tempSignupOption);
+    
+    let tempEvent = new Event(new EventDetails(event.name, event.description, event.date), event.header, tempSignupOption);
+    EventService.saveEventForMessageId(tempEvent, embed.id);
+    console.log(tempEvent);
 }
 
 bot.on("ready", () => {

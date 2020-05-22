@@ -17,6 +17,13 @@ module.exports = {
         // Delete the command message
         originalChannel.bulkDelete(1).catch(console.error);
 
+        let tempArray = FileSystem.getEmbedNames();
+
+        if(!Array.isArray(tempArray) || !tempArray.length){
+            message.author.send('No events to delete.');
+            return; 
+        }
+        
         let question = '```Which of the following events would you like to delete?\n     ' + FileSystem.getEmbedNames().join('\n     ') + '```';
 
         
@@ -36,6 +43,9 @@ module.exports = {
  * @param {TextChannel} channel 
  */
 async function deleteEmbed(answer, channel){
+    FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));
+    FileSystem.removeEmbedName(answer);
+
     fs.unlink('./embeds/' + answer + '.json', (err) => {
         if (err) throw err;
         console.log(answer + '.json was deleted.');
@@ -45,6 +55,8 @@ async function deleteEmbed(answer, channel){
         if (err) throw err;
         //console.log(answer + '.json was deleted.');
     });
+
+
     
     let msgID = await FileSystem.getEmbedID(answer)
     channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});

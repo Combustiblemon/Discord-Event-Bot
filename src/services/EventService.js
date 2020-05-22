@@ -1,5 +1,6 @@
 const BotEvent = require('../models/Event');
 const FileSystem = require('../services/FileSystem');
+const SignupOption = require('../models/SignupOption');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
