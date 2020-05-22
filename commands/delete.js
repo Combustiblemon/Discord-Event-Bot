@@ -39,7 +39,13 @@ async function deleteEmbed(answer, channel){
     fs.unlink('./embeds/' + answer + '.json', (err) => {
         if (err) throw err;
         console.log(answer + '.json was deleted.');
-      });
+    });
+
+    fs.unlink('./events/' + answer + '.json', (err) => {
+        if (err) throw err;
+        //console.log(answer + '.json was deleted.');
+    });
+    
     let msgID = await FileSystem.getEmbedID(answer)
     channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
     

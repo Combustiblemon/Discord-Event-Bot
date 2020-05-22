@@ -9,14 +9,33 @@ class FileSystem{
 
     /**
      * 
-     * @param {Discord.Message} message 
+     * @param {Discord.Message} embed 
      * @param {Event} event
+     * @param {string} mode
      */
-    async writeJSON(event, message){
-                let data = JSON.stringify(message, null, 2);
+    async writeJSON(event, embed, mode){
+            if(mode == 'embed'){
+                this.writeData(embed, event.name, 'embeds');
+            }else if(mode == 'event'){
+                this.writeData(event, event.name, 'event');
+            }else if(mode == 'both'){
+                await this.writeData(embed, event.name, 'embeds');
+                await this.writeData(event, event.name, 'event');
+            }
+    }
+
+    /**
+     * 
+     * @param {any} data 
+     * @param {string} name 
+     * @param {string} mode 
+     */
+    writeData(data, name, mode){
+        let embedData = JSON.stringify(data, null, 2);
                 
-                fs.writeFileSync('embeds/' + event.name + '.json', data);
-                console.log('Done writing file: ' + event.name + '.json');
+            fs.writeFileSync(mode + '/' + name + '.json', embedData);
+            console.log('Done writing '+ mode +' file: ' + name + '.json');
+        return;
     }
 
     /**
@@ -24,9 +43,16 @@ class FileSystem{
      * @returns {Discord.Message}
      */
     readJSON(name){
-        let rawdata = fs.readFileSync('embeds/' + name + '.json');
-        let message = JSON.parse(rawdata);
-        return message;
+        if(name.includes('.json')){
+            let rawdata = fs.readFileSync('embeds/' + name);
+            let message = JSON.parse(rawdata);
+            return message;
+        }else{
+            let rawdata = fs.readFileSync('embeds/' + name + '.json');
+            let message = JSON.parse(rawdata);
+            return message;
+        }
+        
     }
 
     /**

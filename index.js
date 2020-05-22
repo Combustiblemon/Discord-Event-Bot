@@ -4,8 +4,10 @@ require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 const FileSystem = require('./src/services/FileSystem');
+const EventService = require('./src/services/EventService');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
-const bot = new Discord.Client();
+const bot = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const Event = require('./src/models/Event');
 const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
@@ -13,6 +15,7 @@ const PREFIX = '$';
 bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
+const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -23,12 +26,17 @@ for (const file of commandFiles) {
 
 for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
-
+    const event = require(`./events/${file}`);
+    
+    console.log(event);
     FileSystem.addEmbedID(embed.id);
     FileSystem.addEmbedName(embed.embeds[0].title);
+    tempEvent = new Event(event);
+    EventService.saveEventForMessageId(event, embed.id);
 }
 
 bot.on("ready", () => {
+    EventService.setupListeners(bot);
     console.log('This bot is online.');
 });
 

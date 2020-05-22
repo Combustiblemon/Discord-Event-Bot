@@ -45,7 +45,6 @@ class EventService {
         await channel.send(embed)
             .then(async embed => {
                 this.saveEventForMessageId(event, embed.id);
-                FileSystem.writeJSON(event, embed);
                 FileSystem.addEmbedID(embed.id);
                 FileSystem.addEmbedName(embed.embeds[0].title);
 
@@ -55,9 +54,11 @@ class EventService {
                     });
 
                     await embed.react(csvEmoji);
+                    await FileSystem.writeJSON(event, embed, 'both');
                 } catch (error) {
                     console.log(error);
                 }
+
             })
     }
 
@@ -81,9 +82,10 @@ class EventService {
         
         await message.edit(message.embeds[0] = embed);
         
-        await FileSystem.createCSV(event.getHeader(), event.name, testArray)
+        FileSystem.createCSV(event.getHeader(), event.name, testArray)
         console.log('Done writing file: ' + event.name + '.csv');
 
+        FileSystem.writeJSON(event, embed, 'event');
 
     }
 
@@ -186,11 +188,13 @@ class EventService {
     setupListeners(bot) {
         if (this.didSetupListeners) return;
     
-        bot.on('messageReactionAdd', (reaction, user) => {
+        bot.on('messageReactionAdd', async (reaction, user) => {
+            if (reaction.message.partial) await reaction.message.fetch();
             this.messageReactionAdded(reaction, user);
         })
         
-        bot.on('messageReactionRemove', (reaction, user) => {
+        bot.on('messageReactionRemove', async (reaction, user) => {
+            if (reaction.message.partial) await reaction.message.fetch();
             this.messageReactionRemoved(reaction, user);
         })
     
@@ -218,7 +222,7 @@ class EventService {
         let username = user.username;
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-
+        console.log(emoji);
         let signupOption = event.getSingupOptionForEmoji(emoji);
 
         if(signupOption == csvEmoji){
