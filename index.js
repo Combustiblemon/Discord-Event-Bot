@@ -38,10 +38,11 @@ for (const file of embedFiles) {
         tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.signups));
     }
     //console.log(tempSignupOption);
-    
-    let tempEvent = new Event(new EventDetails(event.name, event.description, event.date), event.header, tempSignupOption);
+    let tempDate = event.date.substring(0,10) + ' ' + event.date.substring(11,16);
+    console.log(tempDate)
+    let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, tempSignupOption);
     EventService.saveEventForMessageId(tempEvent, embed.id);
-    console.log(tempEvent);
+    //console.log(tempEvent);
 }
 
 bot.on("ready", () => {
