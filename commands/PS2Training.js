@@ -10,11 +10,9 @@ module.exports = {
     /**
      * 
      * @param {Discord.Client} bot 
-     * @param {Discord.Message} message 
-     * @param {any} args
-     * @param {string} token 
+     * @param {Discord.Message} message  
      */
-    async execute(bot, message, args, token) {
+    async execute(bot, message) {
 
         let textChannel = message.channel;
 
