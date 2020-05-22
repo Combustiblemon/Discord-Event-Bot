@@ -1,21 +1,31 @@
 // Configure environment
 require('dotenv').config();
 
+const fs = require('fs');
 const Discord = require('discord.js');
+const FileSystem = require('./src/services/FileSystem');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const bot = new Discord.Client();
 const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
-const fs = require('fs');
-bot.commands = new Discord.Collection();
 
+bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
+const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
  
     bot.commands.set(command.name, command);
+}
+
+console.log(embedFiles);
+console.log(commandFiles);
+for (const file of embedFiles) {
+    const embed = require(`./embeds/${file}`);
+
+    FileSystem.addEmbedID(embed.id);
 }
 
 bot.on("ready", () => {
@@ -60,10 +70,11 @@ bot.on('message', message => {
             if (!(message.guild === null)) {
                 message.channel.bulkDelete(1);
             }
-            message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5) \n\n'
+            message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
+                                            + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
                                             + 'List of current events: \n' 
-                                            + 'PS2 Ops ($event PS2OP)\n'
-                                            + 'PS2 Training ($event PS2Training)```' );
+                                            + '     PS2 Op ($event PS2OP)\n'
+                                            + '     PS2 Training ($event PS2Training)```' );
         break;        
     }
 });

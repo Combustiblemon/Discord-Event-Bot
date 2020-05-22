@@ -1,6 +1,8 @@
 const BotEvent = require('../models/Event');
+const FileSystem = require('../services/FileSystem');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
+const fs = require('fs');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
@@ -37,10 +39,14 @@ class EventService {
      */
     async postEmbedForEvent(channel, event) {
         const embed = this.createEmbedForEvent(event);
+        
+        
 
         await channel.send(embed)
             .then(async embed => {
                 this.saveEventForMessageId(event, embed.id);
+                FileSystem.writeJSON(event, embed);
+                FileSystem.addEmbedID(embed.id);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
@@ -70,15 +76,14 @@ class EventService {
             });
         });
         
-        const csvWriter = createCsvWriter({
-            header: event.getHeader(),
-            path: ('csv_files/' + event.name + '.csv')
-        });
-    
-        await message.edit(message.embeds[0] = embed);
-        await csvWriter.writeRecords(testArray);
 
+        
+        await message.edit(message.embeds[0] = embed);
+        
+        await FileSystem.createCSV(event.getHeader(), event.name, testArray)
         console.log('Done writing file: ' + event.name + '.csv');
+
+
     }
 
     /**
