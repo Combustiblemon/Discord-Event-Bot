@@ -93,9 +93,10 @@ bot.on('message', message => {
             }
             message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
                                             + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
-                                            + 'List of current events: \n' 
+                                            + 'List of current commands: \n' 
                                             + '     PS2 Op ($event PS2OP)\n'
-                                            + '     PS2 Training ($event PS2Training)```' );
+                                            + '     PS2 Training ($event PS2Training)\n'
+                                            + '     Delete event ($event delete)```' );
         break;        
     }
 });
