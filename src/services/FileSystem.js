@@ -11,16 +11,16 @@ class FileSystem{
      * 
      * @param {Discord.Message} embed 
      * @param {Event} event
-     * @param {string} mode
+     * @param {string} folder
      */
     async writeJSON(event, embed, mode){
             if(mode == 'embed'){
-                this.writeData(embed, event.name, 'embeds');
+                this.writeData(embed, event.name, 'embeds/');
             }else if(mode == 'event'){
-                this.writeData(event, event.name, 'events');
+                this.writeData(event, event.name, 'events/');
             }else if(mode == 'both'){
-                await this.writeData(embed, event.name, 'embeds');
-                await this.writeData(event, event.name, 'events');
+                await this.writeData(embed, event.name, 'embeds/');
+                await this.writeData(event, event.name, 'events/');
             }
     }
 
@@ -28,13 +28,13 @@ class FileSystem{
      * 
      * @param {any} data 
      * @param {string} name 
-     * @param {string} mode 
+     * @param {string} folder 
      */
-    writeData(data, name, mode){
+    writeData(data, name, folder){
         let embedData = JSON.stringify(data, null, 2);
                 
-            fs.writeFileSync(mode + '/' + name + '.json', embedData);
-            console.log('Done writing '+ mode +' file: ' + name + '.json');
+            fs.writeFileSync(folder + name + '.json', embedData);
+            console.log('Done writing file: ' + name + '.json');
         return;
     }
 
@@ -44,11 +44,11 @@ class FileSystem{
      */
     readJSON(name, folder){
         if(name.includes('.json')){
-            let rawdata = fs.readFileSync(folder + '/' + name);
+            let rawdata = fs.readFileSync(folder + name);
             let message = JSON.parse(rawdata);
             return message;
         }else{
-            let rawdata = fs.readFileSync(folder + '/' + name + '.json');
+            let rawdata = fs.readFileSync(folder + name + '.json');
             let message = JSON.parse(rawdata);
             return message;
         }
@@ -123,7 +123,7 @@ class FileSystem{
      * @return {string} 
      */
     async getEmbedID(name){
-        let message = await this.readJSON(name, 'embeds');
+        let message = await this.readJSON(name, 'embeds/');
         return message.id;
 
     }

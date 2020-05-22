@@ -17,7 +17,12 @@ const PREFIX = '$';
 bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
-const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
+//const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
+
+let allowedChannels = [];
+
+allowedChannels = FileSystem.readJSON('channels', '');
+console.log(allowedChannels)
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -52,52 +57,101 @@ bot.on("ready", () => {
 
 bot.on('message', message => {
     
+    let filter = m => m.author.id === message.author.id;
     let args = message.content.substring(PREFIX.length).split(' ');
-    
-    //args is what a person types after the prefix. args[0] is the first word($ping)
-    switch(args[0]) {
-        case 'event':
-            if (!(message.guild === null)) {
-                if(!args[1]) {
+    if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
+        //args is what a person types after the prefix. args[0] is the first word($ping)
+        switch(args[0]) {
+            case 'event':
+                if (!(message.guild === null)) {
+                    if(!args[1]) {
+                            message.channel.bulkDelete(1);
+                            message.author.send('You need to enter a second argument. For a list of commands write $help.');
+                        
+                    }
+                    else if(args[1] === 'PS2OP') {
+                            bot.commands.get('PS2OP').execute(bot, message);
+                    }
+                    else if(args[1] === 'PS2Training') {
+                            bot.commands.get('PS2Training').execute(bot, message);
+                    }
+                    else if(args[1] === 'TestOp') {
+                            bot.commands.get('TestOp').execute(bot, message); 
+                    }
+                    else if(args[1] === 'delete'){
+                        bot.commands.get('delete').execute(bot, message);
+                    }
+                    else {
                         message.channel.bulkDelete(1);
-                        message.author.send('You need to enter a second argument. For a list of commands write $help.');
-                    
-                }
-                else if(args[1] === 'PS2OP') {
-                        bot.commands.get('PS2OP').execute(bot, message);
-                }
-                else if(args[1] === 'PS2Training') {
-                        bot.commands.get('PS2Training').execute(bot, message);
-                }
-                else if(args[1] === 'TestOp') {
-                        bot.commands.get('TestOp').execute(bot, message); 
-                }
-                else if(args[1] === 'delete'){
-                    bot.commands.get('delete').execute(bot, message);
+                        message.author.send('No command with name \"' + args[1] + '\". For a list of commands write $help.')
+                    }
+
                 }
                 else {
-                    message.channel.bulkDelete(1);
-                    message.author.send('No command with name \"' + args[1] + '\". For a list of commands write $help.')
+                    message.author.send('Please use the command in a server channel.');
                 }
+                
+            break;
+        
+            case 'help':
+                if (!(message.guild === null)) {
+                    message.channel.bulkDelete(1);
+                }
+                message.author.send('```'
+                                        + 'Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
+                                        + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
+                                        + 'List of current commands: \n' 
+                                        + '     ($addChannel)        Adds a channel to the whitelist (use channel ID)\n'
+                                        + '     ($removeChannel)     Reamoves a channel from the whitelist (use channel ID)\n'
+                                        + '     ($help)              Displays help message \n'
+                                        + '     ($event delete)      Delete event \n'
+                                        + '     ($event PS2OP)       PS2 Op \n'
+                                        + '     ($event PS2Training) PS2 Training ```');
+            break;
 
-            }
-            else {
-                message.author.send('Please use the command in a server channel.');
-            }
-            
-        break;
+            case 'addChannel':
+                if (!(message.guild === null)) {
+                    message.channel.bulkDelete(1);
+                    message.author.send("Please use the $addChannel command in a DM.");
+                    break;
+                }
+                message.author.send("```Type the ID of the channel you want to add:```").then(()=>{
+                    message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
+                        if(allowedChannels.includes(collected.first().content)){
+                            message.author.send('Channel already whitelisted.');
+                        }else{
+                            allowedChannels.push(collected.first().content);
+                            message.author.send('Channel added to whitelist.');
+                            FileSystem.writeData(allowedChannels, 'channels', '');
+                        }
+                    })
+                }).catch(()=>{
+                    message.author.send('No ID was entered.');
+                })
+            break;
 
-        case 'help':
-            if (!(message.guild === null)) {
-                message.channel.bulkDelete(1);
-            }
-            message.author.send('```Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
-                                            + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
-                                            + 'List of current commands: \n' 
-                                            + '     PS2 Op ($event PS2OP)\n'
-                                            + '     PS2 Training ($event PS2Training)\n'
-                                            + '     Delete event ($event delete)```' );
-        break;        
+            case 'removeChannel':
+                if (!(message.guild === null)) {
+                    message.channel.bulkDelete(1);
+                    message.author.send("Please use the $removeChannel command in a DM.");
+                    break;
+                }
+                
+                message.author.send("```Type the ID of the channel you want to remove:```").then(()=>{
+                    message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
+                        if(!allowedChannels.includes(collected.first().content)){
+                            message.author.send('The channel isn\'t whitelisted.');
+                        }else{
+                            allowedChannels.splice(allowedChannels.indexOf(collected.first().content), 1);
+                            message.author.send('Channel removed from whitelist.');
+                            FileSystem.writeData(allowedChannels, 'channels', '');
+                        }
+                    })
+                }).catch(()=>{
+                    message.author.send('No ID was entered.');
+                })
+            break;
+        }        
     }
 });
 
