@@ -86,7 +86,7 @@ class EventService {
         FileSystem.createCSV(event.getHeader(), event.name, testArray)
         console.log('Done writing file: ' + event.name + '.csv');
 
-        FileSystem.writeJSON(event, embed, 'event');
+        FileSystem.writeJSON(event, embed, 'both');
 
     }
 
