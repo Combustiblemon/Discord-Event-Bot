@@ -4,8 +4,12 @@ require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 const FileSystem = require('./src/services/FileSystem');
+const EventService = require('./src/services/EventService');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
-const bot = new Discord.Client();
+const EventDetails = require('./src/models/EventDetails');
+const SignupOption = require('./src/models/SignupOption');
+const bot = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const Event = require('./src/models/Event');
 const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
@@ -13,6 +17,7 @@ const PREFIX = '$';
 bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
+const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -20,15 +25,28 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
-console.log(embedFiles);
-console.log(commandFiles);
+
 for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
-
+    const event = require(`./events/${file}`);
+    
+    
     FileSystem.addEmbedID(embed.id);
+    FileSystem.addEmbedName(embed.embeds[0].title);
+    let tempSignupOption = [];
+    for (let position of event.signupOptions) {
+        tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.signups));
+    }
+    //console.log(tempSignupOption);
+    let tempDate = event.date.substring(0,10) + ' ' + event.date.substring(11,16);
+    console.log(tempDate)
+    let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, tempSignupOption);
+    EventService.saveEventForMessageId(tempEvent, embed.id);
+    //console.log(tempEvent);
 }
 
 bot.on("ready", () => {
+    EventService.setupListeners(bot);
     console.log('This bot is online.');
 });
 
@@ -46,13 +64,16 @@ bot.on('message', message => {
                     
                 }
                 else if(args[1] === 'PS2OP') {
-                        bot.commands.get('PS2OP').execute(bot, message, args, token);
+                        bot.commands.get('PS2OP').execute(bot, message);
                 }
                 else if(args[1] === 'PS2Training') {
-                        bot.commands.get('PS2Training').execute(bot, message, args, token);
+                        bot.commands.get('PS2Training').execute(bot, message);
                 }
                 else if(args[1] === 'TestOp') {
-                        bot.commands.get('TestOp').execute(bot, message, args, token); 
+                        bot.commands.get('TestOp').execute(bot, message); 
+                }
+                else if(args[1] === 'delete'){
+                    bot.commands.get('delete').execute(bot, message);
                 }
                 else {
                     message.channel.bulkDelete(1);

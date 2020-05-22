@@ -1,5 +1,6 @@
 const BotEvent = require('../models/Event');
 const FileSystem = require('../services/FileSystem');
+const SignupOption = require('../models/SignupOption');
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -45,8 +46,8 @@ class EventService {
         await channel.send(embed)
             .then(async embed => {
                 this.saveEventForMessageId(event, embed.id);
-                FileSystem.writeJSON(event, embed);
                 FileSystem.addEmbedID(embed.id);
+                FileSystem.addEmbedName(embed.embeds[0].title);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
@@ -54,9 +55,11 @@ class EventService {
                     });
 
                     await embed.react(csvEmoji);
+                    await FileSystem.writeJSON(event, embed, 'both');
                 } catch (error) {
                     console.log(error);
                 }
+
             })
     }
 
@@ -80,9 +83,10 @@ class EventService {
         
         await message.edit(message.embeds[0] = embed);
         
-        await FileSystem.createCSV(event.getHeader(), event.name, testArray)
+        FileSystem.createCSV(event.getHeader(), event.name, testArray)
         console.log('Done writing file: ' + event.name + '.csv');
 
+        FileSystem.writeJSON(event, embed, 'both');
 
     }
 
@@ -185,11 +189,13 @@ class EventService {
     setupListeners(bot) {
         if (this.didSetupListeners) return;
     
-        bot.on('messageReactionAdd', (reaction, user) => {
+        bot.on('messageReactionAdd', async (reaction, user) => {
+            if (reaction.message.partial) await reaction.message.fetch();
             this.messageReactionAdded(reaction, user);
         })
         
-        bot.on('messageReactionRemove', (reaction, user) => {
+        bot.on('messageReactionRemove', async (reaction, user) => {
+            if (reaction.message.partial) await reaction.message.fetch();
             this.messageReactionRemoved(reaction, user);
         })
     
@@ -217,7 +223,7 @@ class EventService {
         let username = user.username;
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
-
+        
         let signupOption = event.getSingupOptionForEmoji(emoji);
 
         if(signupOption == csvEmoji){
