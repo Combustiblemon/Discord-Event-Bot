@@ -86,7 +86,7 @@ class EventService {
         FileSystem.createCSV(event.getHeader(), event.name, testArray)
         console.log('Done writing file: ' + event.name + '.csv');
 
-        FileSystem.writeJSON(event, embed, 'both');
+        FileSystem.writeJSON(event, embed, 'event');
 
     }
 
@@ -99,7 +99,8 @@ class EventService {
         let embed = new Discord.MessageEmbed()
             .setTitle(event.name)
             .setDescription(event.description)
-            .setColor(0xF1C40F);
+            .setColor(0xF1C40F)
+            .setFooter('Click 📋 to get signups.');
 
         let dateOptions = {
             weekday: 'long',
@@ -118,7 +119,7 @@ class EventService {
 
         let startTime = event.date.toLocaleTimeString('en-GB', timeOptions);
 
-        let startTimeField = `${startTime}\nhttps://google.com/search?q=${encodeURI(startTime)}`
+        let startTimeField = `${startTime}\n[🕓 Convert time to local](https://google.com/search?q=${encodeURI(startTime)})`
         
         embed.addField('Start time', startTimeField);
         

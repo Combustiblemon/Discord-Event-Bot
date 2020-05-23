@@ -34,7 +34,7 @@ class FileSystem{
         let embedData = JSON.stringify(data, null, 2);
                 
             fs.writeFileSync(folder + name + '.json', embedData);
-            console.log('Done writing file: ' + name + '.json');
+            console.log('Done writing file: ' + folder + name + '.json');
         return;
     }
 

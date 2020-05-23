@@ -20,9 +20,9 @@ const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.js
 //const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
 
 let allowedChannels = [];
+let roles = require('./roles.json');
 
 allowedChannels = FileSystem.readJSON('channels', '');
-console.log(allowedChannels)
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -37,17 +37,14 @@ for (const file of embedFiles) {
     
     
     FileSystem.addEmbedID(embed.id);
-    FileSystem.addEmbedName(embed.embeds[0].title);
+    FileSystem.addEmbedName(event.name);
     let tempSignupOption = [];
     for (let position of event.signupOptions) {
         tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.signups));
     }
-    //console.log(tempSignupOption);
     let tempDate = event.date.substring(0,10) + ' ' + event.date.substring(11,16);
-    console.log(tempDate)
     let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, tempSignupOption);
     EventService.saveEventForMessageId(tempEvent, embed.id);
-    //console.log(tempEvent);
 }
 
 bot.on("ready", () => {
@@ -56,6 +53,8 @@ bot.on("ready", () => {
 });
 
 bot.on('message', message => {
+
+    
     
     let filter = m => m.author.id === message.author.id;
     let args = message.content.substring(PREFIX.length).split(' ');
@@ -101,58 +100,80 @@ bot.on('message', message => {
                                         + 'Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
                                         + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
                                         + 'List of current commands: \n' 
-                                        + '     ($addChannel)        Adds a channel to the whitelist (use channel ID)\n'
-                                        + '     ($removeChannel)     Reamoves a channel from the whitelist (use channel ID)\n'
-                                        + '     ($help)              Displays help message \n'
-                                        + '     ($event delete)      Delete event \n'
-                                        + '     ($event PS2OP)       PS2 Op \n'
-                                        + '     ($event PS2Training) PS2 Training ```');
+                                        + '     ($help)              Displays help message. \n\n'
+                                        + '     ($addChannel)        Adds the channel to the whitelist.\n'
+                                        + '     ($removeChannel)     Removes the channel from the whitelist.\n'
+                                        + '     ($role add|remove)   Adds or removes the minimum role required to use the bot on a server \n'
+                                        + '     Events:\n'
+                                        + '     ($event delete)      Delete event. \n'
+                                        + '     ($event PS2OP)       Sets up a PS2 Op. \n'
+                                        + '     ($event PS2Training) Sets up a PS2 Training. ```');
             break;
 
-            case 'addChannel':
+            case 'role':
                 if (!(message.guild === null)) {
                     message.channel.bulkDelete(1);
-                    message.author.send("Please use the $addChannel command in a DM.");
-                    break;
+                    if(!args[1]){ 
+                        message.author.send('You need to enter a second argument. For a list of commands write $help.');                       
+                    }else if(args[1] == 'add'){
+                         bot.commands.get('role').execute(bot, message, roles, 'add');
+                    }else if(args[1] == 'remove'){
+                         bot.commands.get('role').execute(bot, message, roles, 'remove');
+                    }
+                    
+
                 }
-                message.author.send("```Type the ID of the channel you want to add:```").then(()=>{
-                    message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
-                        if(allowedChannels.includes(collected.first().content)){
+                else {
+                    message.author.send('Please use the command in a server channel.');
+                }
+                
+            break;
+        }
+    } 
+
+        switch(args[0]){
+            case 'addChannel':
+                //Find the server index in the array
+                let serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                
+                    if (!(message.guild === null) && (message.member.roles.highest.comparePositionTo(role) >= 0)) {
+                        message.channel.bulkDelete(1);
+                        if(allowedChannels.includes(message.channel.id)){
                             message.author.send('Channel already whitelisted.');
                         }else{
-                            allowedChannels.push(collected.first().content);
-                            message.author.send('Channel added to whitelist.');
+                            allowedChannels.push(message.channel.id);
                             FileSystem.writeData(allowedChannels, 'channels', '');
+                            message.author.send('Channel added to whitelist.');
                         }
-                    })
-                }).catch(()=>{
-                    message.author.send('No ID was entered.');
-                })
+                    }else {
+                        message.author.send('Command not used in a server channel or you are lacking the required permissions.');
+                    }
+                });
             break;
 
             case 'removeChannel':
-                if (!(message.guild === null)) {
-                    message.channel.bulkDelete(1);
-                    message.author.send("Please use the $removeChannel command in a DM.");
-                    break;
-                }
+                //Find the server index in the array
+                var serverIndex1 = roles.findIndex(x=>x.includes(message.guild.name));
+                message.guild.roles.fetch(roles[serverIndex1][1]).then(role=>{
                 
-                message.author.send("```Type the ID of the channel you want to remove:```").then(()=>{
-                    message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
-                        if(!allowedChannels.includes(collected.first().content)){
+                    if (!(message.guild === null) && (message.member.roles.highest.comparePositionTo(role) >= 0)) {
+                        message.channel.bulkDelete(1);
+                        if(!allowedChannels.includes(message.channel.id)){
                             message.author.send('The channel isn\'t whitelisted.');
                         }else{
-                            allowedChannels.splice(allowedChannels.indexOf(collected.first().content), 1);
-                            message.author.send('Channel removed from whitelist.');
+                            allowedChannels.splice(allowedChannels.indexOf(message.channel.id), 1);
                             FileSystem.writeData(allowedChannels, 'channels', '');
+                            message.author.send('Channel removed from whitelist.');
                         }
-                    })
-                }).catch(()=>{
-                    message.author.send('No ID was entered.');
-                })
+                    }else {
+                        message.author.send('Command not used in a server channel or you are lacking the required permissions.');
+                    }
+                });
             break;
-        }        
-    }
+        }
+           
+    
 });
 
 bot.login(token);
