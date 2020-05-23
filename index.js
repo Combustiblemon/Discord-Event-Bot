@@ -112,44 +112,44 @@ bot.on('message', message => {
             case 'addChannel':
                 if (!(message.guild === null)) {
                     message.channel.bulkDelete(1);
-                    message.author.send("Please use the $addChannel command in a DM.");
-                    break;
-                }
-                message.author.send("```Type the ID of the channel you want to add:```").then(()=>{
-                    message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
-                        if(allowedChannels.includes(collected.first().content)){
-                            message.author.send('Channel already whitelisted.');
-                        }else{
-                            allowedChannels.push(collected.first().content);
-                            message.author.send('Channel added to whitelist.');
-                            FileSystem.writeData(allowedChannels, 'channels', '');
-                        }
+                    message.author.send("```Type the ID of the channel you want to add:```").then(()=>{
+                        message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
+                            if(allowedChannels.includes(collected.first().content)){
+                                message.author.send('Channel already whitelisted.');
+                            }else{
+                                allowedChannels.push(collected.first().content);
+                                message.author.send('Channel added to whitelist.');
+                                FileSystem.writeData(allowedChannels, 'channels', '');
+                            }
+                        })
+                    }).catch(()=>{
+                        message.author.send('No ID was entered.');
                     })
-                }).catch(()=>{
-                    message.author.send('No ID was entered.');
-                })
+                }
+                else {
+                    message.author.send('Please use the command in a server channel.');
+                }
             break;
 
             case 'removeChannel':
                 if (!(message.guild === null)) {
                     message.channel.bulkDelete(1);
-                    message.author.send("Please use the $removeChannel command in a DM.");
-                    break;
-                }
-                
-                message.author.send("```Type the ID of the channel you want to remove:```").then(()=>{
-                    message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
-                        if(!allowedChannels.includes(collected.first().content)){
-                            message.author.send('The channel isn\'t whitelisted.');
-                        }else{
-                            allowedChannels.splice(allowedChannels.indexOf(collected.first().content), 1);
-                            message.author.send('Channel removed from whitelist.');
-                            FileSystem.writeData(allowedChannels, 'channels', '');
-                        }
+                    message.author.send("```Type the ID of the channel you want to remove:```").then(()=>{
+                        message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
+                            if(!allowedChannels.includes(collected.first().content)){
+                                message.author.send('The channel isn\'t whitelisted.');
+                            }else{
+                                allowedChannels.splice(allowedChannels.indexOf(collected.first().content), 1);
+                                message.author.send('Channel removed from whitelist.');
+                                FileSystem.writeData(allowedChannels, 'channels', '');
+                            }
+                        })
+                    }).catch(()=>{
+                        message.author.send('No ID was entered.');
                     })
-                }).catch(()=>{
-                    message.author.send('No ID was entered.');
-                })
+                }else {
+                        message.author.send('Please use the command in a server channel.');
+                }
             break;
         }        
     }
