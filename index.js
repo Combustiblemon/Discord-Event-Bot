@@ -54,7 +54,7 @@ bot.on("ready", () => {
 
 bot.on('message', message => {
 
-    
+    if(!message.content.startsWith(PREFIX)) return;
     
     let filter = m => m.author.id === message.author.id;
     let args = message.content.substring(PREFIX.length).split(' ');
