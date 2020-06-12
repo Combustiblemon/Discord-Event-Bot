@@ -40,7 +40,7 @@ for (const file of embedFiles) {
     FileSystem.addEmbedName(event.name);
     let tempSignupOption = [];
     for (let position of event.signupOptions) {
-        tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.signups));
+        tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
     }
     let tempDate = event.date.substring(0,10) + 'T' + event.date.substring(11,16) + 'Z';
     let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, tempSignupOption);
