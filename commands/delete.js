@@ -44,6 +44,9 @@ module.exports = {
  * @param {TextChannel} channel 
  */
 async function deleteEmbed(answer, channel){
+    let msgID = await FileSystem.getEmbedID(answer);
+    channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
+    
     FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));
     FileSystem.removeEmbedName(answer);
 
@@ -59,8 +62,6 @@ async function deleteEmbed(answer, channel){
 
 
     
-    let msgID = await FileSystem.getEmbedID(answer)
-    channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
     
 }
 
