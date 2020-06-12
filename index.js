@@ -119,42 +119,60 @@ bot.on('message', message => {
         switch(args[0]){
             case 'addChannel':
                 //Find the server index in the array
-                let serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
-                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                
-                    if (!(message.guild === null) && (message.member.roles.highest.comparePositionTo(role) >= 0)) {
+                if(!(message.guild === null)){
+                    let serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+                    if( serverIndex === -1) {
                         message.channel.bulkDelete(1);
-                        if(allowedChannels.includes(message.channel.id)){
-                            message.author.send('Channel already whitelisted.');
-                        }else{
-                            allowedChannels.push(message.channel.id);
-                            FileSystem.writeData(allowedChannels, 'channels', '');
-                            message.author.send('Channel added to whitelist.');
-                        }
-                    }else {
-                        message.author.send('Command not used in a server channel or you are lacking the required permissions.');
+                        message.author.send("You need to add at least one role for the server first.\n`$role add`");
+                        break;
                     }
-                });
+                    
+                    message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                    
+                        if (message.member.roles.highest.comparePositionTo(role) >= 0) {
+                            message.channel.bulkDelete(1);
+                            if(allowedChannels.includes(message.channel.id)){
+                                message.author.send('Channel already whitelisted.');
+                            }else{
+                                allowedChannels.push(message.channel.id);
+                                FileSystem.writeData(allowedChannels, 'channels', '');
+                                message.author.send('Channel added to whitelist.');
+                            }
+                        }else {
+                            message.author.send('You are lacking the required permissions.');
+                        }
+                    });
+                }else{
+                    message.author.send('Please use this command in a server channel.')
+                }
             break;
 
             case 'removeChannel':
-                //Find the server index in the array
-                var serverIndex1 = roles.findIndex(x=>x.includes(message.guild.name));
-                message.guild.roles.fetch(roles[serverIndex1][1]).then(role=>{
-                
-                    if (!(message.guild === null) && (message.member.roles.highest.comparePositionTo(role) >= 0)) {
+                if(!(message.guild === null)){
+                    //Find the server index in the array
+                    var serverIndex1 = roles.findIndex(x=>x.includes(message.guild.name));
+                    if( serverIndex === -1) {
                         message.channel.bulkDelete(1);
-                        if(!allowedChannels.includes(message.channel.id)){
-                            message.author.send('The channel isn\'t whitelisted.');
-                        }else{
-                            allowedChannels.splice(allowedChannels.indexOf(message.channel.id), 1);
-                            FileSystem.writeData(allowedChannels, 'channels', '');
-                            message.author.send('Channel removed from whitelist.');
-                        }
-                    }else {
-                        message.author.send('Command not used in a server channel or you are lacking the required permissions.');
+                        message.author.send("You need to add at least one role for the server first.\n`$role add`");
+                        break;
                     }
-                });
+                    
+                    message.guild.roles.fetch(roles[serverIndex1][1]).then(role=>{
+                    
+                        if (message.member.roles.highest.comparePositionTo(role) >= 0) {
+                            message.channel.bulkDelete(1);
+                            if(!allowedChannels.includes(message.channel.id)){
+                                message.author.send('The channel isn\'t whitelisted.');
+                            }else{
+                                allowedChannels.splice(allowedChannels.indexOf(message.channel.id), 1);
+                                FileSystem.writeData(allowedChannels, 'channels', '');
+                                message.author.send('Channel removed from whitelist.');
+                            }
+                        }
+                    });
+                }else{
+                    message.author.send('Please use this command in a server channel.')
+                }
             break;
 
             case 'role':
