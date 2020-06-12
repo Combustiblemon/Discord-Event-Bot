@@ -38,9 +38,9 @@ function createEvent(eventDetails, header) {
         eventDetails,
         header, 
         [
-            new SignupOption('707719532721995883', 'Infantry', false, []),
-            new SignupOption('707719532617269280', 'Armour', false, []),
-            new SignupOption('707719532785172581', 'Air', false, []),
-            new SignupOption('⭐', 'Squad Leaders', true, [])
+            new SignupOption('707719532721995883', '<:infantry:706621296812884088> Infantry', false, false, []),
+            new SignupOption('707719532617269280', '<:armour:706621296745906219> Armour', false, false, []),
+            new SignupOption('707719532785172581', '<:air:706620854934700102> Air', false, false, []),
+            new SignupOption('⭐', '⭐ Squad Leaders', true, true, []),
         ])
 }
