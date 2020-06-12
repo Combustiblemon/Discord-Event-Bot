@@ -110,25 +110,10 @@ bot.on('message', message => {
                                         + '     ($event PS2Training) Sets up a PS2 Training. ```');
             break;
 
-            case 'role':
-                if (!(message.guild === null)) {
-                    message.channel.bulkDelete(1);
-                    if(!args[1]){ 
-                        message.author.send('You need to enter a second argument. For a list of commands write $help.');                       
-                    }else if(args[1] == 'add'){
-                         bot.commands.get('role').execute(bot, message, roles, 'add');
-                    }else if(args[1] == 'remove'){
-                         bot.commands.get('role').execute(bot, message, roles, 'remove');
-                    }
-                    
-
-                }
-                else {
-                    message.author.send('Please use the command in a server channel.');
-                }
-                
-            break;
+            
         }
+    } 
+                }
     } 
 
         switch(args[0]){
@@ -170,6 +155,27 @@ bot.on('message', message => {
                         message.author.send('Command not used in a server channel or you are lacking the required permissions.');
                     }
                 });
+            break;
+
+            case 'role':
+                if (!(message.guild === null)) {
+                    message.channel.bulkDelete(1);
+                    if(!args[1]){ 
+                        message.author.send('You need to enter a second argument. For a list of commands write $help.');                       
+                    }else if(!message.member.hasPermission("ADMINISTRATOR")){
+                        message.author.send("you need to be an administrator to use the `$role` command.");
+                    }else if(args[1] == 'add'){
+                         bot.commands.get('role').execute(bot, message, roles, 'add');
+                    }else if(args[1] == 'remove'){
+                         bot.commands.get('role').execute(bot, message, roles, 'remove');
+                    }
+                    
+
+                }
+                else {
+                    message.author.send('Please use the command in a server channel.');
+                }
+                
             break;
         }
            
