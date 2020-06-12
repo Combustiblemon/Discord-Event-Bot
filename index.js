@@ -71,7 +71,7 @@ bot.on('message', message => {
                     else if(args[1] === 'PS2OP') {
                             bot.commands.get('PS2OP').execute(bot, message);
                     }
-                    else if(args[1] === 'PS2Training') {
+                    else if(args[1] === 'Training') {
                             bot.commands.get('PS2Training').execute(bot, message);
                     }
                     else if(args[1] === 'TestOp') {
@@ -107,13 +107,11 @@ bot.on('message', message => {
                                         + '     Events:\n'
                                         + '     ($event delete)      Delete event. \n'
                                         + '     ($event PS2OP)       Sets up a PS2 Op. \n'
-                                        + '     ($event PS2Training) Sets up a PS2 Training. ```');
+                                        + '     ($event Training) Sets up a PS2 Training. ```');
             break;
 
             
         }
-    } 
-                }
     } 
 
         switch(args[0]){
