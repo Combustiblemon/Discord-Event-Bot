@@ -16,11 +16,12 @@ module.exports = {
 
         //Find the server index in the array
         let serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
-        if(serverIndex == -1 && mode == 'remove'){
+        if(serverIndex === -1 && mode === 'remove'){
             message.author.send('There is no role for this server.');
             
             return;
         }
+
         
 
 
@@ -30,11 +31,12 @@ module.exports = {
             let msg = message.author.send("```Type the ID of the role you want to add as a new minimum:```").then(msg=>{
                 msg.channel.awaitMessages(filter, {max: 1, time:600000, errors:['time']}).then(collected =>{
                     const answer = collected.first().content
-                    if(serverIndex !== -1 && roles[serverIndex][1] == answer){
+                    if(serverIndex !== -1 && roles[serverIndex][1] === answer){
                         message.author.send('This role is already the minimum.');
                         
                         return;
                     }else{
+                        answer = answer.trim();
                         const tempArray = [message.guild.name, answer];
                         roles.push(tempArray);
                         FileSystem.writeData(roles, 'roles', './');
@@ -50,7 +52,7 @@ module.exports = {
         }else if(mode == 'remove'){
             let msg = message.author.send("```Type the ID of the role you want to remove:```").then(msg=>{
                 msg.channel.awaitMessages(filter, {max: 1, time:600000, errors:['time']}).then(collected =>{
-                    if(typeof roles[serverIndex][1] !== 'undefined' && roles[serverIndex][1] == collected.first().content){
+                    if(typeof roles[serverIndex][1] !== 'undefined' && roles[serverIndex][1] === collected.first().content){
                         roles.splice(serverIndex, 1);
                         FileSystem.writeData(roles, 'roles', './')
                         message.author.send('Role removed.');
