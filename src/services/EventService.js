@@ -126,22 +126,25 @@ class EventService {
         let signupOptionsField = '';
         
         event.signupOptions.forEach(signupOption => {
-            if (signupOption.isAdditionalRole) return;
+            if (signupOption.isAdditionalRole || signupOption.isInline) return;
                 
             signupOptionsField += `${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
         });
 
-        embed.addField(
-            `Total number of signups: ${ event.getTotalSignups()}`, 
-            signupOptionsField
-        );
+        if(!signupOptionsField === ''){
+            embed.addField(
+                `Total number of signups: ${ event.getTotalSignups()}`, 
+                signupOptionsField
+            );
+        }
 
         event.signupOptions.forEach(signupOption => {
-            if (!signupOption.isAdditionalRole) return;
+            if (!signupOption.isAdditionalRole && !signupOption.isInline) return;
 
             embed.addField(
                 `${signupOption.name}: ${signupOption.getNumberOfSignups()}`,
-                this.createMembersListFromSignups(signupOption.signups)
+                this.createMembersListFromSignups(signupOption.signups),
+                signupOption.isInline
             );
         });
 

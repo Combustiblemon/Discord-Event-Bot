@@ -6,12 +6,14 @@ module.exports = class SignupOption {
      * @param {string} emoji 
      * @param {string} name
      * @param {boolean} isAdditionalRole
+     * @param {boolean} isInline
      * @param {string[]} signups
      */
-    constructor(emoji, name, isAdditionalRole, signups) {
+    constructor(emoji, name, isAdditionalRole, isInline, signups) {
         this.emoji = emoji;
         this.name = name;
         this.isAdditionalRole = isAdditionalRole;
+        this.isInline = isInline;
         this.signups = signups;
     }
 
