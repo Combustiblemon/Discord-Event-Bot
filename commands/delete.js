@@ -31,6 +31,7 @@ module.exports = {
         let answer = await requestDetail(question, message);
         if(FileSystem.embedNameExists(answer)){
             deleteEmbed(answer, originalChannel);
+            message.author.send(`Event \`${answer}\` deleted.`);
         }else{
             message.author.send('Invalid name.');
         }
