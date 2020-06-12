@@ -208,7 +208,7 @@ class EventService {
      * @param {Discord.MessageReaction} reaction 
      * @param {Discord.User} user 
      */
-    messageReactionAdded(reaction, user) {
+    async messageReactionAdded(reaction, user) {
         let message = reaction.message;
     
         if (message.guild.member(user.id) == botUserId) return;
@@ -220,8 +220,9 @@ class EventService {
             return;
         }
 
+        let reactionUser = await message.guild.members.fetch(user.id);
         let emoji = reaction.emoji;
-        let username = user.username;
+        let username = reactionUser.displayName;
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
         
@@ -269,7 +270,7 @@ class EventService {
      * @param {Discord.MessageReaction} reaction 
      * @param {Discord.User} user 
      */
-    messageReactionRemoved(reaction, user) {
+    async messageReactionRemoved(reaction, user) {
         let message = reaction.message;
     
         if (message.guild.member(user.id) == botUserId) return;
@@ -281,8 +282,9 @@ class EventService {
             return;
         }
 
+        let reactionUser = await message.guild.members.fetch(user.id);
         let emoji = reaction.emoji;
-        let username = user.username;
+        let username = reactionUser.displayName;
 
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
 
