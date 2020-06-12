@@ -42,7 +42,7 @@ for (const file of embedFiles) {
     for (let position of event.signupOptions) {
         tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.signups));
     }
-    let tempDate = event.date.substring(0,10) + ' ' + event.date.substring(11,16);
+    let tempDate = event.date.substring(0,10) + 'T' + event.date.substring(11,16) + 'Z';
     let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, tempSignupOption);
     EventService.saveEventForMessageId(tempEvent, embed.id);
 }
