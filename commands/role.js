@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Discord = require('discord.js');
 const FileSystem = require('../src/services/FileSystem');
 
@@ -55,7 +54,6 @@ module.exports = {
  * @param {Discord.Message} message
  * @param {string} serverIndex
  * @param {Array} roles
- * @returns {Promise}
  */
 function addRole(message, serverIndex, roles) {
     let author = message.author;
