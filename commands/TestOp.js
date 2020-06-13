@@ -19,7 +19,7 @@ module.exports = {
         // Delete the command message
         textChannel.bulkDelete(1).catch(console.error);
 
-        let eventDetailsService = new EventDetailsService('TestOp', textChannel, message.author.id);
+        let eventDetailsService = new EventDetailsService('TestOp', message.author);
         let eventDetails = await eventDetailsService.requestEventDetails();
 
         let event = createEvent(eventDetails, ['Aspect Test', 'Name Test']);

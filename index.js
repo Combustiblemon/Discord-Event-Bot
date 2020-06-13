@@ -30,7 +30,6 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
-
 for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
     const event = require(`./events/${file}`);
@@ -57,9 +56,16 @@ bot.on('message', message => {
     if(!(message.guild === null)) var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
     
     let filter = m => m.author.id === message.author.id;
+
+    // args is what a person types after the prefix
     let args = message.content.substring(PREFIX.length).split(' ');
+    
+    // args[0] is the first word($ping)
+    let command = args[0];
+    let subCommand = args[1];
+
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
-        //args is what a person types after the prefix. args[0] is the first word($ping)
+        
         switch(args[0]) {
             case 'event':
                 if (!(message.guild === null)) {
@@ -97,108 +103,30 @@ bot.on('message', message => {
                 }
                 
             break;
-        
-            case 'help':
-                if (!(message.guild === null)) {
-                    message.channel.bulkDelete(1);
-                }
-                message.author.send('```'
-                                        + 'Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
-                                        + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
-                                        + 'List of current commands: \n' 
-                                        + '     ($help)              Displays help message. \n\n'
-                                        + '     ($addChannel)        Adds the channel to the whitelist.\n'
-                                        + '     ($removeChannel)     Removes the channel from the whitelist.\n'
-                                        + '     ($role add|remove)   Adds or removes the minimum role required to use the bot on a server \n'
-                                        + '     Events:\n'
-                                        + '     ($event delete)      Delete event. \n'
-                                        + '     ($event PS2OP)       Sets up a PS2 Op. \n'
-                                        + '     ($event Training)    Sets up a PS2 Training. ```');
-            break;
-
             
         }
     } 
 
-        switch(args[0]){
-            case 'addChannel':
-                //Find the server index in the array
-                if(!(message.guild === null)){
-                    if( serverIndex === -1) {
-                        message.channel.bulkDelete(1);
-                        message.author.send("You need to add at least one role for the server first.\n`$role add`");
-                        break;
-                    }
-                    
-                    message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                    
-                        if (message.member.roles.highest.comparePositionTo(role) >= 0) {
-                            message.channel.bulkDelete(1);
-                            if(allowedChannels.includes(message.channel.id)){
-                                message.author.send('Channel already whitelisted.');
-                            }else{
-                                allowedChannels.push(message.channel.id);
-                                FileSystem.writeData(allowedChannels, 'channels', '');
-                                message.author.send('Channel added to whitelist.');
-                            }
-                        }else {
-                            message.author.send('You are lacking the required permissions.');
-                        }
-                    });
-                }else{
-                    message.author.send('Please use this command in a server channel.')
-                }
-            break;
+        switch (command) {
 
-            case 'removeChannel':
-                if(!(message.guild === null)){
-                    //Find the server index in the array
-                    if( serverIndex === -1) {
-                        message.channel.bulkDelete(1);
-                        message.author.send("You need to add at least one role for the server first.\n`$role add`");
-                        break;
-                    }
-                    
-                    message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                    
-                        if (message.member.roles.highest.comparePositionTo(role) >= 0) {
-                            message.channel.bulkDelete(1);
-                            if(!allowedChannels.includes(message.channel.id)){
-                                message.author.send('The channel isn\'t whitelisted.');
-                            }else{
-                                allowedChannels.splice(allowedChannels.indexOf(message.channel.id), 1);
-                                FileSystem.writeData(allowedChannels, 'channels', '');
-                                message.author.send('Channel removed from whitelist.');
-                            }
-                        }else {
-                            message.author.send('You are lacking the required permissions.');
-                        }
-                    });
-                }else{
-                    message.author.send('Please use this command in a server channel.')
-                }
-            break;
+            case 'help':
+                bot.commands
+                    .get('channel')
+                    .execute(bot, message);
+                break;
+
+            case 'channel':
+                bot.commands
+                    .get('channel')
+                    .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
+                break;
 
             case 'role':
-                if (!(message.guild === null)) {
-                    message.channel.bulkDelete(1);
-                    if(!args[1]){ 
-                        message.author.send('You need to enter a second argument. For a list of commands write $help.');                       
-                    }else if(!message.member.hasPermission("ADMINISTRATOR")){
-                        message.author.send("you need to be an administrator to use the `$role` command.");
-                    }else if(args[1] == 'add'){
-                         bot.commands.get('role').execute(bot, message, roles, 'add');
-                    }else if(args[1] == 'remove'){
-                         bot.commands.get('role').execute(bot, message, roles, 'remove');
-                    }
-                    
-
-                }
-                else {
-                    message.author.send('Please use the command in a server channel.');
-                }
+                bot.commands
+                    .get('role')
+                    .execute(bot, message, roles, subCommand);
                 
-            break;
+                break;
         }
            
     
