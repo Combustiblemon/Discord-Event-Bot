@@ -79,7 +79,7 @@ class EventDetailsService {
     async requestSingleDetail(question) {
         let questionMessage = await this.author.send(question);
 
-        let messageFilter = m => m.author.id === author.id;
+        let messageFilter = m => m.author.id === this.author.id;
         
         let messages = await questionMessage.channel.awaitMessages(
             messageFilter, 
