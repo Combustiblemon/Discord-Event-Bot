@@ -78,6 +78,7 @@ bot.on('message', message => {
                             bot.commands.get('TestOp').execute(bot, message); 
                     }
                     else if(args[1] === 'delete'){
+                        var serverIndex1 = roles.findIndex(x=>x.includes(message.guild.name));
                         message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
                             if (message.member.roles.highest.comparePositionTo(role) >= 0) {
                                 bot.commands.get('delete').execute(bot, message);
