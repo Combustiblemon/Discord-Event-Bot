@@ -102,18 +102,21 @@ bot.on('message', message => {
                 if (!(message.guild === null)) {
                     message.channel.bulkDelete(1);
                 }
-                message.author.send('```'
-                                        + 'Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n' 
-                                        + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
-                                        + 'List of current commands: \n' 
-                                        + '     ($help)              Displays help message. \n\n'
-                                        + '     ($addChannel)        Adds the channel to the whitelist.\n'
-                                        + '     ($removeChannel)     Removes the channel from the whitelist.\n'
-                                        + '     ($role add|remove)   Adds or removes the minimum role required to use the bot on a server \n'
-                                        + '     Events:\n'
-                                        + '     ($event delete)      Delete event. \n'
-                                        + '     ($event PS2OP)       Sets up a PS2 Op. \n'
-                                        + '     ($event Training)    Sets up a PS2 Training. ```');
+                message.author.send(
+                    '```'
+                    + 'Please use the date when naming an event (e.g. Thursday Night Ops 14/5).\n'
+                    + 'The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00). \n\n'
+                    + 'List of current commands: \n'
+                    + '     ($help)              Displays help message. \n\n'
+                    + '     ($addChannel)        Adds the channel to the whitelist.\n'
+                    + '     ($removeChannel)     Removes the channel from the whitelist.\n'
+                    + '     ($role add|remove)   Adds or removes the minimum role required to use the bot on a server \n'
+                    + '     Events:\n'
+                    + '     ($event delete)      Delete event. \n'
+                    + '     ($event PS2OP)       Sets up a PS2 Op. \n'
+                    + '     ($event Training)    Sets up a PS2 Training.'
+                    + '```'
+                );
             break;
 
             
