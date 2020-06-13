@@ -22,7 +22,7 @@ module.exports = {
         let eventDetailsService = new EventDetailsService('Training', textChannel, message.author.id);
         let eventDetails = await eventDetailsService.requestEventDetails();
 
-        let event = createEvent(eventDetails, ['Name']);
+        let event = createEvent(eventDetails, ['','Name']);
 
         EventService.newEvent(bot, textChannel, event);
     }
