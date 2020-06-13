@@ -30,11 +30,9 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
-
 for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
     const event = require(`./events/${file}`);
-    
     
     FileSystem.addEmbedID(embed.id);
     FileSystem.addEmbedName(event.name);
@@ -58,9 +56,16 @@ bot.on('message', message => {
     if(!(message.guild === null)) var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
     
     let filter = m => m.author.id === message.author.id;
+
+    // args is what a person types after the prefix
     let args = message.content.substring(PREFIX.length).split(' ');
+    
+    // args[0] is the first word($ping)
+    let command = args[0];
+    let subCommand = args[1];
+
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
-        //args is what a person types after the prefix. args[0] is the first word($ping)
+        
         switch(args[0]) {
             case 'event':
                 if (!(message.guild === null)) {
@@ -184,23 +189,7 @@ bot.on('message', message => {
             break;
 
             case 'role':
-                if (!(message.guild === null)) {
-                    message.channel.bulkDelete(1);
-                    if(!args[1]){ 
-                        message.author.send('You need to enter a second argument. For a list of commands write $help.');                       
-                    }else if(!message.member.hasPermission("ADMINISTRATOR")){
-                        message.author.send("you need to be an administrator to use the `$role` command.");
-                    }else if(args[1] == 'add'){
-                         bot.commands.get('role').execute(bot, message, roles, 'add');
-                    }else if(args[1] == 'remove'){
-                         bot.commands.get('role').execute(bot, message, roles, 'remove');
-                    }
-                    
-
-                }
-                else {
-                    message.author.send('Please use the command in a server channel.');
-                }
+                bot.commands.get('role').execute(bot, message, roles, subCommand);
                 
             break;
         }
