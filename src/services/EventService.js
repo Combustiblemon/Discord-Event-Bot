@@ -252,6 +252,7 @@ class EventService {
 
         if (!signupOption) {
             console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
+            reaction.users.remove(user.id);
             return;
         }
 
