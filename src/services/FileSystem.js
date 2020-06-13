@@ -11,16 +11,28 @@ class FileSystem{
      * 
      * @param {Discord.Message} embed 
      * @param {Event} event
-     * @param {string} folder
+     * @param {string} mode
      */
     async writeJSON(event, embed, mode){
+            let tempDate = event.date.toLocaleDateString('en-US', {
+                timeZone: 'UTC',
+                timeZoneName: 'short',
+                hourCycle: 'h23'
+            });
+            
+            tempDate = await tempDate.substring(0,8);
+            tempDate = await tempDate.replace(/\//gi, "-");
+            let tempName = event.name.replace(/ /gi, "_");
+            
+
+            let name = `${tempName}_${tempDate}`;
             if(mode == 'embed'){
-                this.writeData(embed, event.name, 'embeds/');
+                this.writeData(embed, name, 'embeds/');
             }else if(mode == 'event'){
-                this.writeData(event, event.name, 'events/');
+                this.writeData(event, name, 'events/');
             }else if(mode == 'both'){
-                await this.writeData(embed, event.name, 'embeds/');
-                await this.writeData(event, event.name, 'events/');
+                await this.writeData(embed, name, 'embeds/');
+                await this.writeData(event, name, 'events/');
             }
     }
 
@@ -56,17 +68,32 @@ class FileSystem{
     }
 
     /**
-     * @param {string} name
+     * @param {Event} name
      * @param {Array} header
      * @param {Array} array
      */
-    async createCSV(header ,name, array){
+    async createCSV(header ,event, array){
+
+        let tempDate = event.date.toLocaleDateString('en-US', {
+            timeZone: 'UTC',
+            timeZoneName: 'short',
+            hourCycle: 'h23'
+        });
+        
+        tempDate = await tempDate.substring(0,8);
+        tempDate = await tempDate.replace(/\//gi, "-");
+        let tempName = event.name.replace(/ /gi, "_");
+        
+
+        let name = `${tempName}_${tempDate}`;
+
         const csvWriter = createCsvWriter({
             header: header,
             path: ('csv_files/' + name + '.csv')
         });
 
         csvWriter.writeRecords(array);
+        console.log('Done writing file: ' + event.name + '.csv');
     }
 
     /**

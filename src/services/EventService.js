@@ -45,9 +45,17 @@ class EventService {
 
         await channel.send(embed)
             .then(async embed => {
+                let tempDate = event.date.toLocaleDateString('en-US', {
+                    timeZone: 'UTC',
+                    timeZoneName: 'short',
+                    hourCycle: 'h23'
+                });
+                tempDate = await tempDate.substring(0,8);
+                tempDate = await tempDate.replace(/\//gi, "-");
+
+                FileSystem.addEmbedName(`${event.name.replace(/ /gi, "_")}_${tempDate}`);
                 this.saveEventForMessageId(event, embed.id);
                 FileSystem.addEmbedID(embed.id);
-                FileSystem.addEmbedName(embed.embeds[0].title);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
@@ -79,13 +87,9 @@ class EventService {
             });
         });
         
-
-        
         await message.edit(message.embeds[0] = embed);
         
-        FileSystem.createCSV(event.getHeader(), event.name, testArray)
-        console.log('Done writing file: ' + event.name + '.csv');
-
+        FileSystem.createCSV(event.getHeader(), event, testArray)
         FileSystem.writeJSON(event, embed, 'event');
 
     }

@@ -35,9 +35,8 @@ for (const file of embedFiles) {
     const embed = require(`./embeds/${file}`);
     const event = require(`./events/${file}`);
     
-    
     FileSystem.addEmbedID(embed.id);
-    FileSystem.addEmbedName(event.name);
+    FileSystem.addEmbedName(file.replace(/.json/gi, '').trim());
     let tempSignupOption = [];
     for (let position of event.signupOptions) {
         tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));

@@ -24,13 +24,21 @@ module.exports = {
             return; 
         }
         
-        let question = '```Which of the following events would you like to delete?\n     ' + FileSystem.getEmbedNames().join('\n     ') + '```';
+        tempArray.forEach(function(item, index) {
+            tempArray[index] = item.replace(/_/gi, " ");
+        });
+        
+        let question = '```Which of the following events would you like to delete?\n     ' + tempArray.join("\n     ") + '```';
 
         
 
         let answer = await requestDetail(question, message);
+        if (answer === ''){
+            return;
+        }
+        
         if(FileSystem.embedNameExists(answer)){
-            deleteEmbed(answer, originalChannel);
+            deleteEmbed(answer.replace(/ /gi, '_'), originalChannel);
             message.author.send(`Event \`${answer}\` deleted.`);
         }else{
             message.author.send('Invalid name.');
@@ -48,16 +56,16 @@ async function deleteEmbed(answer, channel){
     channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
     
     FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));
-    FileSystem.removeEmbedName(answer);
+    FileSystem.removeEmbedName(answer.replace(/_/gi, ' '));
 
     fs.unlink('./embeds/' + answer + '.json', (err) => {
         if (err) throw err;
-        console.log(answer + '.json was deleted.');
+        console.log(`embeds/${answer}.json was deleted.`);
     });
 
     fs.unlink('./events/' + answer + '.json', (err) => {
         if (err) throw err;
-        //console.log(answer + '.json was deleted.');
+        console.log(`events/${answer}.json was deleted.`);
     });
 
 
@@ -77,12 +85,16 @@ async function deleteEmbed(answer, channel){
         const filter = collected => collected.author.id === message.author.id;
         const collected = await msg.channel.awaitMessages(filter, {
             max: 1,
-            time: 50000,
-        }).catch(() => {
-            message.author.send('Timeout');
+            time: 600000,
+            errors: ['time']
+        }).catch(error => {
+            console.error(error);
+            message.author.send("No answer was given.");
         });
-
-        let answer = collected.first().content;
+        
+        
+        let answer = '';
+        answer = collected.first().content.trim();
         
 
         return answer;
