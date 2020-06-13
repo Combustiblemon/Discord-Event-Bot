@@ -66,24 +66,24 @@ bot.on('message', message => {
 
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
         
-        switch(args[0]) {
+        switch(command) {
             case 'event':
                 if (!(message.guild === null)) {
-                    if(!args[1]) {
+                    if(!subCommand) {
                             message.channel.bulkDelete(1);
                             message.author.send('You need to enter a second argument. For a list of commands write $help.');
                         
                     }
-                    else if(args[1] === 'PS2OP') {
+                    else if(subCommand === 'PS2OP') {
                             bot.commands.get('PS2OP').execute(bot, message);
                     }
-                    else if(args[1] === 'Training') {
+                    else if(subCommand === 'Training') {
                             bot.commands.get('PS2Training').execute(bot, message);
                     }
-                    else if(args[1] === 'TestOp') {
+                    else if(subCommand === 'TestOp') {
                             bot.commands.get('TestOp').execute(bot, message); 
                     }
-                    else if(args[1] === 'delete'){
+                    else if(subCommand === 'delete'){
                         message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
                             if (message.member.roles.highest.comparePositionTo(role) >= 0) {
                                 bot.commands.get('delete').execute(bot, message);
@@ -94,7 +94,7 @@ bot.on('message', message => {
                     }
                     else {
                         message.channel.bulkDelete(1);
-                        message.author.send('No command with name \"' + args[1] + '\". For a list of commands write $help.')
+                        message.author.send(`No command \"$${command} ${subCommand}\". For a list of commands write $help.`)
                     }
 
                 }
