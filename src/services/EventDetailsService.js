@@ -8,13 +8,11 @@ class EventDetailsService {
     /**
      * 
      * @param {string} eventType The type of event, will be added to questions for flair
-     * @param {Discord.TextChannel} textChannel The text channel in which to ask for event details
-     * @param {string} authorId The id of the user that started the chain
+     * @param {Discord.User} author The user that authored the event
      */
-    constructor (eventType, textChannel, authorId) {
+    constructor (eventType, author) {
         this.eventType = eventType;
-        this.textChannel = textChannel;
-        this.authorId = authorId;
+        this.author = author;
     }
 
     /**
@@ -79,11 +77,11 @@ class EventDetailsService {
      * @returns {Promise<string>} The answer to the question
      */
     async requestSingleDetail(question) {
-        await this.textChannel.send(question);
+        let questionMessage = await this.author.send(question);
 
-        let messageFilter = m => m.author.id === this.authorId;
+        let messageFilter = m => m.author.id === author.id;
         
-        let messages = await this.textChannel.awaitMessages(
+        let messages = await questionMessage.channel.awaitMessages(
             messageFilter, 
             {
                 max: 1, 
@@ -92,13 +90,10 @@ class EventDetailsService {
             }
         ).catch(error =>{
             console.error(error);
-            this.textChannel.send('No answer was given.');
-            this.textChannel.bulkDelete(1).catch(console.error);
+            this.author.send('No answer was given.');
         });
 
         let answer = messages.first().content;
-
-        this.textChannel.bulkDelete(2).catch(console.error);
 
         return answer;
     }
