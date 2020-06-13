@@ -131,7 +131,7 @@ class EventService {
 
             let displayEmoji = signupOption.emoji
             if (displayEmoji.length > 1){
-                displayEmoji = `<${signupOption.emoji}>`;
+                displayEmoji = `<:${signupOption.emoji}>`;
             }
                 
             signupOptionsField += `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
@@ -149,7 +149,7 @@ class EventService {
 
             let displayEmoji = signupOption.emoji
             if (displayEmoji.length > 1){
-                displayEmoji = `<${signupOption.emoji}>`;
+                displayEmoji = `<:${signupOption.emoji}>`;
             }
 
             embed.addField(

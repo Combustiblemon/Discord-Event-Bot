@@ -35,7 +35,7 @@ module.exports = class Event {
         if(emoji.name == '📋'){
             return this.signupOptions.emoji = '📋';
         }
-        return this.signupOptions.find(s => s.emoji == emoji.name || s.emoji == emoji.id);
+        return this.signupOptions.find(s => s.emoji === emoji.name || s.emoji === emoji.id || s.emoji === emoji.identifier);
     }
 
     /**
