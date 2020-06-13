@@ -107,7 +107,7 @@ bot.on('message', message => {
                                         + '     Events:\n'
                                         + '     ($event delete)      Delete event. \n'
                                         + '     ($event PS2OP)       Sets up a PS2 Op. \n'
-                                        + '     ($event Training) Sets up a PS2 Training. ```');
+                                        + '     ($event Training)    Sets up a PS2 Training. ```');
             break;
 
             
