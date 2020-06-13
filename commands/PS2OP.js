@@ -38,9 +38,9 @@ function createEvent(eventDetails, header) {
         eventDetails,
         header, 
         [
-            new SignupOption(':infantry:706621296812884088', 'Infantry', false, false, []),
-            new SignupOption(':armour:706621296745906219', 'Armour', false, false, []),
-            new SignupOption(':air:706620854934700102', 'Air', false, false, []),
+            new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
+            new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
+            new SignupOption('air:706620854934700102', 'Air', false, false, []),
             new SignupOption('⭐', 'Squad Leaders', true, true, []),
             new SignupOption('🛹', 'Bastion Pilot', true, true, [])
         ])

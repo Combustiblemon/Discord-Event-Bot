@@ -130,7 +130,7 @@ class EventService {
             if (signupOption.isAdditionalRole || signupOption.isInline) return;
 
             let displayEmoji = signupOption.emoji
-            if (displayEmoji.length > 1){
+            if (displayEmoji.length > 4){
                 displayEmoji = `<:${signupOption.emoji}>`;
             }
                 
@@ -148,7 +148,7 @@ class EventService {
             if (!signupOption.isAdditionalRole && !signupOption.isInline) return;
 
             let displayEmoji = signupOption.emoji
-            if (displayEmoji.length > 1){
+            if (displayEmoji.length > 4){
                 displayEmoji = `<:${signupOption.emoji}>`;
             }
 

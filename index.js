@@ -55,6 +55,7 @@ bot.on("ready", () => {
 bot.on('message', message => {
 
     if(!message.content.startsWith(PREFIX)) return;
+    if(!(message.guild === null)) var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
     
     let filter = m => m.author.id === message.author.id;
     let args = message.content.substring(PREFIX.length).split(' ');
@@ -127,7 +128,6 @@ bot.on('message', message => {
             case 'addChannel':
                 //Find the server index in the array
                 if(!(message.guild === null)){
-                    let serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
                     if( serverIndex === -1) {
                         message.channel.bulkDelete(1);
                         message.author.send("You need to add at least one role for the server first.\n`$role add`");
@@ -157,14 +157,13 @@ bot.on('message', message => {
             case 'removeChannel':
                 if(!(message.guild === null)){
                     //Find the server index in the array
-                    var serverIndex1 = roles.findIndex(x=>x.includes(message.guild.name));
                     if( serverIndex === -1) {
                         message.channel.bulkDelete(1);
                         message.author.send("You need to add at least one role for the server first.\n`$role add`");
                         break;
                     }
                     
-                    message.guild.roles.fetch(roles[serverIndex1][1]).then(role=>{
+                    message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
                     
                         if (message.member.roles.highest.comparePositionTo(role) >= 0) {
                             message.channel.bulkDelete(1);
