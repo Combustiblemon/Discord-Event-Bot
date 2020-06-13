@@ -78,7 +78,13 @@ bot.on('message', message => {
                             bot.commands.get('TestOp').execute(bot, message); 
                     }
                     else if(args[1] === 'delete'){
-                        bot.commands.get('delete').execute(bot, message);
+                        message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                            if (message.member.roles.highest.comparePositionTo(role) >= 0) {
+                                bot.commands.get('delete').execute(bot, message);
+                            }else {
+                                message.author.send('You are lacking the required permissions.');
+                            }
+                        });
                     }
                     else {
                         message.channel.bulkDelete(1);
@@ -166,6 +172,8 @@ bot.on('message', message => {
                                 FileSystem.writeData(allowedChannels, 'channels', '');
                                 message.author.send('Channel removed from whitelist.');
                             }
+                        }else {
+                            message.author.send('You are lacking the required permissions.');
                         }
                     });
                 }else{
