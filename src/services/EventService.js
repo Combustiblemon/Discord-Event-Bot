@@ -128,8 +128,13 @@ class EventService {
         
         event.signupOptions.forEach(signupOption => {
             if (signupOption.isAdditionalRole || signupOption.isInline) return;
+
+            let displayEmoji = signupOption.emoji
+            if (displayEmoji.length > 1){
+                displayEmoji = `<${signupOption.emoji}>`;
+            }
                 
-            signupOptionsField += `${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
+            signupOptionsField += `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
         });
 
         if(!signupOptionsField == ''){
@@ -142,8 +147,13 @@ class EventService {
         event.signupOptions.forEach(signupOption => {
             if (!signupOption.isAdditionalRole && !signupOption.isInline) return;
 
+            let displayEmoji = signupOption.emoji
+            if (displayEmoji.length > 1){
+                displayEmoji = `<${signupOption.emoji}>`;
+            }
+
             embed.addField(
-                `${signupOption.name}: ${signupOption.getNumberOfSignups()}`,
+                `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}`,
                 this.createMembersListFromSignups(signupOption.signups),
                 signupOption.isInline
             );

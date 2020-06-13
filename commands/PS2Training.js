@@ -38,6 +38,6 @@ function createEvent(eventDetails, header) {
         eventDetails,
         header,
         [
-            new SignupOption('✅', '✅ Signup', false, true, [])
+            new SignupOption('✅', 'Signup', false, true, [])
         ])
 }
