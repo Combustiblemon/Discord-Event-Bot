@@ -78,17 +78,3 @@ module.exports = {
         return;
     }
 }
-
-/*message.author.send("```Type the ID of the channel you want to remove:```").then(()=>{
-                        message.channel.awaitMessages(filter, {max: 1, time:600_000, errors:['time']}).then(collected =>{
-                            if(!allowedChannels.includes(collected.first().content)){
-                                message.author.send('The channel isn\'t whitelisted.');
-                            }else{
-                                allowedChannels.splice(allowedChannels.indexOf(collected.first().content), 1);
-                                message.author.send('Channel removed from whitelist.');
-                                FileSystem.writeData(allowedChannels, 'channels', '');
-                            }
-                        })
-                    }).catch(()=>{
-                        message.author.send('No ID was entered.');
-                    })*/
