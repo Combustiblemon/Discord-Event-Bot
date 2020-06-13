@@ -12,30 +12,28 @@ module.exports = {
      * @param {Array} roles
      * @param {string} mode 
      */
-    execute(bot, message, roles, mode){
+    execute(bot, message, roles, mode) {
 
         //Find the server index in the array
-        let serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
-        if(serverIndex === -1 && mode === 'remove'){
+        let serverIndex = roles.findIndex(x => x.includes(message.guild.name));
+
+        if (serverIndex === -1 && mode === 'remove') {
             message.author.send('There is no role for this server.');
-            
+
             return;
         }
 
-        
-
-
-
         let filter = m => m.author.id === message.author.id;
-        if(mode == 'add'){
-            let msg = message.author.send("```Type the ID of the role you want to add as a new minimum:```").then(msg=>{
-                msg.channel.awaitMessages(filter, {max: 1, time:600000, errors:['time']}).then(collected =>{
-                    const answer = collected.first().content
-                    if(serverIndex !== -1 && roles[serverIndex][1] === answer){
+        
+        if (mode == 'add') {
+            message.author.send("```Type the ID of the role you want to add as a new minimum:```").then(msg => {
+                msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(collected => {
+                    let answer = collected.first().content;
+                    if (serverIndex !== -1 && roles[serverIndex][1] === answer) {
                         message.author.send('This role is already the minimum.');
-                        
+
                         return;
-                    }else{
+                    } else {
                         answer = answer.trim();
                         const tempArray = [message.guild.name, answer];
                         roles.push(tempArray);
@@ -44,33 +42,39 @@ module.exports = {
 
                         return;
                     }
+                }).catch(error => {
+                    console.error(error);
+                    message.author.send('No ID was entered.');
                 })
-            }).catch(()=>{
+            }).catch(() => {
+                console.error(error);
                 message.author.send('No ID was entered.');
             })
-            
-        }else if(mode == 'remove'){
-            let msg = message.author.send("```Type the ID of the role you want to remove:```").then(msg=>{
-                msg.channel.awaitMessages(filter, {max: 1, time:600000, errors:['time']}).then(collected =>{
-                    if(typeof roles[serverIndex][1] !== 'undefined' && roles[serverIndex][1] === collected.first().content){
+
+        } else if (mode == 'remove') {
+            let msg = message.author.send("```Type the ID of the role you want to remove:```").then(msg => {
+                msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(collected => {
+                    if (typeof roles[serverIndex][1] !== 'undefined' && roles[serverIndex][1] === collected.first().content) {
                         roles.splice(serverIndex, 1);
                         FileSystem.writeData(roles, 'roles', './')
                         message.author.send('Role removed.');
-                        
+
                         return;
-                    }else{
-                        message.guild.roles.fetch(collected.first().content).then(role=>{
+                    } else {
+                        message.guild.roles.fetch(collected.first().content).then(role => {
                             message.author.send('The roleID does not exist in the database.');
-                            
+
                             return;
                         });
                     }
+                }).catch(() => {
+                    message.author.send('No ID was entered.');
                 })
-            }).catch(()=>{
+            }).catch(() => {
                 message.author.send('No ID was entered.');
             })
         }
-        
+
         return;
     }
 }
