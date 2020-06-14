@@ -1,6 +1,7 @@
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
+const BotEvent = require('../models/Event');
 
 let embedsInMemoryID = [];
 let embedsInMemoryName = [];
@@ -10,7 +11,7 @@ class FileSystem {
     /**
      * 
      * @param {Discord.Message} embed 
-     * @param {Event} event
+     * @param {BotEvent} event
      * @param {string} mode
      */
     async writeJSON(event, embed, mode) {
@@ -61,7 +62,7 @@ class FileSystem {
 
     /**
      * 
-     * @param {Event} event 
+     * @param {BotEvent} event 
      */
     getFileNameForEvent(event) {
         let date = event.date.toISOString();
@@ -76,20 +77,69 @@ class FileSystem {
     }
 
     /**
-     * @param {Event} name
-     * @param {Array} header
-     * @param {Array} array
+     * @param {BotEvent} event
      */
-    async createCSV(header ,event, array){
+    async createCSV(event) {
+        let records = this.createCSVRecords(event);
+
         let name = this.getFileNameForEvent(event);
+
+        let header = event.getHeader();
+        // Add additional roles to header
+        header = header.concat(event.signupOptions.filter(x => x.isAdditionalRole).map(x => x.name));        
 
         const csvWriter = createCsvWriter({
             header: header,
             path: ('csv_files/' + name + '.csv')
         });
 
-        csvWriter.writeRecords(array);
+        csvWriter.writeRecords(records);
         console.log('Done writing file: ' + name + '.csv');
+    }
+
+    /**
+     * @param {BotEvent} event
+     */
+    createCSVRecords(event) {
+        let records = new Array();
+        
+        let main = event.signupOptions.filter(x => !x.isAdditionalRole);
+        let additional = event.signupOptions.filter(x => x.isAdditionalRole);
+
+        main.forEach(mainOption => {
+            mainOption.signups.forEach(signup => {
+                let record = [mainOption.name, signup];
+                
+                additional.forEach(() => record.push('n'));
+
+                records.push(record);
+            });
+        });
+
+        additional.forEach((additionalOption, index) => {
+            // Index of the additional option in a record (after main option and signup name)
+            let additionalIndex = index + 2;
+
+            additionalOption.signups.forEach(signup => {
+                let recordIndex = records.findIndex(x => x[1] === signup);
+                
+                if (recordIndex !== -1) {
+                    // Record for user already exists
+                    records[recordIndex][additionalIndex] = 'y';
+                } 
+                else {
+                    // Record for user does not exist
+                    let record = ['', signup];
+                
+                    additional.forEach(() => record.push('n'));
+                    record[additionalIndex] = 'y';
+
+                    records.push(record);
+                }
+            });
+        });
+
+        return records;
     }
 
     /**

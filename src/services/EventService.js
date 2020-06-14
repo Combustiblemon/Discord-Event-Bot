@@ -73,19 +73,10 @@ class EventService {
     async editEmbedForEvent(message, event) {
         const embed = this.createEmbedForEvent(event);
         
-        var testArray = new Array();
-        
-        event.signupOptions.forEach(signupOption => {
-            signupOption.signups.forEach(signup => {
-                testArray.push([signupOption.name, signup]);
-            });
-        });
-        
         await message.edit(message.embeds[0] = embed);
         
-        FileSystem.createCSV(event.getHeader(), event, testArray)
+        FileSystem.createCSV(event);
         FileSystem.writeJSON(event, embed, 'event');
-
     }
 
     /**
