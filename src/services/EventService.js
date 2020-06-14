@@ -45,15 +45,9 @@ class EventService {
 
         await channel.send(embed)
             .then(async embed => {
-                let tempDate = event.date.toLocaleDateString('en-US', {
-                    timeZone: 'UTC',
-                    timeZoneName: 'short',
-                    hourCycle: 'h23'
-                });
-                tempDate = await tempDate.substring(0,8);
-                tempDate = await tempDate.replace(/\//gi, "-");
+                let fileName = FileSystem.getFileNameForEvent(event);
 
-                FileSystem.addEmbedName(`${event.name.replace(/ /gi, "_")}_${tempDate}`);
+                FileSystem.addEmbedName(fileName);
                 this.saveEventForMessageId(event, embed.id);
                 FileSystem.addEmbedID(embed.id);
 
@@ -248,7 +242,7 @@ class EventService {
 
         if(signupOption == csvEmoji){
             user.send('CSV file for ' + event.name +'.\n', {files: [
-                ('./csv_files/' + event.name + '.csv')
+                ('./csv_files/' + FileSystem.getFileNameForEvent(event) + '.csv')
             ]});
             reaction.users.remove(user.id);
             return;
