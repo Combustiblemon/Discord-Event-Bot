@@ -111,7 +111,7 @@ bot.on('message', message => {
 
             case 'help':
                 bot.commands
-                    .get('channel')
+                    .get('help')
                     .execute(bot, message);
                 break;
 
