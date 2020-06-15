@@ -91,7 +91,7 @@ bot.on('message', message => {
                     else if(subCommand === 'PS2OP') {
                             bot.commands.get('PS2OP').execute(bot, message);
                     }
-                    else if(subCommand === 'Training') {
+                    else if(subCommand === 'training') {
                             bot.commands.get('PS2Training').execute(bot, message);
                     }
                     else if(subCommand === 'TestOp') {

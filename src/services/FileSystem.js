@@ -197,12 +197,14 @@ class FileSystem {
      * @param  {string} name The name of the embed to be converted to ID
      * @return {string} 
      */
-    async getEmbedID(name){
-        let message = {id: "undefined"};
+    getEmbedID(name){
+        //let message = {id: "undefined"};
         if(this.embedNameExists(name)){
-            message = await this.readJSON(name, 'embeds/');
+            let message = this.readJSON(name, 'embeds/');
+            return message.id;
         }
-        return message.id;
+
+        return null;
 
     }
 
