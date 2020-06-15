@@ -36,9 +36,9 @@ class FileSystem {
     writeData(data, name, folder) {
         let embedData = JSON.stringify(data, null, 2);
                 
-        fs.writeFileSync(folder + name + '.json', embedData);
+        fs.writeFileSync(`${folder}${name}.json`, embedData);
         
-        console.log('Done writing file: ' + folder + name + '.json');
+        console.log(`Done writing file: ${folder}${name}.json`);
         
         return;
     }
@@ -49,11 +49,11 @@ class FileSystem {
      */
     readJSON(name, folder) {
         if (name.includes('.json')) {
-            let rawdata = fs.readFileSync(folder + name);
+            let rawdata = fs.readFileSync(`${folder}${name}`);
             let message = JSON.parse(rawdata);
             return message;
         } else {
-            let rawdata = fs.readFileSync(folder + name + '.json');
+            let rawdata = fs.readFileSync(`${folder}${name}.json'`);
             let message = JSON.parse(rawdata);
             return message;
         }
@@ -90,11 +90,11 @@ class FileSystem {
 
         const csvWriter = createCsvWriter({
             header: header,
-            path: ('csv_files/' + name + '.csv')
+            path: (`csv_files/${name}.csv`)
         });
 
         csvWriter.writeRecords(records);
-        console.log('Done writing file: ' + name + '.csv');
+        console.log(`Done writing file: ${name}.csv`);
     }
 
     /**
