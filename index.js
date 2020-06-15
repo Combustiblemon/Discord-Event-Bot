@@ -28,7 +28,7 @@ if(fs.existsSync('./roles.json')){
 }
 
 if(fs.existsSync('./channels.json')){
-    allowedChannels = FileSystem.readJSON('channels', '');
+    allowedChannels = FileSystem.readJSON('channels', './');
 }else{
     FileSystem.writeData(roles, 'channels', './');
 }

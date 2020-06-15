@@ -13,7 +13,7 @@ class FileSystem {
      * 
      * @param {Discord.Message} embed The embed to be written to file
      * @param {BotEvent} event The event to be written to file
-     * @param {string} mode The mode to use: 'embed'/'event'/'both'
+     * @param {string} mode The mode to use: 'embed'|'event'|'both'
      */
     async writeJSON(event, embed, mode) {
         let name = this.getFileNameForEvent(event);
@@ -55,7 +55,7 @@ class FileSystem {
             let message = JSON.parse(rawdata);
             return message;
         } else {
-            let rawdata = fs.readFileSync(`${folder}${name}.json'`);
+            let rawdata = fs.readFileSync(`${folder}${name}.json`);
             let message = JSON.parse(rawdata);
             return message;
         }
