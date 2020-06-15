@@ -198,7 +198,10 @@ class FileSystem {
      * @return {string} 
      */
     async getEmbedID(name){
-        let message = await this.readJSON(name, 'embeds/');
+        let message = {id: "undefined"};
+        if(this.embedNameExists(name)){
+            message = await this.readJSON(name, 'embeds/');
+        }
         return message.id;
 
     }
