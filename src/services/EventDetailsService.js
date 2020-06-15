@@ -9,10 +9,12 @@ class EventDetailsService {
      * 
      * @param {string} eventType The type of event, will be added to questions for flair
      * @param {Discord.User} author The user that authored the event
+     * @param {boolean=} hasBastion If the event has the posibility for a bastion pilot signup
      */
-    constructor (eventType, author) {
+    constructor (eventType, author, hasBastion = false) {
         this.eventType = eventType;
         this.author = author;
+        this.hasBastion = hasBastion;
     }
 
     /**
@@ -23,8 +25,9 @@ class EventDetailsService {
         let name = await this.requestEventName();
         let description = await this.requestEventDescription();
         let date = await this.requestEventDate();
+        if(this.hasBastion) var bastion = await this.requestEventBastion();
 
-        return new EventDetails(name, description, date);
+        return new EventDetails(name, description, date, bastion);
     }
 
     /**
@@ -70,6 +73,29 @@ class EventDetailsService {
 
         return date;
     }
+    
+    /**
+     * @returns {Promise<boolean>} If the event will need a bastion pilot as answered by author
+     */
+    async requestEventBastion(){
+        let question = `Will the ${this.eventType} need a Bastion pilot signup?\n \`Y/N\``;
+
+        let bastion;
+
+        while(!bastion){
+            let answer = await this.requestSingleDetail(question);
+            //remove whitespace and convert to uppercase
+            answer.trim().toUpperCase();
+            if (answer = 'Y'){
+                bastion = true;
+            }else if (answer = 'N'){
+                bastion = false;
+            }
+        }
+
+
+        return bastion;
+    }
 
     /**
      * 
@@ -97,6 +123,7 @@ class EventDetailsService {
 
         return answer;
     }
+
 }
 
 module.exports = EventDetailsService;

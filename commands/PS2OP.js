@@ -19,7 +19,7 @@ module.exports = {
         // Delete the command message
         textChannel.bulkDelete(1).catch(console.error);
 
-        let eventDetailsService = new EventDetailsService('OP', message.author);
+        let eventDetailsService = new EventDetailsService('OP', message.author, true);
         let eventDetails = await eventDetailsService.requestEventDetails();
 
         let event = createEvent(eventDetails, ['Position', 'Name']);
@@ -34,14 +34,19 @@ module.exports = {
  * @returns {Event}
  */
 function createEvent(eventDetails, header) {
+    let signupOptions = [
+        new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
+        new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
+        new SignupOption('air:706620854934700102', 'Air', false, false, []),
+        new SignupOption('⭐', 'Squad Leaders', true, true, [])
+    ];
+
+    if (eventDetails.bastion){
+        signupOptions.push(new SignupOption('🛹', 'Bastion Pilot', true, true, []));
+    }
+
     return new Event(
         eventDetails,
         header, 
-        [
-            new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
-            new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
-            new SignupOption('air:706620854934700102', 'Air', false, false, []),
-            new SignupOption('⭐', 'Squad Leaders', true, true, []),
-            new SignupOption('🛹', 'Bastion Pilot', true, true, [])
-        ])
+        signupOptions)
 }

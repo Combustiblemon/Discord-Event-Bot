@@ -13,6 +13,7 @@ module.exports = class Event {
         this.name = eventDetails.name;
         this.description = eventDetails.description;
         this.date = eventDetails.date;
+        this.bastion = eventDetails.bastion;
         this.header = header;
         this.signupOptions = signupOptions;
     }
@@ -43,5 +44,12 @@ module.exports = class Event {
      */
     getHeader(){
         return this.header;
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    getBastion(){
+        return this.bastion;
     }
 }
