@@ -74,7 +74,12 @@ bot.on('message', message => {
     let subCommand = args[1];
 
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
-        
+        if (serverIndex === -1){
+            message.channel.bulkDelete(1);
+            message.author.send(`Please use \`$role add\` before using \`$${command} ${subCommand}\`.`);
+            return;
+        }
+
         switch(command) {
             case 'event':
                 if (!(message.guild === null)) {
