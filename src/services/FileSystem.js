@@ -9,10 +9,11 @@ let embedsInMemoryName = [];
 class FileSystem {
 
     /**
+     * Writes events and embeds to file.
      * 
-     * @param {Discord.Message} embed 
-     * @param {BotEvent} event
-     * @param {string} mode
+     * @param {Discord.Message} embed The embed to be written to file
+     * @param {BotEvent} event The event to be written to file
+     * @param {string} mode The mode to use: 'embed'/'event'/'both'
      */
     async writeJSON(event, embed, mode) {
         let name = this.getFileNameForEvent(event);
@@ -29,9 +30,9 @@ class FileSystem {
 
     /**
      * 
-     * @param {any} data 
-     * @param {string} name 
-     * @param {string} folder 
+     * @param {any} data The data to be written
+     * @param {string} name The name of the file
+     * @param {string} folder The folder of the file
      */
     writeData(data, name, folder) {
         let embedData = JSON.stringify(data, null, 2);
@@ -44,7 +45,8 @@ class FileSystem {
     }
 
     /**
-     * @param {string} name
+     * @param {string} name The name of the file
+     * @param {string} folder The folder where the file is
      * @returns {Discord.Message}
      */
     readJSON(name, folder) {
@@ -62,7 +64,7 @@ class FileSystem {
 
     /**
      * 
-     * @param {BotEvent} event 
+     * @param {BotEvent} event The event from which the name will be created
      */
     getFileNameForEvent(event) {
         let date = event.date.toISOString();
@@ -98,7 +100,7 @@ class FileSystem {
     }
 
     /**
-     * @param {BotEvent} event
+     * @param {BotEvent} event The event the CSV corresponds to
      */
     createCSVRecords(event) {
         let records = new Array();
@@ -144,7 +146,7 @@ class FileSystem {
 
     /**
      * 
-     * @param {string} id 
+     * @param {string} id The id of the embed
      */
     addEmbedID(id){
         embedsInMemoryID.push(id);
@@ -152,7 +154,7 @@ class FileSystem {
 
     /**
      * 
-     * @param {string} id 
+     * @param {string} id The id of the embed
      */
     removeEmbedID(id){
         const isName = (element) => element === id;
@@ -160,7 +162,7 @@ class FileSystem {
     }
 
     /**
-     * @param {string} name
+     * @param {string} name The name of the embed
      */
     addEmbedName(name){
         embedsInMemoryName.push(name);
@@ -169,7 +171,7 @@ class FileSystem {
 
     /**
      * 
-     * @param {string} name 
+     * @param {string} name The name of the embed
      */
     removeEmbedName(name){
         const isName = (element) => element === name;
@@ -192,7 +194,7 @@ class FileSystem {
 
     /**
      * 
-     * @param  {string} name
+     * @param  {string} name The name of the embed to be converted to ID
      * @return {string} 
      */
     async getEmbedID(name){
@@ -203,7 +205,7 @@ class FileSystem {
 
     /**
      * 
-     * @param {string} name 
+     * @param {string} name The name of the embed to be checked
      * @return {Promise<boolean>}
      */
     embedNameExists(name){
