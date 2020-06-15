@@ -64,7 +64,7 @@ class EventDetailsService {
         while (!date || isNaN(date.getTime())) {
             let answer = await this.requestSingleDetail(question);
             answer = answer.trim();
-            answer = answer.substring(0,10) + 'T' + answer.substring(11,16) + 'Z';
+            answer = `${answer.substring(0,10)}T${answer.substring(11,16)}Z`;
             date = new Date(answer);
         }
 
