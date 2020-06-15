@@ -20,9 +20,18 @@ const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.js
 //const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
 
 let allowedChannels = [];
-let roles = require('./roles.json');
+let roles = [];
+if(fs.existsSync('./roles.json')){
+    roles = require('./roles.json');
+}else{
+    FileSystem.writeData(roles, 'roles', './');
+}
 
-allowedChannels = FileSystem.readJSON('channels', '');
+if(fs.existsSync('./channels.json')){
+    allowedChannels = FileSystem.readJSON('channels', '');
+}else{
+    FileSystem.writeData(roles, 'channels', './');
+}
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
