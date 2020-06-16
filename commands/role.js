@@ -57,7 +57,7 @@ module.exports = {
  */
 function addRole(message, serverIndex, roles) {
     let author = message.author;
-    let text = "```Type the ID of the role you want to add as a new minimum:```";
+    let text = "```Type the ID of the role you want to add as a new minimum:\nHint: enable discord developer mode and right click the role to get the ID.```";
     let filter = m => m.author.id === author.id;
 
     author.send(text).then(msg => {
