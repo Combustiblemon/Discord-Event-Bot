@@ -20,8 +20,8 @@ module.exports = {
         // Delete the command message
         originalChannel.bulkDelete(1).catch(console.error);
 
-        let tempArray = FileSystem.getEmbedNames();
-
+        let tempArray = Array.from(FileSystem.getEmbedNames());
+        
         if(!Array.isArray(tempArray) || !tempArray.length){
             message.author.send('No events to delete.');
             return; 
