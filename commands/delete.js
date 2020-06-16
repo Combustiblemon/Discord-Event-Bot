@@ -27,6 +27,9 @@ module.exports = {
             return; 
         }
         
+        //find only the messages in the current channel
+        tempArray = await messagesInChannel(originalChannel, tempArray);
+        
         tempArray.forEach(function(item, index) {
             tempArray[index] = item.replace(/_/gi, " ");
         });
@@ -82,4 +85,21 @@ function deleteEmbed(answer, channel){
 
     
     
+}
+
+/**
+ * 
+ * @param {Discord.Channel} channel 
+ * @param {Array} embedNames 
+ */
+function messagesInChannel(channel, embedNames){
+
+    embedNames.forEach(function(item, index) {
+        //if the channel of the embed is different from the channel delete was used in it removes it.
+        if(FileSystem.getEmbedChannel(item) != channel){
+            embedNames.splice(index, 1);
+        }
+    });
+
+    return embedNames;
 }
