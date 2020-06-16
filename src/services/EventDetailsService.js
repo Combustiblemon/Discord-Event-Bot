@@ -32,9 +32,14 @@ class EventDetailsService {
         let date = await this.requestEventDate();
         if(this.hasBastion) var bastion = await this.requestExtraEvent('Bastion pilot');
         if(this.hasColossus) var colossus = await this.requestExtraEvent('Colossus driver');
-        if(this.hasConstruction) var construction = await this.requestExtraEvent('Colossus driver');
+        if(this.hasConstruction) var construction = await this.requestExtraEvent('Construction');
 
-        return new EventDetails(name, description, date, {bastion: bastion, colossus: colossus, construction: construction});
+        let options = {
+            bastion: bastion,
+            colossus: colossus, 
+            construction: construction
+        }
+        return new EventDetails(name, description, date, options);
     }
 
     /**
