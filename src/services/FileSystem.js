@@ -198,7 +198,14 @@ class FileSystem {
      * @return {string} 
      */
     getEmbedID(name){
-        //let message = {id: "undefined"};
+        if(this.embedNameExists(name)){
+            let embed = this.readJSON(name, 'embeds/');
+            return embed.id;
+        }
+
+        return null;
+
+    }
         if(this.embedNameExists(name)){
             let message = this.readJSON(name, 'embeds/');
             return message.id;
