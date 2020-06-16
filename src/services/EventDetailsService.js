@@ -85,7 +85,7 @@ class EventDetailsService {
 
         let bastion;
 
-        while(typeof bastion != "boolean"){
+        while(typeof bastion !== "boolean"){
             let answer = await this.requestSingleDetail(question);
             //remove whitespace and convert to uppercase
             answer.trim().toUpperCase();
@@ -108,7 +108,7 @@ class EventDetailsService {
 
         let colossus;
 
-        while(typeof colossus != "boolean"){
+        while(typeof colossus !== "boolean"){
             let answer = await this.requestSingleDetail(question);
             //remove whitespace and convert to uppercase
             answer.trim().toUpperCase();
