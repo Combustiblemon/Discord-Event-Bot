@@ -22,13 +22,14 @@ module.exports = {
         //Get the embed names that exist in file
         let tempArray = FileSystem.getEmbedNames();
         
+        //find only the messages in the current channel
+        tempArray = await messagesInChannel(originalChannel, tempArray);
+
         if(!Array.isArray(tempArray) || !tempArray.length){
             message.author.send('No events to delete.');
             return; 
         }
         
-        //find only the messages in the current channel
-        tempArray = await messagesInChannel(originalChannel, tempArray);
         
         //Replace the '_' in the name with ' '
         tempArray.forEach(function(item, index) {
@@ -94,15 +95,17 @@ function deleteEmbed(answer, channel){
  * 
  * @param {Discord.Channel} channel 
  * @param {Array} embedNames 
+ * @returns {Array}
  */
 function messagesInChannel(channel, embedNames){
-
-    embedNames.forEach(function(item, index) {
+    let temp = [];
+    console.log('inside: ', embedNames);
+    embedNames.forEach(function (item, index) {
         //if the channel of the embed is different from the channel delete was used in it removes it.
-        if(FileSystem.getEmbedChannel(item) !== channel){
-            embedNames.splice(index, 1);
+        if (FileSystem.getEmbedChannel(item) === channel.id) {
+            temp.push(item); 
         }
-    });
-
-    return embedNames;
+    })
+    
+    return Array.from(temp);
 }
