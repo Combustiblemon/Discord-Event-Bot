@@ -9,11 +9,11 @@ module.exports = class Event {
      * @param {boolean=} bastion
      * @param {boolean=} colossus
      */
-    constructor(name, description, date, bastion = false, colossus = false) {
+    constructor(name, description, date, bastion, colossus) {
         this.name = name;
         this.description = description; 
         this.date = date;
-        this.bastion = bastion;
-        this.colossus = colossus;      
+        this.bastion = bastion || false;
+        this.colossus = colossus || false;      
     }
 }
