@@ -182,14 +182,14 @@ class FileSystem {
      * @returns {Array}
      */
     getEmbedIDs(){
-        return embedsInMemoryID;
+        return Array.from(embedsInMemoryID);
     }
 
     /**
      * @returns {Array}
      */
     getEmbedNames(){
-        return embedsInMemoryName;
+        return Array.from(embedsInMemoryName);
     }
 
     /**
