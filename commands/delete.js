@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
 const FileSystem = require('../src/services/FileSystem');
+const nullEmbedID = require('../src/models/error');
+const EventDetailsService = require('../src/services/EventDetailsService');
 const fs = require('fs');
 
 const messageTimeout = 600_000;
@@ -13,6 +15,7 @@ module.exports = {
      */
     async execute(bot, message){
         let originalChannel = message.channel;
+
 
         // Delete the command message
         originalChannel.bulkDelete(1).catch(console.error);
@@ -32,11 +35,13 @@ module.exports = {
 
         
 
-        let answer = await requestDetail(question, message);
+        //let answer = await requestDetail(question, message);
+        let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
         if (answer === ''){
             return;
         }
-        
+        answer = answer.replace(/ /gi, '_');
+        console.log(`answer: ${answer}`);
         if(FileSystem.embedNameExists(answer)){
             deleteEmbed(answer.replace(/ /gi, '_'), originalChannel);
             message.author.send(`Event \`${answer}\` deleted.`);
@@ -51,8 +56,13 @@ module.exports = {
  * @param {string} answer
  * @param {TextChannel} channel 
  */
-async function deleteEmbed(answer, channel){
-    let msgID = await FileSystem.getEmbedID(answer);
+function deleteEmbed(answer, channel){
+    let msgID = FileSystem.getEmbedID(answer);
+    if (msgID === null){
+        console.error(new nullEmbedID('Embed does not exist in memory'));
+        return;
+    }
+    console.log(msgID);
     channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
     
     FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));
