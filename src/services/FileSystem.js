@@ -206,9 +206,16 @@ class FileSystem {
         return null;
 
     }
+
+    /**
+     * 
+     * @param  {string} name The name of the embed to return the channel of
+     * @return {string} 
+     */
+    getEmbedChannel(name){
         if(this.embedNameExists(name)){
-            let message = this.readJSON(name, 'embeds/');
-            return message.id;
+            let embed = this.readJSON(name, 'embeds/');
+            return embed.channelID;
         }
 
         return null;
