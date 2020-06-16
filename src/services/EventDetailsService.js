@@ -10,11 +10,13 @@ class EventDetailsService {
      * @param {string} eventType The type of event, will be added to questions for flair
      * @param {Discord.User} author The user that authored the event
      * @param {boolean=} hasBastion If the event has the posibility for a bastion pilot signup
+     * @param {boolean=} hasColossus If the event has the possibility for a colossus driver signup
      */
-    constructor (eventType, author, hasBastion = false) {
+    constructor (eventType, author, hasBastion = false, hasColossus = false) {
         this.eventType = eventType;
         this.author = author;
         this.hasBastion = hasBastion;
+        this.hasColossus = hasColossus;
     }
 
     /**
@@ -26,8 +28,9 @@ class EventDetailsService {
         let description = await this.requestEventDescription();
         let date = await this.requestEventDate();
         if(this.hasBastion) var bastion = await this.requestEventBastion();
-
-        return new EventDetails(name, description, date, bastion);
+        if(this.hasColossus) var colossus = await this.requestEventColossus();
+        console.log(bastion +"  "+ colossus);
+        return new EventDetails(name, description, date, bastion, colossus);
     }
 
     /**
@@ -82,13 +85,13 @@ class EventDetailsService {
 
         let bastion;
 
-        while(!bastion){
+        while(typeof bastion != "boolean"){
             let answer = await this.requestSingleDetail(question);
             //remove whitespace and convert to uppercase
             answer.trim().toUpperCase();
-            if (answer = 'Y'){
+            if (answer == 'Y'){
                 bastion = true;
-            }else if (answer = 'N'){
+            }else if (answer == 'N'){
                 bastion = false;
             }
         }
@@ -98,14 +101,46 @@ class EventDetailsService {
     }
 
     /**
+     * @returns {Promise<boolean>} If the event will need a colossus driver as answered by author
+     */
+    async requestEventColossus(){
+        let question = `Will the ${this.eventType} need a Colossus driver signup?\n \`Y/N\``;
+
+        let colossus;
+
+        while(typeof colossus != "boolean"){
+            let answer = await this.requestSingleDetail(question);
+            //remove whitespace and convert to uppercase
+            answer.trim().toUpperCase();
+            if (answer === 'Y'){
+                colossus = true;
+            }else if (answer === 'N'){
+                colossus = false;
+            }
+        }
+
+
+        return colossus;
+    }
+
+    /**
      * 
      * @param {string} question The question to ask
+     * @param {Discord.Message=} message 
      * @returns {Promise<string>} The answer to the question
      */
-    async requestSingleDetail(question) {
-        let questionMessage = await this.author.send(question);
+    async requestSingleDetail(question, message = null) {
+        let questionMessage;
+        let messageFilter;
+        if (message === null){
+            questionMessage = await this.author.send(question);
 
-        let messageFilter = m => m.author.id === this.author.id;
+            messageFilter = m => m.author.id === this.author.id;
+        }else{
+            questionMessage = await message.author.send(question);
+
+            messageFilter = m => m.author.id === message.author.id;
+        }
         
         let messages = await questionMessage.channel.awaitMessages(
             messageFilter, 

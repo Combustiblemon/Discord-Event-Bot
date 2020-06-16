@@ -6,7 +6,7 @@ const EventDetailsService = require('../src/services/EventDetailsService');
 
 module.exports = {
     name: 'PS2OP',
-    description: 'Sets up a PS2 op',
+    description: 'Sets up a PS2 op event archetype.',
     /**
      * 
      * @param {Discord.Client} bot 
@@ -19,7 +19,7 @@ module.exports = {
         // Delete the command message
         textChannel.bulkDelete(1).catch(console.error);
 
-        let eventDetailsService = new EventDetailsService('OP', message.author, true);
+        let eventDetailsService = new EventDetailsService('OP', message.author, true, true);
         let eventDetails = await eventDetailsService.requestEventDetails();
 
         let event = createEvent(eventDetails, ['Position', 'Name']);
@@ -44,7 +44,11 @@ function createEvent(eventDetails, header) {
     if (eventDetails.bastion){
         signupOptions.push(new SignupOption('🛹', 'Bastion Pilot', true, true, []));
     }
-
+    
+    if (eventDetails.colossus){
+        signupOptions.push(new SignupOption('tank:722512189067362324', 'Colossus Driver', true, true, []));
+    }
+    console.log(eventDetails);
     return new Event(
         eventDetails,
         header, 
