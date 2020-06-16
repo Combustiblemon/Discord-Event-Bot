@@ -96,6 +96,8 @@ bot.on('message', message => {
                     }
                     else if(subCommand === 'TestOp') {
                             bot.commands.get('TestOp').execute(bot, message); 
+                    }else if(subCommand === 'OW'){
+                        bot.commands.get('OW').execute(bot, message); 
                     }
                     else if(subCommand === 'delete'){
                         message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{

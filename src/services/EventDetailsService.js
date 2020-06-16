@@ -4,19 +4,22 @@ const EventDetails = require('../models/EventDetails');
 const messageTimeout = 600_000;
 
 class EventDetailsService {
-
+    
     /**
      * 
      * @param {string} eventType The type of event, will be added to questions for flair
      * @param {Discord.User} author The user that authored the event
-     * @param {boolean=} hasBastion If the event has the posibility for a bastion pilot signup
-     * @param {boolean=} hasColossus If the event has the possibility for a colossus driver signup
+     * @param {object} options The extra options available
+     * @param {boolean} options.bastion If the event has the posibility for a Bastion pilot signup
+     * @param {boolean} options.colossus If the event has the posibility for a Colossus driver signup
+     * @param {boolean} options.construction If the event has the posibility for a Construction signup  
      */
-    constructor (eventType, author, hasBastion = false, hasColossus = false) {
+    constructor (eventType, author, options) {
         this.eventType = eventType;
         this.author = author;
-        this.hasBastion = hasBastion;
-        this.hasColossus = hasColossus;
+        this.hasBastion = options.bastion || false;
+        this.hasColossus = options.colossus || false;
+        this.hasConstruction = options.construction || false;
     }
 
     /**
@@ -27,10 +30,16 @@ class EventDetailsService {
         let name = await this.requestEventName();
         let description = await this.requestEventDescription();
         let date = await this.requestEventDate();
-        if(this.hasBastion) var bastion = await this.requestEventBastion();
-        if(this.hasColossus) var colossus = await this.requestEventColossus();
+        if(this.hasBastion) var bastion = await this.requestExtraEvent('Bastion pilot');
+        if(this.hasColossus) var colossus = await this.requestExtraEvent('Colossus driver');
+        if(this.hasConstruction) var construction = await this.requestExtraEvent('Construction');
 
-        return new EventDetails(name, description, date, bastion, colossus);
+        let options = {
+            bastion: bastion,
+            colossus: colossus, 
+            construction: construction
+        }
+        return new EventDetails(name, description, date, options);
     }
 
     /**
@@ -78,50 +87,30 @@ class EventDetailsService {
     }
     
     /**
-     * @returns {Promise<boolean>} If the event will need a bastion pilot as answered by author
+     * @param {string} description What is the specific required
+     * @returns {Promise<boolean>} If the event will need the specific, as answered by author
      */
-    async requestEventBastion(){
-        let question = `Will the ${this.eventType} need a Bastion pilot signup?\n \`Y/N\``;
+    async requestExtraEvent(description){
+        let question = `Will the ${this.eventType} need ${description} signup?\n \`Y/N\``;
 
-        let bastion;
+        let event;
 
-        while(typeof bastion != "boolean"){
+        while(typeof event !== "boolean"){
             let answer = await this.requestSingleDetail(question);
             //remove whitespace and convert to uppercase
             answer.trim().toUpperCase();
             if (answer == 'Y'){
-                bastion = true;
+                event = true;
             }else if (answer == 'N'){
-                bastion = false;
+                event = false;
             }
         }
 
 
-        return bastion;
+        return event;
     }
 
-    /**
-     * @returns {Promise<boolean>} If the event will need a colossus driver as answered by author
-     */
-    async requestEventColossus(){
-        let question = `Will the ${this.eventType} need a Colossus driver signup?\n \`Y/N\``;
 
-        let colossus;
-
-        while(typeof colossus != "boolean"){
-            let answer = await this.requestSingleDetail(question);
-            //remove whitespace and convert to uppercase
-            answer.trim().toUpperCase();
-            if (answer === 'Y'){
-                colossus = true;
-            }else if (answer === 'N'){
-                colossus = false;
-            }
-        }
-
-
-        return colossus;
-    }
 
     /**
      * 

@@ -99,7 +99,7 @@ function messagesInChannel(channel, embedNames){
 
     embedNames.forEach(function(item, index) {
         //if the channel of the embed is different from the channel delete was used in it removes it.
-        if(FileSystem.getEmbedChannel(item) != channel){
+        if(FileSystem.getEmbedChannel(item) !== channel){
             embedNames.splice(index, 1);
         }
     });
