@@ -6,7 +6,7 @@ const EventDetailsService = require('../src/services/EventDetailsService');
 
 module.exports = {
     name: 'PS2Training',
-    description: 'Sets up a PS2 training.',
+    description: 'Sets up a PS2 training event archetype.',
     /**
      * 
      * @param {Discord.Client} bot 
