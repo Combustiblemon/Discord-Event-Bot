@@ -48,7 +48,7 @@ function createEvent(eventDetails, header) {
     if (eventDetails.colossus){
         signupOptions.push(new SignupOption('tank:722512189067362324', 'Colossus Driver', true, true, []));
     }
-    console.log(eventDetails);
+    
     return new Event(
         eventDetails,
         header, 

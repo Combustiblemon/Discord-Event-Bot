@@ -29,7 +29,7 @@ class EventDetailsService {
         let date = await this.requestEventDate();
         if(this.hasBastion) var bastion = await this.requestEventBastion();
         if(this.hasColossus) var colossus = await this.requestEventColossus();
-        console.log(bastion +"  "+ colossus);
+        
         return new EventDetails(name, description, date, bastion, colossus);
     }
 
