@@ -19,7 +19,7 @@ module.exports = {
         // Delete the command message
         textChannel.bulkDelete(1).catch(console.error);
 
-        let eventDetailsService = new EventDetailsService('OP', message.author, true, true);
+        let eventDetailsService = new EventDetailsService('OP', message.author, {bastion: true, colossus: true});
         let eventDetails = await eventDetailsService.requestEventDetails();
 
         let event = createEvent(eventDetails, ['Position', 'Name']);
