@@ -182,14 +182,14 @@ class FileSystem {
      * @returns {Array}
      */
     getEmbedIDs(){
-        return embedsInMemoryID;
+        return Array.from(embedsInMemoryID);
     }
 
     /**
      * @returns {Array}
      */
     getEmbedNames(){
-        return embedsInMemoryName;
+        return Array.from(embedsInMemoryName);
     }
 
     /**
@@ -198,10 +198,24 @@ class FileSystem {
      * @return {string} 
      */
     getEmbedID(name){
-        //let message = {id: "undefined"};
         if(this.embedNameExists(name)){
-            let message = this.readJSON(name, 'embeds/');
-            return message.id;
+            let embed = this.readJSON(name, 'embeds/');
+            return embed.id;
+        }
+
+        return null;
+
+    }
+
+    /**
+     * 
+     * @param  {string} name The name of the embed to return the channel of
+     * @return {string} 
+     */
+    getEmbedChannel(name){
+        if(this.embedNameExists(name)){
+            let embed = this.readJSON(name, 'embeds/');
+            return embed.channelID;
         }
 
         return null;

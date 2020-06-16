@@ -16,32 +16,35 @@ module.exports = {
     async execute(bot, message){
         let originalChannel = message.channel;
 
-
         // Delete the command message
         originalChannel.bulkDelete(1).catch(console.error);
 
-        let tempArray = Array.from(FileSystem.getEmbedNames());
+        //Get the embed names that exist in file
+        let tempArray = FileSystem.getEmbedNames();
         
         if(!Array.isArray(tempArray) || !tempArray.length){
             message.author.send('No events to delete.');
             return; 
         }
         
+        //find only the messages in the current channel
+        tempArray = await messagesInChannel(originalChannel, tempArray);
+        
+        //Replace the '_' in the name with ' '
         tempArray.forEach(function(item, index) {
             tempArray[index] = item.replace(/_/gi, " ");
         });
         
         let question = '```Which of the following events would you like to delete?\n     ' + tempArray.join("\n     ") + '```';
 
-        
-
-        //let answer = await requestDetail(question, message);
         let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
         if (answer === ''){
             return;
         }
+        
+        //replace the ' ' in the answer with '_' so it matches the file naming structure 
         answer = answer.replace(/ /gi, '_');
-        console.log(`answer: ${answer}`);
+        //check if the the name exists
         if(FileSystem.embedNameExists(answer)){
             deleteEmbed(answer.replace(/ /gi, '_'), originalChannel);
             message.author.send(`Event \`${answer}\` deleted.`);
@@ -57,17 +60,21 @@ module.exports = {
  * @param {TextChannel} channel 
  */
 function deleteEmbed(answer, channel){
+    //convert the embed name into ID
     let msgID = FileSystem.getEmbedID(answer);
     if (msgID === null){
         console.error(new nullEmbedID('Embed does not exist in memory'));
         return;
     }
-    console.log(msgID);
+
+    //delete the message
     channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
     
+    //remove references to embed
     FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));
     FileSystem.removeEmbedName(answer.replace(/_/gi, ' '));
 
+    //remove the files
     fs.unlink('./embeds/' + answer + '.json', (err) => {
         if (err) throw err;
         console.log(`embeds/${answer}.json was deleted.`);
@@ -84,28 +91,18 @@ function deleteEmbed(answer, channel){
 }
 
 /**
-     * 
-     * @param {string} question 
-     * @param {Discord.Message} message 
-     * @returns {Promise<string>}
-     */
-    async function requestDetail(question, message) {
-        const msg = await message.author.send(question);
+ * 
+ * @param {Discord.Channel} channel 
+ * @param {Array} embedNames 
+ */
+function messagesInChannel(channel, embedNames){
 
-        const filter = collected => collected.author.id === message.author.id;
-        const collected = await msg.channel.awaitMessages(filter, {
-            max: 1,
-            time: 600000,
-            errors: ['time']
-        }).catch(error => {
-            console.error(error);
-            message.author.send("No answer was given.");
-        });
-        
-        
-        let answer = '';
-        answer = collected.first().content.trim();
-        
+    embedNames.forEach(function(item, index) {
+        //if the channel of the embed is different from the channel delete was used in it removes it.
+        if(FileSystem.getEmbedChannel(item) != channel){
+            embedNames.splice(index, 1);
+        }
+    });
 
-        return answer;
-    }
+    return embedNames;
+}
