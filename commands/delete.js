@@ -62,6 +62,7 @@ function deleteEmbed(answer, channel){
         console.error(new nullEmbedID('Embed does not exist in memory'));
         return;
     }
+
     console.log(msgID);
     channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
     
@@ -82,30 +83,3 @@ function deleteEmbed(answer, channel){
     
     
 }
-
-/**
-     * 
-     * @param {string} question 
-     * @param {Discord.Message} message 
-     * @returns {Promise<string>}
-     */
-    async function requestDetail(question, message) {
-        const msg = await message.author.send(question);
-
-        const filter = collected => collected.author.id === message.author.id;
-        const collected = await msg.channel.awaitMessages(filter, {
-            max: 1,
-            time: 600000,
-            errors: ['time']
-        }).catch(error => {
-            console.error(error);
-            message.author.send("No answer was given.");
-        });
-        
-        
-        let answer = '';
-        answer = collected.first().content.trim();
-        
-
-        return answer;
-    }
