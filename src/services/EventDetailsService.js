@@ -29,7 +29,7 @@ class EventDetailsService {
         let date = await this.requestEventDate();
         if(this.hasBastion) var bastion = await this.requestEventBastion();
         if(this.hasColossus) var colossus = await this.requestEventColossus();
-        
+
         return new EventDetails(name, description, date, bastion, colossus);
     }
 
@@ -156,7 +156,7 @@ class EventDetailsService {
 
         let answer = messages.first().content;
 
-        return answer;
+        return answer.trim();
     }
 
 }
