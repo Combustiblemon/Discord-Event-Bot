@@ -60,8 +60,14 @@ bot.on("ready", () => {
 
 bot.on('message', message => {
 
+    //if the message doesn't start with PREFIX return
     if(!message.content.startsWith(PREFIX)) return;
-    if(!(message.guild === null)) var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+    if(!(message.guild === null)) {
+        //find the server position in memory
+        var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+        //delete the command message
+        message.channel.bulkDelete(1).catch(console.error);
+    }
     
     let filter = m => m.author.id === message.author.id;
 
@@ -74,7 +80,6 @@ bot.on('message', message => {
 
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
         if (serverIndex === -1){
-            message.channel.bulkDelete(1);
             message.author.send(`Please use \`$role add\` before using \`$${command} ${subCommand}\`.`);
             return;
         }
@@ -83,7 +88,6 @@ bot.on('message', message => {
             case 'event':
                 if (!(message.guild === null)) {
                     if(!subCommand) {
-                            message.channel.bulkDelete(1);
                             message.author.send('You need to enter a second argument. For a list of commands write $help.');
                         
                     }
@@ -108,7 +112,6 @@ bot.on('message', message => {
                         });
                     }
                     else {
-                        message.channel.bulkDelete(1);
                         message.author.send(`No command \"$${command} ${subCommand}\". For a list of commands write $help.`)
                     }
 

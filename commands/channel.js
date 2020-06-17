@@ -25,7 +25,6 @@ module.exports = {
         }
 
         if (serverIndex === -1) {
-            message.channel.bulkDelete(1);
             message.author.send("You need to add at least one role for the server first.\n`$role add`");
             return;
         }
@@ -59,7 +58,6 @@ function addChannel(allowedChannels, message, roles, serverIndex) {
             return;
         }
 
-        message.channel.bulkDelete(1);
 
         if (allowedChannels.includes(message.channel.id)) {
             author.send('Channel already whitelisted.');
@@ -91,7 +89,6 @@ function removeChannel(allowedChannels, message, roles, serverIndex) {
             return;
         }
 
-        message.channel.bulkDelete(1);
 
         if (!allowedChannels.includes(message.channel.id)) {
             author.send('The channel isn\'t whitelisted.');

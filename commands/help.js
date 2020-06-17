@@ -8,9 +8,6 @@ module.exports = {
      * @param {Discord.Message} message  
      */
     async execute(bot, message) {
-        if (!(message.guild === null)) {
-            message.channel.bulkDelete(1);
-        }
 
         message.author.send(helpMessage);
     }
