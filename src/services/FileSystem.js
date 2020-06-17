@@ -35,14 +35,19 @@ class FileSystem {
      * 
      * @param {any} data The data to be written
      * @param {string} name The name of the file
-     * @param {string} folder The folder of the file
+     * @param {string} folder The folder to write the file
      */
     writeData(data, name, folder) {
         let embedData = JSON.stringify(data, null, 2);
-                
-        fs.writeFileSync(`${folder}${name}.json`, embedData);
         
-        console.log(`Done writing file: ${folder}${name}.json`);
+        if(name.includes('.json')){
+            fs.writeFileSync(`${folder}${name}`, embedData);
+            console.log(`Done writing file: ${folder}${name}`);
+        }else{
+            fs.writeFileSync(`${folder}${name}.json`, embedData);
+            console.log(`Done writing file: ${folder}${name}.json`);
+        }
+        
         
         return;
     }
