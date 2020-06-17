@@ -113,7 +113,6 @@ class EventService {
         embed.addField('Start time', startTimeField);
         
         let signupOptionsField = '';
-        console.log("signup: " + signupOptionsField);
         
         event.signupOptions.forEach(signupOption => {
             if (signupOption.isAdditionalRole || signupOption.isInline) return;
@@ -126,12 +125,14 @@ class EventService {
             signupOptionsField += `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
         });
 
-        if(!signupOptionsField == ''){
-            embed.addField(
-                `Total number of signups: ${ event.getTotalSignups()}`, 
-                signupOptionsField
-            );
-        }
+        signupOptionsField += `Total: ${ event.getTotalSignups()}\n`
+        embed.addField(
+            `Signups:`, 
+            signupOptionsField
+        );
+        
+        /*if(!signupOptionsField == ''){
+        }*/
 
         event.signupOptions.forEach(signupOption => {
             if (!signupOption.isAdditionalRole && !signupOption.isInline) return;

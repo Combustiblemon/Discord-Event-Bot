@@ -99,7 +99,6 @@ function deleteEmbed(answer, channel){
  */
 function messagesInChannel(channel, embedNames){
     let temp = [];
-    console.log('inside: ', embedNames);
     embedNames.forEach(function (item, index) {
         //if the channel of the embed is different from the channel delete was used in it removes it.
         if (FileSystem.getEmbedChannel(item) === channel.id) {
