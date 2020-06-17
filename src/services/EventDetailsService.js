@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const EventDetails = require('../models/EventDetails');
 
 const messageTimeout = 600_000;
+const pattern = ['<','>',':','\"','/','\\','|','?','*'];
 
 class EventDetailsService {
     
@@ -49,7 +50,12 @@ class EventDetailsService {
     async requestEventName() {
         let question = `What is the name of the ${this.eventType}?`;
 
-        let answer = await this.requestSingleDetail(question);
+        let answer = '?';
+
+        while(this.containsIllegalCharacters(answer)){
+            answer = await this.requestSingleDetail(question);
+            this.author.send(`\`\`\`You have entered an illegal character.\n please avoid using the following characters:\n ${pattern}\`\`\``);
+        }
 
         return answer;
     }
@@ -146,6 +152,25 @@ class EventDetailsService {
         let answer = messages.first().content;
 
         return answer.trim();
+    }
+
+    /**
+     * 
+     * @param {string} text
+     * @returns {boolean} 
+     */
+    containsIllegalCharacters(text){
+        
+        var value = 0;
+        pattern.forEach(function(word){
+            value = value + text.includes(word);
+        });;
+
+        if (value > 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }
