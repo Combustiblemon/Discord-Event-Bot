@@ -50,10 +50,10 @@ class EventDetailsService {
     async requestEventName() {
         let question = `What is the name of the ${this.eventType}?`;
 
-        let answer = '?';
+        
+        let answer = await this.requestSingleDetail(question);
 
         while(this.containsIllegalCharacters(answer)){
-            answer = await this.requestSingleDetail(question);
             this.author.send(`\`\`\`You have entered an illegal character.\n please avoid using the following characters:\n ${pattern}\`\`\``);
         }
 
