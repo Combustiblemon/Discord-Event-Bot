@@ -22,6 +22,7 @@ List of current commands:
     ($help)               Displays this help message.
     ($channel add|remove) Adds or removes the channel to/from the whitelist.
     ($role add|remove)    Adds or removes the minimum role required to use the bot on a server
+    ($csv)                Get a specific CSV file from a list of events.
     Events:
     ($event delete)       Delete event.
     ($event PS2OP)        Sets up a PS2 Op type event.
