@@ -251,7 +251,6 @@ class FileSystem {
 
         //check if the patch exists
         if (fs.existsSync(path.dirname(filePath))) {
-            console.log('Marco!');
             return true;
         }
         
@@ -261,6 +260,21 @@ class FileSystem {
         return true;
     }
 
+    /**
+     * 
+     * @param {string} name The name of the file to check.
+     * @param {string=} folder The folder the file is in.
+     */
+    async ensureFileExistance(name, folder = './' ){
+        if(fs.existsSync(`${folder}${name}`)){
+            let file = require(`${folder}${name}`);
+            return file;
+        }else{
+            let data = [];
+            this.writeData(data, `${name}`,`${folder}` )
+            return data;
+        }
+    }
 }
 
 module.exports = new FileSystem();
