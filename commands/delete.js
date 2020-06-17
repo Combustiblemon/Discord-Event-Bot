@@ -34,7 +34,7 @@ module.exports = {
             tempArray[index] = item.replace(/_/gi, " ");
         });
         
-        let question = '```Which of the following events would you like to delete?\n     ' + tempArray.join("\n     ") + '```';
+        const question = '```Which of the following events would you like to delete?\n     ' + tempArray.join("\n     ") + '```';
 
         let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
         if (!answer) return;

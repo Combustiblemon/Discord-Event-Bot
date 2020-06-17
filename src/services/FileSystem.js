@@ -8,9 +8,11 @@ const EventDetailsService = require('./EventDetailsService');
 
 let embedsInMemoryID = [];
 let embedsInMemoryName = [];
+let csvFilesInMemory = [];
 
 class FileSystem {
 
+    //#region JSON logic
     /**
      * Writes events and embeds to file.
      * 
@@ -70,6 +72,8 @@ class FileSystem {
         
     }
 
+    //#endregion
+
     /**
      * 
      * @param {BotEvent} event The event from which the name will be created
@@ -86,6 +90,7 @@ class FileSystem {
         return `${date}_${name}`;
     }
 
+    //#region CSV logic
     /**
      * @param {BotEvent} event The event to find the signups from.
      * @param {string} guildName The name of the server the event is in.
@@ -154,6 +159,26 @@ class FileSystem {
         });
 
         return records;
+    }
+    //#endregion
+
+    //#region add/remove/get/checks
+
+    /**
+     * 
+     * @param {string} name The name of the CSV file
+     */
+    addCSVFile(name){
+        if(!csvFilesInMemory.includes(name)){
+            csvFilesInMemory.push(name);
+        }
+    }
+
+    /**
+     * @returns {Array} An array of the CSV file names in memory
+     */
+    getCSVFilesNames(){
+        return Array.from(csvFilesInMemory);
     }
 
     /**
@@ -242,6 +267,7 @@ class FileSystem {
     embedNameExists(name){
         return embedsInMemoryName.includes(name);
     }
+    //#endregion
 
     /**
      * 
