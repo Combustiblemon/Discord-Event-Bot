@@ -28,7 +28,6 @@ let roles = FileSystem.ensureFileExistance('roles.json', '../../').then(function
 });
  
 const csvFiles = glob.sync('csv_files' + '/**/*.csv');
-console.log(csvFiles);
 
 
 for (const file of commandFiles) {
