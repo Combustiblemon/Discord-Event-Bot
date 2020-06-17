@@ -11,4 +11,19 @@ class nullEmbedID extends Error {
       }
   }
 
-  module.exports = nullEmbedID;
+  class illegalCharactersInFilename extends Error {
+    constructor(message) {
+      super(message)
+      this.name = this.constructor.name
+      Error.captureStackTrace(this, illegalCharactersInFilename);
+    }
+
+    statusCode() {
+        return this.status
+      }
+  }
+
+  module.exports = {
+    nullEmbedID: nullEmbedID,
+    illegalCharactersInFilename: illegalCharactersInFilename
+  };

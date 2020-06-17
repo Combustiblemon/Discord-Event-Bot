@@ -17,7 +17,6 @@ module.exports = {
             return;
         }
 
-        message.channel.bulkDelete(1);
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.author.send("You need to be an administrator to use the `$role` command.");

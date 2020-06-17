@@ -16,8 +16,6 @@ module.exports = {
     async execute(bot, message){
         let originalChannel = message.channel;
 
-        // Delete the command message
-        originalChannel.bulkDelete(1).catch(console.error);
 
         //Get the embed names that exist in file
         let tempArray = FileSystem.getEmbedNames();

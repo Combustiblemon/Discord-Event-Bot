@@ -25,7 +25,6 @@ module.exports = {
         }
 
         if (serverIndex === -1) {
-            message.channel.bulkDelete(1);
             message.author.send("You need to add at least one role for the server first.\n`$role add`");
             return;
         }
@@ -52,20 +51,21 @@ module.exports = {
 function addChannel(allowedChannels, message, roles, serverIndex) {
     let author = message.author;
 
-    message.guild.roles.fetch(roles[serverIndex][1]).then(role => {
+    message.guild.roles.fetch(roles[serverIndex][1]).then(async role => {
     
         if (message.member.roles.highest.comparePositionTo(role) < 0) {
             author.send('You are lacking the required permissions.');
             return;
         }
 
-        message.channel.bulkDelete(1);
 
         if (allowedChannels.includes(message.channel.id)) {
             author.send('Channel already whitelisted.');
             return;
         }
         
+        await FileSystem.ensureDirectoryExistence(`./csv_files/${message.guild.name.replace(/[<>:"/\\|?*]/gi, '')}/test.csv`);
+
         allowedChannels.push(message.channel.id);
         FileSystem.writeData(allowedChannels, 'channels', '');
         author.send('Channel added to whitelist.');
@@ -89,7 +89,6 @@ function removeChannel(allowedChannels, message, roles, serverIndex) {
             return;
         }
 
-        message.channel.bulkDelete(1);
 
         if (!allowedChannels.includes(message.channel.id)) {
             author.send('The channel isn\'t whitelisted.');

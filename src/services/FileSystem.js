@@ -1,7 +1,10 @@
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
+const path = require('path');
 const BotEvent = require('../models/Event');
+const Errors = require('../models/error');
+const EventDetailsService = require('./EventDetailsService');
 
 let embedsInMemoryID = [];
 let embedsInMemoryName = [];
@@ -32,14 +35,19 @@ class FileSystem {
      * 
      * @param {any} data The data to be written
      * @param {string} name The name of the file
-     * @param {string} folder The folder of the file
+     * @param {string} folder The folder to write the file
      */
     writeData(data, name, folder) {
         let embedData = JSON.stringify(data, null, 2);
-                
-        fs.writeFileSync(`${folder}${name}.json`, embedData);
         
-        console.log(`Done writing file: ${folder}${name}.json`);
+        if(name.includes('.json')){
+            fs.writeFileSync(`${folder}${name}`, embedData);
+            console.log(`Done writing file: ${folder}${name}`);
+        }else{
+            fs.writeFileSync(`${folder}${name}.json`, embedData);
+            console.log(`Done writing file: ${folder}${name}.json`);
+        }
+        
         
         return;
     }
@@ -79,20 +87,24 @@ class FileSystem {
     }
 
     /**
-     * @param {BotEvent} event
+     * @param {BotEvent} event The event to find the signups from.
+     * @param {string} guildName The name of the server the event is in.
      */
-    async createCSV(event) {
+    async createCSV(event, guildName) {
         let records = this.createCSVRecords(event);
 
+        //remove illegal characters from the server name
+        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '');
+        
         let name = this.getFileNameForEvent(event);
-
+        
         let header = event.getHeader();
         // Add additional roles to header
         header = header.concat(event.signupOptions.filter(x => x.isAdditionalRole).map(x => x.name));        
 
         const csvWriter = createCsvWriter({
             header: header,
-            path: (`csv_files/${name}.csv`)
+            path: (`csv_files/${guildName}/${name}.csv`)
         });
 
         csvWriter.writeRecords(records);
@@ -229,6 +241,48 @@ class FileSystem {
      */
     embedNameExists(name){
         return embedsInMemoryName.includes(name);
+    }
+
+    /**
+     * 
+     * @param {string} filePath The path of the file to be written
+     * @returns {Promise<boolean>} 
+     */
+    async ensureDirectoryExistence(filePath) {
+        //remove the '/' character from filePath and then rejoin the string
+        var dirname = filePath.substring(2).split('/');
+        
+        //Check for illegal characters before writing
+        if(EventDetailsService.prototype.containsIllegalCharacters(dirname.join(' '))){
+            console.error(new Errors.illegalCharactersInFilename(`'${filePath}' contains illegal characters`));
+            return null;
+        }
+
+        //check if the patch exists
+        if (fs.existsSync(path.dirname(filePath))) {
+            return true;
+        }
+        
+        //if the path doesn't exist write it
+        fs.mkdirSync(path.dirname(filePath));
+        console.log(`Created path: ${filePath}`);
+        return true;
+    }
+
+    /**
+     * 
+     * @param {string} name The name of the file to check.
+     * @param {string=} folder The folder the file is in.
+     */
+    async ensureFileExistance(name, folder = './' ){
+        if(fs.existsSync(`${folder}${name}`)){
+            let file = require(`${folder}${name}`);
+            return file;
+        }else{
+            let data = [];
+            this.writeData(data, `${name}`,`${folder}` )
+            return data;
+        }
     }
 }
 
