@@ -19,19 +19,14 @@ const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith(
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
 //const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
 
-let allowedChannels = [];
-let roles = [];
-if(fs.existsSync('./roles.json')){
-    roles = require('./roles.json');
-}else{
-    FileSystem.writeData(roles, 'roles', './');
-}
+//read the files from disk, if they don't exist write them
+let allowedChannels = FileSystem.ensureFileExistance('channels.json', '../../').then(function(result){
+    allowedChannels = result;
+});
+let roles = FileSystem.ensureFileExistance('roles.json', '../../').then(function(result){
+    roles = result;
+});
 
-if(fs.existsSync('./channels.json')){
-    allowedChannels = FileSystem.readJSON('channels', './');
-}else{
-    FileSystem.writeData(roles, 'channels', './');
-}
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
