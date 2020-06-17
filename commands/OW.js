@@ -21,6 +21,7 @@ module.exports = {
 
         let eventDetailsService = new EventDetailsService('OW event', message.author, {construction: true});
         let eventDetails = await eventDetailsService.requestEventDetails();
+        if(!eventDetails) return;
 
         let event = createEvent(eventDetails, ['Position', 'Name']);
 
