@@ -17,7 +17,6 @@ const PREFIX = '$';
 bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
-//const eventFiles = fs.readdirSync('./events/').filter(file => file.endsWith('.json'));
 
 //read the files from disk, if they don't exist write them
 let allowedChannels = FileSystem.ensureFileExistance('channels.json', '../../').then(function(result){
@@ -28,6 +27,9 @@ let roles = FileSystem.ensureFileExistance('roles.json', '../../').then(function
 });
  
 const csvFiles = glob.sync('csv_files' + '/**/*.csv');
+csvFiles.forEach(element =>{
+    FileSystem.addCSVFile(element);
+})
 
 
 for (const file of commandFiles) {
@@ -144,6 +146,11 @@ bot.on('message', message => {
                     .execute(bot, message, roles, subCommand);
                 
                 break;
+            case 'csv':
+                bot.commands
+                    .get('csv')
+                    .execute(bot, message);
+            break;
         }
            
     

@@ -230,7 +230,7 @@ class EventService {
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
         
         let signupOption = event.getSingupOptionForEmoji(emoji);
-        let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '')
+        let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
         if(signupOption == csvEmoji){
             user.send('CSV file for ' + event.name +'.\n', {files: [
                 (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
