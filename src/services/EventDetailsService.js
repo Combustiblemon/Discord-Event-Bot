@@ -15,7 +15,7 @@ class EventDetailsService {
      * @param {boolean} options.colossus If the event has the posibility for a Colossus driver signup
      * @param {boolean} options.construction If the event has the posibility for a Construction signup  
      */
-    constructor (eventType, author, options) {
+    constructor (eventType, author, options={}) {
         this.eventType = eventType;
         this.author = author;
         this.hasBastion = options.bastion || false;
