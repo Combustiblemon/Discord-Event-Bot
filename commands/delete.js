@@ -66,7 +66,7 @@ function deleteEmbed(answer, channel){
     }
 
     //delete the message
-    channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.log(error)});
+    channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.error(error)});
     
     //remove references to embed
     FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));

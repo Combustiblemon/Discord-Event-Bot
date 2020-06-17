@@ -31,7 +31,7 @@ module.exports = {
         GuildCSVs.forEach(function(item, index) {
             GuildCSVs[index] = item.substring(11+guildName.length, item.length - 4).replace(/_/gi, " ");
         });
-        console.log(GuildCSVs);
+        
 
         const question = '```Which of the following events would you the CSV for?\n     ' + GuildCSVs.join("\n     ") + '```';
         let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
