@@ -5,9 +5,9 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const FileSystem = require('./src/services/FileSystem');
 const EventService = require('./src/services/EventService');
-const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const EventDetails = require('./src/models/EventDetails');
 const SignupOption = require('./src/models/SignupOption');
+const glob = require('glob');
 const bot = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 const Event = require('./src/models/Event');
 const token = process.env.DISCORD_BOT_TOKEN;
@@ -26,6 +26,9 @@ let allowedChannels = FileSystem.ensureFileExistance('channels.json', '../../').
 let roles = FileSystem.ensureFileExistance('roles.json', '../../').then(function(result){
     roles = result;
 });
+ 
+const csvFiles = glob.sync('csv_files' + '/**/*.csv');
+console.log(csvFiles);
 
 
 for (const file of commandFiles) {

@@ -1,7 +1,6 @@
 const BotEvent = require('../models/Event');
 const FileSystem = require('../services/FileSystem');
 const SignupOption = require('../models/SignupOption');
-const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
 
@@ -231,10 +230,10 @@ class EventService {
         console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
         
         let signupOption = event.getSingupOptionForEmoji(emoji);
-
+        let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '')
         if(signupOption == csvEmoji){
             user.send('CSV file for ' + event.name +'.\n', {files: [
-                ('./csv_files/' + FileSystem.getFileNameForEvent(event) + '.csv')
+                (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
             ]});
             reaction.users.remove(user.id);
             return;

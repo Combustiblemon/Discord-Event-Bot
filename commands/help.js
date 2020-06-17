@@ -18,7 +18,7 @@ module.exports = {
 
 const helpMessage = `
 \`\`\`
-For any extra help message (CombustibleLemon#6917).
+For any extra help message CombustibleLemon#6917.
 Report bugs/request features: https://github.com/Combustiblemon/Discord-Event-Bot/issues.
 The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00).
 List of current commands:

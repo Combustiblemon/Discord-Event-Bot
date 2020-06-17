@@ -87,7 +87,8 @@ class FileSystem {
     }
 
     /**
-     * @param {BotEvent} event
+     * @param {BotEvent} event The event to find the signups from.
+     * @param {string} guildName The name of the server the event is in.
      */
     async createCSV(event, guildName) {
         let records = this.createCSVRecords(event);
@@ -250,7 +251,7 @@ class FileSystem {
     async ensureDirectoryExistence(filePath) {
         //remove the '/' character from filePath and then rejoin the string
         var dirname = filePath.substring(2).split('/');
-        console.log(dirname);
+        
         //Check for illegal characters before writing
         if(EventDetailsService.prototype.containsIllegalCharacters(dirname.join(' '))){
             console.error(new Errors.illegalCharactersInFilename(`'${filePath}' contains illegal characters`));
