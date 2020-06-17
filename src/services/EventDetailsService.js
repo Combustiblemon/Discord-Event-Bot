@@ -29,11 +29,23 @@ class EventDetailsService {
      */
     async requestEventDetails() {
         let name = await this.requestEventName();
+        if(!name) return;
         let description = await this.requestEventDescription();
+        if(!description) return null;
         let date = await this.requestEventDate();
-        if(this.hasBastion) var bastion = await this.requestExtraEvent('Bastion pilot');
-        if(this.hasColossus) var colossus = await this.requestExtraEvent('Colossus driver');
-        if(this.hasConstruction) var construction = await this.requestExtraEvent('Construction');
+        if(!date) return null;
+        if(this.hasBastion) {
+            var bastion = await this.requestExtraEvent('Bastion pilot');
+            if(!bastion) return null;
+        }
+        if(this.hasColossus) {
+            var colossus = await this.requestExtraEvent('Colossus driver');
+            if(!colossus) return null;
+        }
+        if(this.hasConstruction) {
+            var construction = await this.requestExtraEvent('Construction');
+            if(!construction) return null;
+        }
 
         let options = {
             bastion: bastion,
@@ -53,8 +65,12 @@ class EventDetailsService {
         
         let answer = await this.requestSingleDetail(question);
 
+        if(!answer) return null;
+
         while(this.containsIllegalCharacters(answer)){
             this.author.send(`\`\`\`You have entered an illegal character.\n please avoid using the following characters:\n ${pattern}\`\`\``);
+            answer = await this.requestSingleDetail(question);
+            if(!answer) return null;
         }
 
         return answer;
@@ -68,6 +84,8 @@ class EventDetailsService {
         let question = `Write a short description of the ${this.eventType}.`;
 
         let answer = await this.requestSingleDetail(question);
+
+        if(!answer) return null;
 
         return answer;
     }
@@ -84,6 +102,7 @@ class EventDetailsService {
         // Ask for date while no valid date has been given
         while (!date || isNaN(date.getTime())) {
             let answer = await this.requestSingleDetail(question);
+            if(!answer) return null;
             answer = answer.trim();
             answer = `${answer.substring(0,10)}T${answer.substring(11,16)}Z`;
             date = new Date(answer);
@@ -103,6 +122,7 @@ class EventDetailsService {
 
         while(typeof event !== "boolean"){
             let answer = await this.requestSingleDetail(question);
+            if(!answer) return null;
             //remove whitespace and convert to uppercase
             answer.trim().toUpperCase();
             if (answer == 'Y'){
@@ -127,7 +147,7 @@ class EventDetailsService {
     async requestSingleDetail(question, message = null) {
         let questionMessage;
         let messageFilter;
-        if (message === null){
+        if (!message){
             questionMessage = await this.author.send(question);
 
             messageFilter = m => m.author.id === this.author.id;
@@ -144,11 +164,12 @@ class EventDetailsService {
                 time: messageTimeout,
                 errors: ['time'] 
             }
-        ).catch(error =>{
-            console.error(error);
-            this.author.send('No answer was given.');
+        ).catch(() =>{
+            console.error('Message timeout. No message after question.');
+            questionMessage.channel.send('No answer was given. Please use the command again.');
         });
 
+        if(!message) return null;
         let answer = messages.first().content;
 
         return answer.trim();

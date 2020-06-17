@@ -21,6 +21,7 @@ module.exports = {
 
         let eventDetailsService = new EventDetailsService('OP', message.author, {bastion: true, colossus: true});
         let eventDetails = await eventDetailsService.requestEventDetails();
+        if(!eventDetails) return;
 
         let event = createEvent(eventDetails, ['Position', 'Name']);
 
