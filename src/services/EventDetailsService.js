@@ -64,7 +64,7 @@ class EventDetailsService {
 
         
         let answer = await this.requestSingleDetail(question);
-
+        
         if(!answer) return null;
 
         while(this.containsIllegalCharacters(answer)){
@@ -169,7 +169,7 @@ class EventDetailsService {
             questionMessage.channel.send('No answer was given. Please use the command again.');
         });
 
-        if(!message) return null;
+        if(!messages.first().content) return null;
         let answer = messages.first().content;
 
         return answer.trim();
