@@ -1,7 +1,10 @@
 const createCsvWriter = require('csv-writer').createArrayCsvWriter;
 const Discord = require('discord.js');
 const fs = require('fs');
+const path = require('path');
 const BotEvent = require('../models/Event');
+const Errors = require('../models/error');
+const EventDetailsService = require('./EventDetailsService');
 
 let embedsInMemoryID = [];
 let embedsInMemoryName = [];
@@ -230,6 +233,34 @@ class FileSystem {
     embedNameExists(name){
         return embedsInMemoryName.includes(name);
     }
+
+    /**
+     * 
+     * @param {string} filePath The path of the file to be written
+     * @returns {Promise<boolean>} 
+     */
+    async ensureDirectoryExistence(filePath) {
+        //remove the '/' character from filePath and then rejoin the string
+        var dirname = filePath.substring(2).split('/');
+        console.log(dirname);
+        //Check for illegal characters before writing
+        if(EventDetailsService.prototype.containsIllegalCharacters(dirname.join(' '))){
+            console.error(new Errors.illegalCharactersInFilename(`'${filePath}' contains illegal characters`));
+            return null;
+        }
+
+        //check if the patch exists
+        if (fs.existsSync(path.dirname(filePath))) {
+            console.log('Marco!');
+            return true;
+        }
+        
+        //if the path doesn't exist write it
+        fs.mkdirSync(path.dirname(filePath));
+        console.log(`Created path: ${filePath}`);
+        return true;
+    }
+
 }
 
 module.exports = new FileSystem();
