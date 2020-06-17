@@ -84,18 +84,21 @@ class FileSystem {
     /**
      * @param {BotEvent} event
      */
-    async createCSV(event) {
+    async createCSV(event, guildName) {
         let records = this.createCSVRecords(event);
 
+        //remove illegal characters from the server name
+        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '');
+        
         let name = this.getFileNameForEvent(event);
-
+        
         let header = event.getHeader();
         // Add additional roles to header
         header = header.concat(event.signupOptions.filter(x => x.isAdditionalRole).map(x => x.name));        
 
         const csvWriter = createCsvWriter({
             header: header,
-            path: (`csv_files/${name}.csv`)
+            path: (`csv_files/${guildName}/${name}.csv`)
         });
 
         csvWriter.writeRecords(records);

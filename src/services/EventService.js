@@ -75,7 +75,7 @@ class EventService {
         
         await message.edit(message.embeds[0] = embed);
         
-        FileSystem.createCSV(event);
+        FileSystem.createCSV(event, message.guild.name);
         FileSystem.writeJSON(event, embed, 'event');
     }
 

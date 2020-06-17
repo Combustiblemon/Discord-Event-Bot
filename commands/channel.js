@@ -52,7 +52,7 @@ module.exports = {
 function addChannel(allowedChannels, message, roles, serverIndex) {
     let author = message.author;
 
-    message.guild.roles.fetch(roles[serverIndex][1]).then(role => {
+    message.guild.roles.fetch(roles[serverIndex][1]).then(async role => {
     
         if (message.member.roles.highest.comparePositionTo(role) < 0) {
             author.send('You are lacking the required permissions.');
@@ -66,6 +66,8 @@ function addChannel(allowedChannels, message, roles, serverIndex) {
             return;
         }
         
+        await FileSystem.ensureDirectoryExistence(`./csv_files/${message.guild.name.replace(/[<>:"/\\|?*]/gi, '')}/test.csv`);
+
         allowedChannels.push(message.channel.id);
         FileSystem.writeData(allowedChannels, 'channels', '');
         author.send('Channel added to whitelist.');
