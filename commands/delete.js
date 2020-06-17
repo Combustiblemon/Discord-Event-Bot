@@ -39,9 +39,8 @@ module.exports = {
         let question = '```Which of the following events would you like to delete?\n     ' + tempArray.join("\n     ") + '```';
 
         let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
-        if (answer === ''){
-            return;
-        }
+        if (!answer) return;
+        
         
         //replace the ' ' in the answer with '_' so it matches the file naming structure 
         answer = answer.replace(/ /gi, '_');

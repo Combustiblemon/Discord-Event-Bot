@@ -74,12 +74,12 @@ function addRole(message, serverIndex, roles) {
             roles.push(tempArray);
             FileSystem.writeData(roles, 'roles', './');
             author.send('Role Added.');
-        }).catch(error => {
-            console.error(error);
+        }).catch(() => {
+            console.error('No role ID was entered.');
             author.send('No ID was entered.');
         })
-    }).catch(error => {
-        console.error(error);
+    }).catch(() => {
+        console.error(new Error('An error occurred'));
         message.author.send('An error occurred');
     })
 }
@@ -112,12 +112,12 @@ function removeRole(message, serverIndex, roles) {
 
                 return;
             });
-        }).catch(error => {
-            console.error(error);
+        }).catch(() => {
+            console.error('No role ID was entered.');
             message.author.send('No ID was entered.');
         });
-    }).catch(error => {
-        console.error(error);
+    }).catch(() => {
+        cconsole.error(new Error('An error occurred'));
         message.author.send('An error occurred');
     });
 }
