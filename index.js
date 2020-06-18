@@ -87,7 +87,7 @@ bot.on('message', message => {
 
         switch(command) {
             case 'event':
-                if (!(message.guild === null)) {
+                if (isGuildChannel) {
                     if(!subCommand) {
                             message.author.send('You need to enter a second argument. For a list of commands write $help.');
                         
