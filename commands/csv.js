@@ -12,6 +12,10 @@ module.exports = {
      * @param {Array} csvFiles 
      */
     async execute(bot, message){
+        if(!message.guild){
+            message.author.send('Please use the command in a server channel.');
+            return;
+        }
         
         let csvFiles = FileSystem.getCSVFilesNames();
         let user = message.author;
