@@ -55,6 +55,11 @@ for (const file of embedFiles) {
 }
 
 bot.on("ready", () => {
+    //sets up the status message
+    bot.user.setActivity('$help', { type: 'LISTENING' })
+               .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
+               .catch(console.error);
+    //sets up the reaction listeners
     EventService.setupListeners(bot);
     console.log('This bot is online.');
 });
