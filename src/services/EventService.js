@@ -57,6 +57,7 @@ class EventService {
 
                     await embed.react(csvEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
+                    await FileSystem.createCSV(event, embed.guild.name);
                 } catch (error) {
                     console.error(error);
                 }
