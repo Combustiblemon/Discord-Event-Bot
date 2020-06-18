@@ -88,7 +88,7 @@ class EventService {
             .setTitle(event.name)
             .setDescription(event.description)
             .setColor(0xF1C40F)
-            .setFooter('Click 📋 to get signups.');
+            .setFooter(`Click 📋 to get signups.\n Created by: ${event.author}`);
 
         let dateOptions = {
             weekday: 'long',

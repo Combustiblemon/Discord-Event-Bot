@@ -16,13 +16,11 @@ module.exports = {
 
         let textChannel = message.channel;
 
-
-
         let eventDetailsService = new EventDetailsService('OP', message.author, {bastion: true, colossus: true});
         let eventDetails = await eventDetailsService.requestEventDetails();
         if(!eventDetails) return;
 
-        let event = createEvent(eventDetails, ['Position', 'Name']);
+        let event = createEvent(eventDetails, ['Position', 'Name'], message.member.displayName);
 
         EventService.newEvent(bot, textChannel, event);
     }
@@ -33,7 +31,7 @@ module.exports = {
  * @param {Array} header
  * @returns {Event}
  */
-function createEvent(eventDetails, header) {
+function createEvent(eventDetails, header, author) {
     let signupOptions = [
         new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
         new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
@@ -52,5 +50,7 @@ function createEvent(eventDetails, header) {
     return new Event(
         eventDetails,
         header, 
-        signupOptions)
+        author,
+        signupOptions
+    )
 }

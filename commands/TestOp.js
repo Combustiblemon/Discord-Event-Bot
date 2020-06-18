@@ -21,7 +21,7 @@ module.exports = {
         let eventDetailsService = new EventDetailsService('TestOp', message.author);
         let eventDetails = await eventDetailsService.requestEventDetails();
 
-        let event = createEvent(eventDetails, ['Aspect Test', 'Name Test']);
+        let event = createEvent(eventDetails, ['Aspect Test', 'Name Test'], message.member.displayName);
 
         EventService.newEvent(bot, textChannel, event);
     }
@@ -36,6 +36,7 @@ function createEvent(eventDetails, header) {
     return new Event(
         eventDetails,
         header,
+        author,
         [
             new SignupOption('🔫', 'Infantry', false, false, []),
             new SignupOption('🚌', 'Armour', false, false, []),
