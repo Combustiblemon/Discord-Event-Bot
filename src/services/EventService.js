@@ -58,7 +58,7 @@ class EventService {
                     await embed.react(csvEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
                 } catch (error) {
-                    console.log(error);
+                    console.error(error);
                 }
 
             })
