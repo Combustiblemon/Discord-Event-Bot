@@ -18,6 +18,7 @@ const helpMessage = `
 For any extra help message CombustibleLemon#6917.
 Report bugs/request features: https://github.com/Combustiblemon/Discord-Event-Bot/issues.
 The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00).
+After the event is over use command '$event delete' to delete your event.
 List of current commands:
     ($help)               Displays this help message.
     ($channel add|remove) Adds or removes the channel to/from the whitelist.
