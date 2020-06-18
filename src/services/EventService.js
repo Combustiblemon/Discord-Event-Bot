@@ -127,7 +127,7 @@ class EventService {
         });
 
         if(signupOptionsField.count > 0){
-            signupOptionsField += `Total: ${ event.getTotalSignups()}\n`
+            signupOptionsField.field += `Total: ${ event.getTotalSignups()}\n`
             embed.addField(
                 `Signups:`, 
                 signupOptionsField.field
