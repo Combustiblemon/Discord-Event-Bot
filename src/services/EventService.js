@@ -57,6 +57,7 @@ class EventService {
 
                     await embed.react(csvEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
+                    await FileSystem.createCSV(event, embed.guild.name);
                 } catch (error) {
                     console.error(error);
                 }
@@ -88,7 +89,7 @@ class EventService {
             .setTitle(event.name)
             .setDescription(event.description)
             .setColor(0xF1C40F)
-            .setFooter('Click 📋 to get signups.');
+            .setFooter(`Click 📋 to get signups.\n Created by: ${event.author}`);
 
         let dateOptions = {
             weekday: 'long',
@@ -111,7 +112,7 @@ class EventService {
         
         embed.addField('Start time', startTimeField);
         
-        let signupOptionsField = '';
+        let signupOptionsField = {field: '', count: 0};
         
         event.signupOptions.forEach(signupOption => {
             if (signupOption.isAdditionalRole || signupOption.isInline) return;
@@ -121,17 +122,17 @@ class EventService {
                 displayEmoji = `<:${signupOption.emoji}>`;
             }
                 
-            signupOptionsField += `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
+            signupOptionsField.field += `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
+            signupOptionsField.count += 1;
         });
 
-        signupOptionsField += `Total: ${ event.getTotalSignups()}\n`
-        embed.addField(
-            `Signups:`, 
-            signupOptionsField
-        );
-        
-        /*if(!signupOptionsField == ''){
-        }*/
+        if(signupOptionsField.count > 0){
+            signupOptionsField.field += `Total: ${ event.getTotalSignups()}\n`
+            embed.addField(
+                `Signups:`, 
+                signupOptionsField.field
+            );
+        }
 
         event.signupOptions.forEach(signupOption => {
             if (!signupOption.isAdditionalRole && !signupOption.isInline) return;

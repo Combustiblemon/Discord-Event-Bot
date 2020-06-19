@@ -7,15 +7,17 @@ module.exports = class Event {
      * 
      * @param {EventDetails} eventDetails
      * @param {Array} header
+     * @param {string} author
      * @param {SignupOption[]} signupOptions
      */
-    constructor(eventDetails, header, signupOptions) {
+    constructor(eventDetails, header, author, signupOptions) {
         this.name = eventDetails.name;
         this.description = eventDetails.description;
         this.date = eventDetails.date;
         this.bastion = eventDetails.bastion;
         this.header = header;
         this.signupOptions = signupOptions;
+        this.author = author;
     }
 
     /**

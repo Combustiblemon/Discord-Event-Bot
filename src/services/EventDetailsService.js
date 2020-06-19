@@ -29,22 +29,22 @@ class EventDetailsService {
      */
     async requestEventDetails() {
         let name = await this.requestEventName();
-        if(!name) return;
+        if(name === 'no answer') return;
         let description = await this.requestEventDescription();
-        if(!description) return null;
+        if(name === 'no answer') return null;
         let date = await this.requestEventDate();
-        if(!date) return null;
+        if(name === 'no answer') return null;
         if(this.hasBastion) {
             var bastion = await this.requestExtraEvent('Bastion pilot');
-            if(!bastion) return null;
+            if(name === 'no answer') return null;
         }
         if(this.hasColossus) {
             var colossus = await this.requestExtraEvent('Colossus driver');
-            if(!colossus) return null;
+            if(name === 'no answer') return null;
         }
         if(this.hasConstruction) {
             var construction = await this.requestExtraEvent('Construction');
-            if(!construction) return null;
+            if(name === 'no answer') return null;
         }
 
         let options = {
@@ -65,12 +65,12 @@ class EventDetailsService {
         
         let answer = await this.requestSingleDetail(question);
         
-        if(!answer) return null;
+        if(!answer) return 'no answer';
 
         while(this.containsIllegalCharacters(answer)){
             this.author.send(`\`\`\`You have entered an illegal character.\n please avoid using the following characters:\n ${pattern}\`\`\``);
             answer = await this.requestSingleDetail(question);
-            if(!answer) return null;
+            if(!answer) return 'no answer';
         }
 
         return answer;
@@ -85,7 +85,7 @@ class EventDetailsService {
 
         let answer = await this.requestSingleDetail(question);
 
-        if(!answer) return null;
+        if(!answer) return 'no answer';
 
         return answer;
     }
@@ -102,7 +102,7 @@ class EventDetailsService {
         // Ask for date while no valid date has been given
         while (!date || isNaN(date.getTime())) {
             let answer = await this.requestSingleDetail(question);
-            if(!answer) return null;
+            if(!answer) return 'no answer';
             answer = answer.trim();
             answer = `${answer.substring(0,10)}T${answer.substring(11,16)}Z`;
             date = new Date(answer);
@@ -122,7 +122,7 @@ class EventDetailsService {
 
         while(typeof event !== "boolean"){
             let answer = await this.requestSingleDetail(question);
-            if(!answer) return null;
+            if(!answer) return 'no answer';
             //remove whitespace and convert to uppercase
             answer.trim().toUpperCase();
             if (answer == 'Y'){
@@ -141,7 +141,7 @@ class EventDetailsService {
     /**
      * 
      * @param {string} question The question to ask
-     * @param {Discord.Message=} message 
+     * @param {Discord.Message=} message The message object to pass (required if used outside of parent class)
      * @returns {Promise<string>} The answer to the question
      */
     async requestSingleDetail(question, message = null) {

@@ -39,7 +39,6 @@ module.exports = {
         let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
         if (!answer) return;
         
-        
         //replace the ' ' in the answer with '_' so it matches the file naming structure 
         answer = answer.replace(/ /gi, '_');
         //check if the the name exists
@@ -60,7 +59,7 @@ module.exports = {
 function deleteEmbed(answer, channel){
     //convert the embed name into ID
     let msgID = FileSystem.getEmbedID(answer);
-    if (msgID === null){
+    if (!msgID){
         console.error(new nullEmbedID('Embed does not exist in memory'));
         return;
     }
@@ -70,7 +69,7 @@ function deleteEmbed(answer, channel){
     
     //remove references to embed
     FileSystem.removeEmbedID(FileSystem.getEmbedID(answer));
-    FileSystem.removeEmbedName(answer.replace(/_/gi, ' '));
+    FileSystem.removeEmbedName(answer);
 
     //remove the files
     fs.unlink('./embeds/' + answer + '.json', (err) => {

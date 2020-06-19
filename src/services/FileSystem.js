@@ -195,7 +195,12 @@ class FileSystem {
      */
     removeEmbedID(id){
         const isName = (element) => element === id;
-        embedsInMemoryName.splice(embedsInMemoryName.findIndex(isName), 1)
+        let index = embedsInMemoryID.findIndex(isName)
+        if(index === -1){
+            console.error(new Errors.arrayLookupFail(''));
+            return;
+        }
+        embedsInMemoryID.splice(index, 1)
     }
 
     /**
@@ -211,8 +216,13 @@ class FileSystem {
      * @param {string} name The name of the embed
      */
     removeEmbedName(name){
-        const isName = (element) => element === name;
-        embedsInMemoryName.splice(embedsInMemoryName.findIndex(isName), 1)
+        const isName = (element) => element.includes(name);
+        let index = embedsInMemoryName.findIndex(isName)
+        if(index === -1){
+            console.error(new Errors.arrayLookupFail(''));
+            return;
+        }
+        embedsInMemoryName.splice(index, 1);
     }
 
     /**

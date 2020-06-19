@@ -23,7 +23,20 @@ class nullEmbedID extends Error {
       }
   }
 
+  class arrayLookupFail extends Error {
+    constructor(message) {
+      super(message)
+      this.name = this.constructor.name
+      Error.captureStackTrace(this, arrayLookupFail);
+    }
+
+    statusCode() {
+        return this.status
+      }
+  }
+
   module.exports = {
     nullEmbedID: nullEmbedID,
-    illegalCharactersInFilename: illegalCharactersInFilename
+    illegalCharactersInFilename: illegalCharactersInFilename,
+    arrayLookupFail: arrayLookupFail
   };

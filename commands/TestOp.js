@@ -18,10 +18,11 @@ module.exports = {
 
 
 
-        let eventDetailsService = new EventDetailsService('TestOp', message.author);
-        let eventDetails = await eventDetailsService.requestEventDetails();
+        //let eventDetailsService = new EventDetailsService('TestOp', message.author);
+        let eventDetails = {name: 'test', description: 'test', date: date = new Date('2040-11-11 11:11')};
+        eventDetails.name =  await EventDetailsService.prototype.requestSingleDetail('name:', message);
 
-        let event = createEvent(eventDetails, ['Aspect Test', 'Name Test']);
+        let event = createEvent(eventDetails, ['Aspect Test', 'Name Test'], message.member.displayName);
 
         EventService.newEvent(bot, textChannel, event);
     }
@@ -30,12 +31,14 @@ module.exports = {
 /**
  * @param {EventDetails} eventDetails
  * @param {Array} header
+ * @param {string} author
  * @returns {Event}
  */
-function createEvent(eventDetails, header) {
+function createEvent(eventDetails, header, author) {
     return new Event(
         eventDetails,
         header,
+        author,
         [
             new SignupOption('🔫', 'Infantry', false, false, []),
             new SignupOption('🚌', 'Armour', false, false, []),

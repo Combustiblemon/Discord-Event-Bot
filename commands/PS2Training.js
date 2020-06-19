@@ -22,7 +22,7 @@ module.exports = {
         let eventDetails = await eventDetailsService.requestEventDetails();
         if(!eventDetails) return;
 
-        let event = createEvent(eventDetails, ['','Name']);
+        let event = createEvent(eventDetails, ['','Name'], message.member.displayName);
 
         EventService.newEvent(bot, textChannel, event);
     }
@@ -33,11 +33,12 @@ module.exports = {
  * @param {Array} header
  * @returns {Event}
  */
-function createEvent(eventDetails, header) {
+function createEvent(eventDetails, header, author) {
     return new Event(
         eventDetails,
         header,
+        author,
         [
-            new SignupOption('✅', 'Signup', false, true, [])
+            new SignupOption('✅', 'Signups', false, true, [])
         ])
 }
