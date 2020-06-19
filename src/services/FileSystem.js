@@ -310,9 +310,9 @@ class FileSystem {
      * @param {string} name The name of the file to check.
      * @param {string=} folder The folder the file is in.
      */
-    async ensureFileExistance(name, folder = './' ){
+    async ensureFileExistance(name, folder){
         if(fs.existsSync(`${folder}${name}`)){
-            let file = require(`${folder}${name}`);
+            let file = this.readJSON(name, folder);
             return file;
         }else{
             let data = [];

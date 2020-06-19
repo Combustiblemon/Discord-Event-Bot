@@ -19,10 +19,10 @@ const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith(
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
 
 //read the files from disk, if they don't exist write them
-let allowedChannels = FileSystem.ensureFileExistance('channels.json', '../../').then(function(result){
+let allowedChannels = FileSystem.ensureFileExistance('channels.json', './').then(function(result){
     allowedChannels = result;
 });
-let roles = FileSystem.ensureFileExistance('roles.json', '../../').then(function(result){
+let roles = FileSystem.ensureFileExistance('roles.json', './').then(function(result){
     roles = result;
 });
  
