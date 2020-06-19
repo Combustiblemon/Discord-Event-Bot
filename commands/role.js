@@ -48,6 +48,7 @@ module.exports = {
     }
 }
 
+//#region addRole
 /**
  * 
  * @param {Discord.Message} message
@@ -82,7 +83,9 @@ function addRole(message, serverIndex, roles) {
         message.author.send('An error occurred');
     })
 }
+//#endregion
 
+//#region removeRole
 /**
  * 
  * @param {Discord.Message} message
@@ -120,3 +123,4 @@ function removeRole(message, serverIndex, roles) {
         message.author.send('An error occurred');
     });
 }
+//#endregion
