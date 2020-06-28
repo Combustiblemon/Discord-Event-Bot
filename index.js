@@ -166,3 +166,9 @@ bot.on('message', message => {
 });
 
 bot.login(token);
+
+function GetRoles(){
+    return Array.from(roles);
+}
+
+exports.GetRoles = GetRoles;
