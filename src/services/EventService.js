@@ -3,6 +3,7 @@ const FileSystem = require('../services/FileSystem');
 const SignupOption = require('../models/SignupOption');
 const Discord = require('discord.js');
 const fs = require('fs');
+const index = require('../../index');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
@@ -233,10 +234,21 @@ class EventService {
         let signupOption = event.getSingupOptionForEmoji(emoji);
         let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
         if(signupOption == csvEmoji){
-            user.send('CSV file for ' + event.name +'.\n', {files: [
-                (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
-            ]});
-            reaction.users.remove(user.id);
+            let roles = index.GetRoles();
+            var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+            message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                if (message.member.roles.highest.comparePositionTo(role) >= 0) {
+                    user.send('CSV file for ' + event.name +'.\n', {files: [
+                        (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
+                    ]});
+                    reaction.users.remove(user.id);
+                    return;
+                    
+                }else {
+                    user.send('You are lacking the required permissions.');
+                    return;
+                }
+            });
             return;
         }
 
