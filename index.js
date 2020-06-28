@@ -1,6 +1,6 @@
 // Configure environment
 require('dotenv').config();
-
+//#region Requires/initializations 
 const fs = require('fs');
 const Discord = require('discord.js');
 const FileSystem = require('./src/services/FileSystem');
@@ -19,13 +19,13 @@ const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith(
 const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
 
 //read the files from disk, if they don't exist write them
-let allowedChannels = FileSystem.ensureFileExistance('channels.json', '../../').then(function(result){
+let allowedChannels = FileSystem.ensureFileExistance('channels.json', './').then(function(result){
     allowedChannels = result;
 });
-let roles = FileSystem.ensureFileExistance('roles.json', '../../').then(function(result){
+let roles = FileSystem.ensureFileExistance('roles.json', './').then(function(result){
     roles = result;
 });
- 
+
 const csvFiles = glob.sync('csv_files' + '/**/*.csv');
 csvFiles.forEach(element =>{
     FileSystem.addCSVFile(element);
@@ -34,7 +34,7 @@ csvFiles.forEach(element =>{
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
- 
+    
     bot.commands.set(command.name, command);
 }
 
@@ -44,7 +44,7 @@ for (const file of embedFiles) {
     
     FileSystem.addEmbedID(embed.id);
     FileSystem.addEmbedName(file.replace(/.json/gi, '').trim());
-
+    
     let tempSignupOption = [];
     for (let position of event.signupOptions) {
         tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
@@ -53,19 +53,20 @@ for (const file of embedFiles) {
     let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, event.author, tempSignupOption);
     EventService.saveEventForMessageId(tempEvent, embed.id);
 }
+//#endregion
 
 bot.on("ready", () => {
     //sets up the status message
-    bot.user.setActivity('$help', { type: 'LISTENING' })
-               .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
-               .catch(console.error);
+    bot.user.setActivity(`${PREFIX}help`, { type: 'LISTENING' })
+    .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
+    .catch(console.error);
     //sets up the reaction listeners
     EventService.setupListeners(bot);
     console.log('This bot is online.');
 });
 
 bot.on('message', message => {
-
+    
     //if the message doesn't start with PREFIX return
     if(!message.content.startsWith(PREFIX)) return;
     if(!(message.guild === null)) {
@@ -90,6 +91,7 @@ bot.on('message', message => {
             return;
         }
 
+        //#region command event
         switch(command) {
             case 'event':
                 if (message.guild) {
@@ -129,8 +131,9 @@ bot.on('message', message => {
             break;
             
         }
+        //#endregion 
     } 
-
+        //#region commands 
         switch (command) {
 
             case 'help':
@@ -157,8 +160,15 @@ bot.on('message', message => {
                     .execute(bot, message);
             break;
         }
+        //#endregion
            
     
 });
 
 bot.login(token);
+
+function GetRoles(){
+    return Array.from(roles);
+}
+
+exports.GetRoles = GetRoles;

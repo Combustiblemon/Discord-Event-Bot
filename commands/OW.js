@@ -37,11 +37,11 @@ function createEvent(eventDetails, header, author) {
         new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
         new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
         new SignupOption('air:706620854934700102', 'Air', false, false, []),
-        new SignupOption('💪🏻', 'Flex', false, true, [])
+        new SignupOption('💪🏻', 'Flex', false, false, [])
     ];
 
     if(eventDetails.construction){
-        signupOptions.push(new SignupOption('⛑', 'Construction', false, true, []))
+        signupOptions.push(new SignupOption('⛑', 'Construction', false, false, []))
     }
     
     return new Event(

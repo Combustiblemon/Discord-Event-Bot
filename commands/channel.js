@@ -41,6 +41,7 @@ module.exports = {
     }
 }
 
+//#region addChannel
 /**
  * 
  * @param {Array} allowedChannels
@@ -71,7 +72,9 @@ function addChannel(allowedChannels, message, roles, serverIndex) {
         author.send('Channel added to whitelist.');
     });
 }
+//#endregion
 
+//#region removeChannel
 /**
  * 
  * @param {Array} allowedChannels
@@ -100,3 +103,4 @@ function removeChannel(allowedChannels, message, roles, serverIndex) {
         author.send('Channel removed from whitelist.');
     });
 }
+//#endregion
