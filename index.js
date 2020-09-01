@@ -86,7 +86,7 @@ bot.on('message', message => {
     let subCommand = args[1];
 
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
-        if (serverIndex === -1){
+        if (serverIndex === -1 && `${command} ${subCommand}` != 'role add'){
             message.author.send(`Please use \`$role add\` before using \`$${command} ${subCommand}\`.`);
             return;
         }
