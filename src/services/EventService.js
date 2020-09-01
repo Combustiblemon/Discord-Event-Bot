@@ -237,7 +237,7 @@ class EventService {
             let roles = index.GetRoles();
             var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
             message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                if (message.member.roles.highest.comparePositionTo(role) >= 0) {
+                if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     user.send('CSV file for ' + event.name +'.\n', {files: [
                         (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
                     ]});
@@ -246,6 +246,7 @@ class EventService {
                     
                 }else {
                     user.send('You are lacking the required permissions.');
+                    reaction.users.remove(user.id);
                     return;
                 }
             });

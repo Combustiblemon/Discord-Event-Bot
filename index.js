@@ -112,7 +112,7 @@ bot.on('message', message => {
                     }
                     else if(subCommand === 'delete'){
                         message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                            if (message.member.roles.highest.comparePositionTo(role) >= 0) {
+                            if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
                                 bot.commands.get('delete').execute(bot, message);
                             }else {
                                 message.author.send('You are lacking the required permissions.');
