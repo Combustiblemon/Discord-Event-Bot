@@ -60,12 +60,15 @@ let eventList = [['PS2', ['**(Training)** Single signup option', '**(PS2OP)** PS
 
 bot.on("ready", () => {
     //sets up the status message
-    bot.user.setActivity(`${PREFIX}help`, { type: 'LISTENING' })
-    .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
+    bot.user.setPresence({ activity: { name: `${PREFIX}help`, type: 'LISTENING' }, status: 'active' })
     .catch(console.error);
     //sets up the reaction listeners
     EventService.setupListeners(bot);
     console.log('This bot is online.');
+    setInterval(() => {
+        bot.user.setPresence({ activity: { name: `${PREFIX}help`, type: 'LISTENING' }, status: 'active' })
+        .catch(console.error);
+    }, 3,600,000);
 });
 
 bot.on('message', message => {
@@ -104,13 +107,13 @@ bot.on('message', message => {
                         
                     }
                     else if(subCommand === 'PS2OP') {
-                            bot.commands.get('PS2OP').execute(bot, message);
+                        bot.commands.get('PS2OP').execute(bot, message);
                     }
                     else if(subCommand === 'Training') {
-                            bot.commands.get('PS2Training').execute(bot, message);
+                        bot.commands.get('PS2Training').execute(bot, message);
                     }
                     else if(subCommand === 'TestOp') {
-                            bot.commands.get('TestOp').execute(bot, message); 
+                        bot.commands.get('TestOp').execute(bot, message); 
                     }else if(subCommand === 'OW'){
                         bot.commands.get('OW').execute(bot, message); 
                     }
@@ -144,20 +147,20 @@ bot.on('message', message => {
                 bot.commands
                     .get('help')
                     .execute(bot, message);
-                break;
+            break;
 
             case 'channel':
                 bot.commands
                     .get('channel')
                     .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
-                break;
+            break;
 
             case 'role':
                 bot.commands
                     .get('role')
                     .execute(bot, message, roles, subCommand);
-                
-                break;
+            break;
+
             case 'csv':
                 bot.commands
                     .get('csv')
@@ -170,6 +173,7 @@ bot.on('message', message => {
 });
 
 bot.login(token);
+
 
 function GetRoles(){
     return Array.from(roles);
