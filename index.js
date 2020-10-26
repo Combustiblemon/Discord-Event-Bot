@@ -53,6 +53,9 @@ for (const file of embedFiles) {
     let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, event.author, tempSignupOption);
     EventService.saveEventForMessageId(tempEvent, embed.id);
 }
+
+//A list of events to be used in $event command
+let eventList = [['PS2', ['**(Training)** Single signup option', '**(PS2OP)** PS2 OP multiple signup options', '**(OW)** Similar to PS2OP, but set up for Outfit Wars']]]
 //#endregion
 
 bot.on("ready", () => {
@@ -96,7 +99,8 @@ bot.on('message', message => {
             case 'event':
                 if (message.guild) {
                     if(!subCommand) {
-                            message.author.send('You need to enter a second argument. For a list of commands write $help.');
+                        bot.commands.get('EventInterface').execute(bot, message, eventList);
+                        //message.author.send('You need to enter a second argument. For a list of commands write $help.');
                         
                     }
                     else if(subCommand === 'PS2OP') {
