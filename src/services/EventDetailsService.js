@@ -116,27 +116,38 @@ class EventDetailsService {
      * @returns {Promise<boolean>} If the event will need the specific, as answered by author
      */
     async requestExtraEvent(description){
-        let question = `Will the ${this.eventType} need ${description} signup?\n \`Y/N\``;
-
+        let question = `Will the ${this.eventType} need ${description} signup?`;
         let event;
+        let msgAuthor = await this.getAuthor();
 
-        while(typeof event !== "boolean"){
-            let answer = await this.requestSingleDetail(question);
-            if(!answer) return 'no answer';
-            //remove whitespace and convert to uppercase
-            answer.trim().toUpperCase();
-            if (answer == 'Y'){
-                event = true;
-            }else if (answer == 'N'){
-                event = false;
+        await msgAuthor.send(question).then(async embed => {
+            try {
+                await embed.react('✅');
+                await embed.react('❌');
+
+            } catch (error) {
+                console.error(error);
             }
-        }
+            const filter = (reaction, user) => {
+                return (reaction.emoji.name === '✅' || reaction.emoji.name === '❌')&& user.id === msgAuthor.id;
+            };
 
+            await embed.awaitReactions(filter, { max: 1, time: 120000, errors: ['time'] })
+                .then(collected => {
+                    if (collected.firstKey(1) == '✅'){
+                        event = true;
+                    }else if (collected.firstKey(1) == '❌'){
+                        event = false;
+                    }
+                })
+                .catch(collected => {
+                    console.error(collected)
+                    msgAuthor.send('The event creation timed out. Please remake the event if you want to try again.');
+                });
+        });
 
         return event;
     }
-
-
 
     /**
      * 
@@ -145,17 +156,11 @@ class EventDetailsService {
      * @returns {Promise<string>} The answer to the question
      */
     async requestSingleDetail(question, message = null) {
-        let questionMessage;
-        let messageFilter;
-        if (!message){
-            questionMessage = await this.author.send(question);
-
-            messageFilter = m => m.author.id === this.author.id;
-        }else{
-            questionMessage = await message.author.send(question);
-
-            messageFilter = m => m.author.id === message.author.id;
-        }
+        let msgAuthor = await this.getAuthor(message);
+        //let questionMessage;
+        //let messageFilter;
+        let questionMessage = await msgAuthor.send(question);
+        let messageFilter = m => m.author.id === msgAuthor.id;
         
         let messages = await questionMessage.channel.awaitMessages(
             messageFilter, 
@@ -191,6 +196,14 @@ class EventDetailsService {
             return true;
         }else{
             return false;
+        }
+    }
+
+    getAuthor(message = null){
+        if (!message){
+            return this.author;
+        }else{
+            return message.author;
         }
     }
 
