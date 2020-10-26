@@ -59,7 +59,7 @@ class FileSystem {
      * @param {string} folder The folder where the file is
      * @returns {Discord.Message}
      */
-    readJSON(name, folder) {
+    readJSON(name, folder='') {
         if (name.includes('.json')) {
             let rawdata = fs.readFileSync(`${folder}${name}`);
             let message = JSON.parse(rawdata);
