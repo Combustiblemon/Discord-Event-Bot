@@ -47,7 +47,7 @@ class EventService {
             .then(async embed => {
                 let fileName = FileSystem.getFileNameForEvent(event);
 
-                FileSystem.addEmbedName(fileName);
+                FileSystem.addEmbedName(fileName, channel.guild.name);
                 this.saveEventForMessageId(event, embed.id);
                 FileSystem.addEmbedID(embed.id);
 
