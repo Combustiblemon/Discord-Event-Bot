@@ -137,42 +137,61 @@ bot.on('message', message => {
                 
             break;
             
-        }
-        //#endregion 
-    } 
-        //#region commands 
-        switch (command) {
-
-            case 'help':
-                bot.commands
-                    .get('help')
-                    .execute(bot, message);
-            break;
-
             case 'channel':
-                bot.commands
-                    .get('channel')
-                    .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
+                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                    if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
+                        bot.commands
+                            .get('channel')
+                            .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
+                    }else {
+                        message.author.send('You are lacking the required permissions.');
+                    }});
             break;
 
             case 'role':
-                bot.commands
-                    .get('role')
-                    .execute(bot, message, roles, subCommand);
+                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                    if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
+                        bot.commands
+                            .get('role')
+                            .execute(bot, message, roles, subCommand);
+                    }else {
+                        message.author.send('You are lacking the required permissions.');
+                    }});
             break;
 
             case 'csv':
-                bot.commands
-                    .get('csv')
-                    .execute(bot, message);
+                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                    if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
+                        bot.commands
+                            .get('csv')
+                            .execute(bot, message);
+                    }else {
+                        message.author.send('You are lacking the required permissions.');
+                    }});
             break;
+            
         }
-        //#endregion
+        //#endregion 
+    } 
+
+    //#region commands 
+    switch (command) {
+
+        case 'help':
+            bot.commands
+                .get('help')
+                .execute(bot, message);
+        break;
+    }
+    //#endregion
            
     
 });
 
+
 bot.login(token);
+
+
 
 
 function GetRoles(){
