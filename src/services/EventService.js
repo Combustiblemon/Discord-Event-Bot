@@ -215,7 +215,8 @@ class EventService {
      */
     async messageReactionAdded(reaction, user) {
         let message = reaction.message;
-    
+        
+        if (message.channel.type == 'dm') return;
         if (message.guild.member(user.id) == botUserId) return;
         
         let event = this.getEventForMessageId(message.id);
@@ -290,7 +291,8 @@ class EventService {
      */
     async messageReactionRemoved(reaction, user) {
         let message = reaction.message;
-    
+        
+        if (message.channel.type == 'dm') return;
         if (message.guild.member(user.id) == botUserId) return;
         
         let event = this.getEventForMessageId(message.id);

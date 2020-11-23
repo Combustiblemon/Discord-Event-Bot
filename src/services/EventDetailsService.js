@@ -11,13 +11,15 @@ class EventDetailsService {
      * @param {string} eventType The type of event, will be added to questions for flair
      * @param {Discord.User} author The user that authored the event
      * @param {object} options The extra options available
+     * @param {boolean} repeatable If the event should be repeated
      * @param {boolean} options.bastion If the event has the posibility for a Bastion pilot signup
      * @param {boolean} options.colossus If the event has the posibility for a Colossus driver signup
      * @param {boolean} options.construction If the event has the posibility for a Construction signup  
      */
-    constructor (eventType, author, options={}) {
+    constructor (eventType, author, options={}, repeatable=false) {
         this.eventType = eventType;
         this.author = author;
+        this.repeatable = repeatable;
         this.hasBastion = options.bastion || false;
         this.hasColossus = options.colossus || false;
         this.hasConstruction = options.construction || false;
@@ -141,8 +143,8 @@ class EventDetailsService {
                     }
                 })
                 .catch(collected => {
-                    console.error(collected)
-                    msgAuthor.send('The event creation timed out. Please remake the event if you want to try again.');
+                    console.warn(collected)
+                    event = 'no answer';
                 });
         });
 
@@ -209,4 +211,4 @@ class EventDetailsService {
 
 }
 
-module.exports = EventDetailsService;
+    module.exports = EventDetailsService;

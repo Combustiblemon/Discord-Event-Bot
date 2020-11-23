@@ -11,6 +11,7 @@ module.exports = {
     },  
 };
 
+
 function createEmbed(eventList){
     let embed = new Discord.MessageEmbed()
         .setTitle('List of Events.')
