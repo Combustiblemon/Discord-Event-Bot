@@ -22,6 +22,11 @@ class FileSystem {
      */
     async writeJSON(event, embed, mode) {
         let name = this.getFileNameForEvent(event);
+        if(embed){
+            name = `${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/${name}`
+        }
+        this.ensureDirectoryExistence(`embeds/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
+        this.ensureDirectoryExistence(`events/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
 
         if (mode == 'embed') {
             this.writeData(embed, name, 'embeds/');
@@ -99,7 +104,7 @@ class FileSystem {
         let records = this.createCSVRecords(event);
 
         //remove illegal characters from the server name
-        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '');
+        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '^');
         
         let name = this.getFileNameForEvent(event);
         
