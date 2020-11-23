@@ -54,7 +54,7 @@ function addChannel(allowedChannels, message, roles, serverIndex) {
 
     message.guild.roles.fetch(roles[serverIndex][1]).then(async role => {
     
-        if (message.member.roles.highest.comparePositionTo(role) < 0) {
+        if (message.member.roles.highest.comparePositionTo(role) < 0 && !message.member.hasPermission("ADMINISTRATOR")) {
             author.send('You are lacking the required permissions.');
             return;
         }
