@@ -39,7 +39,6 @@ function createEvent(eventDetails, header, author) {
         eventDetails,
         header,
         author,
-        1,
         [
             new SignupOption('🔫', 'Infantry', false, false, []),
             new SignupOption('🚌', 'Armour', false, false, []),

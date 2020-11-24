@@ -35,7 +35,7 @@ class EventDetailsService {
         let description = await this.requestEventDescription();
         if(description === 'no answer') return null;
         let date = await this.requestEventDate();
-        let repeatableDay = await this.questionYesNo()
+        let repeatableDay = await this.questionYesNo('`Should this event repeat every week?`')
         if(date === 'no answer') return null;
         if(this.hasBastion) {
             var bastion = await this.requestExtraEvent('Bastion pilot');
@@ -50,6 +50,8 @@ class EventDetailsService {
             if(construction === 'no answer') return null;
         }
 
+        this.author.send('`Event created successfully`')
+
         let options = {
             bastion: bastion,
             colossus: colossus, 
@@ -63,7 +65,7 @@ class EventDetailsService {
      * @returns {Promise<string>} The name for the event as answered by author
      */
     async requestEventName() {
-        let question = `What is the name of the ${this.eventType}?`;
+        let question = `\`What is the name of the ${this.eventType}?\``;
 
         
         let answer = await this.requestSingleDetail(question);
@@ -84,7 +86,7 @@ class EventDetailsService {
      * @returns {Promise<string>} The description for the event as answered by author
      */
     async requestEventDescription() {
-        let question = `Write a short description of the ${this.eventType}.`;
+        let question = `\`Write a short description of the ${this.eventType}.\``;
 
         let answer = await this.requestSingleDetail(question);
 
@@ -98,7 +100,7 @@ class EventDetailsService {
      * @returns {Promise<Date>} The date for the event as answered by author
      */
     async requestEventDate() {
-        let question = `When (in UTC and YYYY-MM-DD hh:mm format) is the ${this.eventType}?`;
+        let question = `\`When (in UTC and YYYY-MM-DD hh:mm format) is the ${this.eventType}?\``;
 
         let date;
 
@@ -119,7 +121,7 @@ class EventDetailsService {
      * @returns {Promise<boolean>} If the event will need the specific, as answered by author
      */
     async requestExtraEvent(description){
-        let question = `Will the ${this.eventType} need ${description} signup?`;
+        let question = `\`Will the ${this.eventType} need ${description} signup?\``;
         
 
         let event = await this.questionYesNo(question);
@@ -131,7 +133,7 @@ class EventDetailsService {
 
     async questionYesNo(question, author = null){
         if(!author){
-            author = await this.getAuthor(message);
+            author = await this.getAuthor();
         }
         let event;
         await author.send(question).then(async embed => {
@@ -185,7 +187,7 @@ class EventDetailsService {
             }
         ).catch(() =>{
             console.error('Message timeout. No message after question.');
-            questionMessage.channel.send('No answer was given. Please use the command again.');
+            questionMessage.channel.send('`No answer was given. Please use the command again.`');
         });
 
         if(!messages.first().content) return null;

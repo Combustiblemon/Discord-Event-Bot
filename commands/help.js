@@ -30,10 +30,11 @@ const description = `For any extra help or bug reports message CombustibleLemon#
                      [You can help with the hosting costs.](https://www.paypal.com/donate/?hosted_button_id=3AW5RFTZVUY3E)`
 
 const commands =`**($help)**               Displays this help message.
+                 **($event)**              Opens up a list of events and their descriptions.
                  **($channel add|remove)** Adds or removes the channel to/from the whitelist.
                  **($role add|remove)**    Adds or removes the minimum role required to use the bot on a server.
                  **($csv)**                Get a specific CSV file from a list of all events.
-                 **($event)**              Opens up a list of events and their descriptions.`
+                 `
 
 const helpMessage = `
 \`\`\`

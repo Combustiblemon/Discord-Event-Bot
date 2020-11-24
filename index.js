@@ -69,7 +69,7 @@ for (const server of savedServers){
             tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
         }
         let tempDate = `${event.date.substring(0,10)}T${event.date.substring(11,16)}Z`;
-        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, event.author, event.repeatableDay, tempSignupOption);
+        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate), event.repeatableDay), event.header, event.author, tempSignupOption);
         EventService.saveEventForMessageId(tempEvent, embed.id);
 
         if (event.repeatableDay > -1){

@@ -12,7 +12,7 @@ module.exports = class Event {
      * @param {boolean} options.colossus If the event has the posibility for a Colossus driver signup
      * @param {boolean} options.construction If the event has the posibility for a Construction signup  
      */
-    constructor(name, description, date, options={}, repeatableDay=-1) {
+    constructor(name, description, date, repeatableDay=-1, options={}) {
         this.name = name;
         this.description = description; 
         this.date = date;
