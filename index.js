@@ -17,12 +17,6 @@ const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '^';
 
 
-
-
-
-
-
-
 let savedServers = []
 fs.readdirSync('./embeds/').forEach(file => {
     if(file != '.gitignore'){
@@ -38,9 +32,6 @@ let cronJob = new CronJob('0 0 5 * * *', function() {
 }, null, true, 'UTC')
 cronJob.start();
 
-bot.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
-
 //read the files from disk, if they don't exist write them
 let allowedChannels = FileSystem.ensureFileExistance('channels.json', './').then(function(result){
     allowedChannels = result;
@@ -49,8 +40,19 @@ let roles = FileSystem.ensureFileExistance('roles.json', './').then(function(res
     roles = result;
 });
 
+bot.commands = new Discord.Collection();
+var commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
+
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
+    
+    bot.commands.set(command.name, command);
+}
+
+commandFiles = fs.readdirSync('./commands/events').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+    const command = require(`./commands/events/${file}`);
     
     bot.commands.set(command.name, command);
 }

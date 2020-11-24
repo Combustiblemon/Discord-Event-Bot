@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
-const Event = require('../src/models/Event');
-const SignupOption = require('../src/models/SignupOption');
-const EventService = require('../src/services/EventService');
-const EventDetailsService = require('../src/services/EventDetailsService');
+const Event = require('../../src/models/Event');
+const SignupOption = require('../../src/models/SignupOption');
+const EventService = require('../../src/services/EventService');
+const EventDetailsService = require('../../src/services/EventDetailsService');
 
 module.exports = {
     name: 'TestOp',
@@ -39,6 +39,7 @@ function createEvent(eventDetails, header, author) {
         eventDetails,
         header,
         author,
+        true,
         [
             new SignupOption('🔫', 'Infantry', false, false, []),
             new SignupOption('🚌', 'Armour', false, false, []),
