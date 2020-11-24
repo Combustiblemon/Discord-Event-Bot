@@ -111,8 +111,8 @@ bot.on('message', message => {
     let args = message.content.substring(PREFIX.length).split(' ');
     
     // args[0] is the first word($ping)
-    let command = args[0];
-    let subCommand = args[1];
+    let command = args[0].toLowerCase();
+    let subCommand = args[1].toLowerCase();
 
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
         if (serverIndex === -1 && `${command} ${subCommand}` != 'role add'){
@@ -133,15 +133,15 @@ bot.on('message', message => {
                         //message.author.send('You need to enter a second argument. For a list of commands write $help.');
                         
                     }
-                    else if(subCommand === 'PS2OP') {
+                    else if(subCommand === 'ps2op') {
                         bot.commands.get('PS2OP').execute(bot, message);
                     }
-                    else if(subCommand === 'Training') {
+                    else if(subCommand === 'training') {
                         bot.commands.get('PS2Training').execute(bot, message);
                     }
-                    else if(subCommand === 'TestOp') {
+                    else if(subCommand === 'testop') {
                         bot.commands.get('TestOp').execute(bot, message); 
-                    }else if(subCommand === 'OW'){
+                    }else if(subCommand === 'ow'){
                         bot.commands.get('OW').execute(bot, message); 
                     }
                     else if(subCommand === 'delete'){
