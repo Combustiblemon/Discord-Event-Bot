@@ -7,16 +7,39 @@ const FileSystem = require('./src/services/FileSystem');
 const EventService = require('./src/services/EventService');
 const EventDetails = require('./src/models/EventDetails');
 const SignupOption = require('./src/models/SignupOption');
+const EventList = require('./src/models/EventList');
+var CronJob = require('cron').CronJob;
 const glob = require('glob');
-const bot = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const bot = new Discord.Client({ partials: ['USER', 'GUILD_MEMBER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 const Event = require('./src/models/Event');
+const EventScheduler = require('./src/services/EventScheduler');
 const token = process.env.DISCORD_BOT_TOKEN;
-const PREFIX = '$';
+const PREFIX = '^';
 
+
+
+
+
+
+
+
+let savedServers = []
+fs.readdirSync('./embeds/').forEach(file => {
+    if(file != '.gitignore'){
+        savedServers.push(file)
+    }
+});
+
+EventList.initialize()
+FileSystem.initializeEmbedName(savedServers)
+
+let cronJob = new CronJob('0 0 5 * * *', function() {
+    console.log('hello :3');
+}, null, true, 'UTC')
+cronJob.start();
 
 bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
-const embedFiles = fs.readdirSync('./embeds/').filter(file => file.endsWith('.json'));
 
 //read the files from disk, if they don't exist write them
 let allowedChannels = FileSystem.ensureFileExistance('channels.json', './').then(function(result){
@@ -26,37 +49,37 @@ let roles = FileSystem.ensureFileExistance('roles.json', './').then(function(res
     roles = result;
 });
 
-const csvFiles = glob.sync('csv_files' + '/**/*.csv');
-csvFiles.forEach(element =>{
-    FileSystem.addCSVFile(element);
-})
-
-
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     
     bot.commands.set(command.name, command);
 }
 
-for (const file of embedFiles) {
-    const embed = require(`./embeds/${file}`);
-    const event = require(`./events/${file}`);
-    
-    FileSystem.addEmbedID(embed.id);
-    FileSystem.addEmbedName(file.replace(/.json/gi, '').trim());
-    
-    let tempSignupOption = [];
-    for (let position of event.signupOptions) {
-        tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
-    }
-    let tempDate = `${event.date.substring(0,10)}T${event.date.substring(11,16)}Z`;
-    let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, event.author, tempSignupOption);
-    EventService.saveEventForMessageId(tempEvent, embed.id);
-}
+for (const server of savedServers){
+    var embedFiles = fs.readdirSync(`./embeds/${server}`).filter(file => file.endsWith('.json'));
+    for (const file of embedFiles) {
+        const embed = JSON.parse(fs.readFileSync(`./embeds/${server}/${file}`, 'utf8'));
+        const event = JSON.parse(fs.readFileSync(`./events/${server}/${file}`, 'utf8'));
+        
+        FileSystem.addEmbedID(embed.id);
+        FileSystem.addEmbedName(file.replace(/.json/gi, '').trim(), server);
+        
+        let tempSignupOption = [];
+        for (let position of event.signupOptions) {
+            tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
+        }
+        let tempDate = `${event.date.substring(0,10)}T${event.date.substring(11,16)}Z`;
+        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate)), event.header, event.author, event.repeatableDay, tempSignupOption);
+        EventService.saveEventForMessageId(tempEvent, embed.id);
 
-//A list of events to be used in $event command
-let eventList = [['PS2', ['**(Training)** Single signup option', '**(PS2OP)** PS2 OP multiple signup options', '**(OW)** Similar to PS2OP, but set up for Outfit Wars']]]
+        if (event.repeatableDay > -1){
+            EventScheduler.addEventToCheck(file.replace(/.json/gi, '').trim(), event.repeatableDay);
+        }
+    }
+}
 //#endregion
+
+
 
 bot.on("ready", () => {
     //sets up the status message
@@ -99,10 +122,14 @@ bot.on('message', message => {
 
         //#region command event
         switch(command) {
+            case 'test':
+                bot.commands.get('test').execute(bot, message);
+            break;
+            
             case 'event':
                 if (message.guild) {
                     if(!subCommand) {
-                        bot.commands.get('EventInterface').execute(bot, message, eventList);
+                        bot.commands.get('EventInterface').execute(bot, message, EventList.getEvents());
                         //message.author.send('You need to enter a second argument. For a list of commands write $help.');
                         
                     }
