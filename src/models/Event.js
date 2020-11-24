@@ -11,11 +11,11 @@ module.exports = class Event {
      * @param {int} repeatableDay
      * @param {SignupOption[]} signupOptions
      */
-    constructor(eventDetails, header, author, repeatableDay=-1, signupOptions) {
+    constructor(eventDetails, header, author, signupOptions) {
         this.name = eventDetails.name;
         this.description = eventDetails.description;
         this.date = eventDetails.date;
-        this.repeatableDay = repeatableDay;
+        this.repeatableDay = eventDetails.repeatableDay;
         this.header = header;
         this.signupOptions = signupOptions;
         this.author = author;
@@ -41,6 +41,9 @@ module.exports = class Event {
     getSingupOptionForEmoji(emoji) {
         if(emoji.name == '📋'){
             return this.signupOptions.emoji = '📋';
+        }
+        if(emoji.name == '🗑'){
+            return this.signupOptions.emoji = '🗑';
         }
         return this.signupOptions.find(s => s.emoji === emoji.name || s.emoji === emoji.id || s.emoji === emoji.identifier);
     }
