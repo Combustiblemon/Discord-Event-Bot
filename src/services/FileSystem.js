@@ -23,10 +23,8 @@ class FileSystem {
      * @param {string} mode The mode to use: 'embed'|'event'|'both'
      */
     async writeJSON(event, embed, mode) {
-        let name = this.getFileNameForEvent(event);
-        if(embed){
-            name = `${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/${name}`
-        }
+        let name = `${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/${this.getFileNameForEvent(event)}`
+
         this.ensureDirectoryExistence(`embeds/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
         this.ensureDirectoryExistence(`events/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
 

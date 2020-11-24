@@ -4,10 +4,13 @@ const SignupOption = require('../models/SignupOption');
 const Discord = require('discord.js');
 const fs = require('fs');
 const index = require('../../index');
+const EventDetailsService = require('./EventDetailsService');
+const DeleteEvent = require('../../commands/delete');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
 let csvEmoji = '📋';
+const deleteEmoji = "🗑";
 
 class EventService {
     
@@ -57,6 +60,7 @@ class EventService {
                     });
 
                     await embed.react(csvEmoji);
+                    await embed.react(deleteEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
                     await FileSystem.createCSV(event, embed.guild.name);
                 } catch (error) {
@@ -72,9 +76,9 @@ class EventService {
      * @param {BotEvent} event 
      */
     async editEmbedForEvent(message, event) {
-        const embed = this.createEmbedForEvent(event);
+        let embed = this.createEmbedForEvent(event);
         
-        await message.edit(message.embeds[0] = embed);
+        embed = await message.edit(message.embeds[0] = embed);
         
         FileSystem.createCSV(event, message.guild.name);
         FileSystem.writeJSON(event, embed, 'event');
@@ -234,6 +238,31 @@ class EventService {
         
         let signupOption = event.getSingupOptionForEmoji(emoji);
         let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
+        // for some reason the :wastebucket: emoji is %F0%9F%97%91
+        if(signupOption == deleteEmoji){
+            let roles = index.GetRoles();
+            var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+            message.guild.roles.fetch(roles[serverIndex][1]).then(async role=>{
+                if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
+                    let answer = await EventDetailsService.prototype.questionYesNo(`\`Are you sure you want to delete "${event.name}"?\``, reactionUser);
+                    
+                    if(answer){
+                        DeleteEvent.deleteEmbed(`${event.date.toISOString().substring(0,10)}_${event.name.replace(/ /gi, "_")}`, reaction.message);
+                        reactionUser.send('\`Event deleted.\`')
+                    }
+                    else reactionUser.send('\`Event not deleted.\`')
+                    
+                    return;
+                    
+                }else {
+                    user.send('You are lacking the required permissions.');
+                    reaction.users.remove(user.id);
+                    return;
+                }
+            });
+            return;
+        }
+
         if(signupOption == csvEmoji){
             let roles = index.GetRoles();
             var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
@@ -310,7 +339,7 @@ class EventService {
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
         
-        if(signupOption == csvEmoji){
+        if(signupOption == csvEmoji || signupOption == deleteEmoji){
             return;
         }
 

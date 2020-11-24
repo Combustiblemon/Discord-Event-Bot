@@ -33,20 +33,21 @@ class EventDetailsService {
         let name = await this.requestEventName();
         if(name === 'no answer') return;
         let description = await this.requestEventDescription();
-        if(name === 'no answer') return null;
+        if(description === 'no answer') return null;
         let date = await this.requestEventDate();
-        if(name === 'no answer') return null;
+        let repeatableDay = await this.questionYesNo()
+        if(date === 'no answer') return null;
         if(this.hasBastion) {
             var bastion = await this.requestExtraEvent('Bastion pilot');
-            if(name === 'no answer') return null;
+            if(bastion === 'no answer') return null;
         }
         if(this.hasColossus) {
             var colossus = await this.requestExtraEvent('Colossus driver');
-            if(name === 'no answer') return null;
+            if(colossus === 'no answer') return null;
         }
         if(this.hasConstruction) {
             var construction = await this.requestExtraEvent('Construction');
-            if(name === 'no answer') return null;
+            if(construction === 'no answer') return null;
         }
 
         let options = {
@@ -119,10 +120,21 @@ class EventDetailsService {
      */
     async requestExtraEvent(description){
         let question = `Will the ${this.eventType} need ${description} signup?`;
-        let event;
-        let msgAuthor = await this.getAuthor();
+        
 
-        await msgAuthor.send(question).then(async embed => {
+        let event = await this.questionYesNo(question);
+
+        return event;
+    }
+
+    
+
+    async questionYesNo(question, author = null){
+        if(!author){
+            author = await this.getAuthor(message);
+        }
+        let event;
+        await author.send(question).then(async embed => {
             try {
                 await embed.react('✅');
                 await embed.react('❌');
@@ -131,7 +143,7 @@ class EventDetailsService {
                 console.error(error);
             }
             const filter = (reaction, user) => {
-                return (reaction.emoji.name === '✅' || reaction.emoji.name === '❌')&& user.id === msgAuthor.id;
+                return (reaction.emoji.name === '✅' || reaction.emoji.name === '❌')&& user.id === author.id;
             };
 
             await embed.awaitReactions(filter, { max: 1, time: 120000, errors: ['time'] })

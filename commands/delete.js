@@ -22,7 +22,7 @@ module.exports = {
         let tempArray = FileSystem.getEmbedNames(message.guild.name);
         
         //find only the messages in the current channel
-        tempArray = await messagesInChannel(message, tempArray);
+        tempArray = await this.messagesInChannel(message, tempArray);
 
         if(!Array.isArray(tempArray) || !tempArray.length){
             message.author.send('No events to delete.');
@@ -44,65 +44,68 @@ module.exports = {
         answer = answer.replace(/ /gi, '_');
         //check if the the name exists
         if(FileSystem.embedNameExists(answer, message.guild.name)){
-            deleteEmbed(answer.replace(/ /gi, '_'), message);
+            this.deleteEmbed(answer.replace(/ /gi, '_'), message);
             message.author.send(`Event \`${answer}\` deleted.`);
         }else{
             message.author.send('Invalid name.');
         }
-    },   
-}
+    },
 
-/**
- * 
- * @param {string} answer
- * @param {Discord.Message} message 
- */
-function deleteEmbed(answer, message){
-    //convert the embed name into ID
-    let msgID = FileSystem.getEmbedID(answer, message.guild.name);
-    if (!msgID){
-        console.error(new nullEmbedID('Embed does not exist in memory'));
-        return;
-    }
-
-    //delete the message
-    message.channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.error(error)});
-    
-    //remove references to embed
-    FileSystem.removeEmbedID(FileSystem.getEmbedID(answer, message.guild.name));
-    FileSystem.removeEmbedName(answer, message.guild.name);
-    //EventScheduler.removeEventFromCheck(answer);
-
-    removeFiles(answer, message.guild.name.replace(/[<>:"/\\|?*]/gi, '^'));
-}
-
-/**
- * 
- * @param {Discord.Message} message 
- * @param {Array} embedNames 
- * @returns {Array}
- */
-function messagesInChannel(message, embedNames){
-    let temp = [];
-    embedNames.forEach(function (item, index) {
-        //if the channel of the embed is different from the channel delete was used in it removes it.
-        if (FileSystem.getEmbedChannel(item, message.guild.name) === message.channel.id) {
-            temp.push(item); 
+    /**
+     * 
+     * @param {string} answer
+     * @param {Discord.Message} message 
+     */
+    deleteEmbed(answer, message){
+        //convert the embed name into ID
+        let msgID = FileSystem.getEmbedID(answer, message.guild.name);
+        if (!msgID){
+            console.error(new nullEmbedID('Embed does not exist in memory'));
+            return;
         }
-    })
-    
-    return Array.from(temp);
+
+        //delete the message
+        message.channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.error(error)});
+        
+        //remove references to embed
+        FileSystem.removeEmbedID(FileSystem.getEmbedID(answer, message.guild.name));
+        FileSystem.removeEmbedName(answer, message.guild.name);
+        //EventScheduler.removeEventFromCheck(answer);
+
+        this.removeFiles(answer, message.guild.name.replace(/[<>:"/\\|?*]/gi, '^'));
+    },
+
+    /**
+     * 
+     * @param {Discord.Message} message 
+     * @param {Array} embedNames 
+     * @returns {Array}
+     */
+    messagesInChannel(message, embedNames){
+        let temp = [];
+        embedNames.forEach(function (item, index) {
+            //if the channel of the embed is different from the channel delete was used in it removes it.
+            if (FileSystem.getEmbedChannel(item, message.guild.name) === message.channel.id) {
+                temp.push(item); 
+            }
+        })
+        
+        return Array.from(temp);
+    },
+
+    removeFiles(filename, server){
+        server = server.replace(/[<>:"/\\|?*]/gi, '^');
+
+        //remove the files
+        fs.unlink(`./embeds/${server}/` + filename + '.json', (err) => {
+            if (err) throw err;
+            console.log(`embeds/${server}/${filename}.json was deleted.`);
+        });
+
+        fs.unlink(`./events/${server}/` + filename + '.json', (err) => {
+            if (err) throw err;
+            console.log(`events/${server}/${filename}.json was deleted.`);
+        });
+    }
 }
 
-function removeFiles(answer, server){
-    //remove the files
-    fs.unlink(`./embeds/${server}/` + answer + '.json', (err) => {
-        if (err) throw err;
-        console.log(`embeds/${server}/${answer}.json was deleted.`);
-    });
-
-    fs.unlink(`./events/${server}/` + answer + '.json', (err) => {
-        if (err) throw err;
-        console.log(`events/${server}/${answer}.json was deleted.`);
-    });
-}
