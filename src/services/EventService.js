@@ -59,7 +59,7 @@ class EventService {
                         embed.react(signupOption.emoji);
                     });
 
-                    await embed.react(csvEmoji);
+                    if(event.csv) await embed.react(csvEmoji);
                     await embed.react(deleteEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
                     await FileSystem.createCSV(event, embed.guild.name);

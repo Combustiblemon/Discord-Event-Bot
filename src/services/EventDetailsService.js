@@ -16,7 +16,7 @@ class EventDetailsService {
      * @param {boolean} options.colossus If the event has the posibility for a Colossus driver signup
      * @param {boolean} options.construction If the event has the posibility for a Construction signup  
      */
-    constructor (eventType, author, options={}, repeatable=false) {
+    constructor (eventType, author, options={}, repeatable=true) {
         this.eventType = eventType;
         this.author = author;
         this.repeatable = repeatable;
@@ -35,8 +35,11 @@ class EventDetailsService {
         let description = await this.requestEventDescription();
         if(description === 'no answer') return null;
         let date = await this.requestEventDate();
-        let repeatableDay = await this.questionYesNo('`Should this event repeat every week?`')
         if(date === 'no answer') return null;
+        if(this.repeatable){
+            var repeatableDay = await this.questionYesNo('`Should this event repeat every week?`')
+            if(repeatableDay === 'no answer') return null;
+        }
         if(this.hasBastion) {
             var bastion = await this.requestExtraEvent('Bastion pilot');
             if(bastion === 'no answer') return null;
@@ -57,7 +60,7 @@ class EventDetailsService {
             colossus: colossus, 
             construction: construction
         }
-        return new EventDetails(name, description, date, options);
+        return new EventDetails(name, description, date, repeatableDay, options);
     }
 
     /**
