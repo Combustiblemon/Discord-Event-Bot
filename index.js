@@ -93,7 +93,7 @@ bot.on("ready", () => {
     setInterval(() => {
         bot.user.setPresence({ activity: { name: `${PREFIX}help`, type: 'LISTENING' }, status: 'active' })
         .catch(console.error);
-    }, 3,600,000);
+    }, 3600000);
 });
 
 bot.on('message', message => {
