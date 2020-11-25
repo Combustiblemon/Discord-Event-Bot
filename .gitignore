@@ -1,3 +1,5 @@
 .env
 channels.json
 roles.json
+TO-DO.txt
+.gitignore
