@@ -14,7 +14,7 @@ const bot = new Discord.Client({ partials: ['USER', 'GUILD_MEMBER', 'MESSAGE', '
 const Event = require('./src/models/Event');
 const EventScheduler = require('./src/services/EventScheduler');
 const token = process.env.DISCORD_BOT_TOKEN;
-const PREFIX = '^';
+const PREFIX = '$';
 
 
 let savedServers = []
@@ -27,10 +27,10 @@ fs.readdirSync('./embeds/').forEach(file => {
 EventList.initialize()
 FileSystem.initializeEmbedName(savedServers)
 
-let cronJob = new CronJob('0 0 5 * * *', function() {
+/* let cronJob = new CronJob('0 0 5 * * *', function() {
     console.log('hello :3');
 }, null, true, 'UTC')
-cronJob.start();
+cronJob.start(); */
 
 //read the files from disk, if they don't exist write them
 let allowedChannels = FileSystem.ensureFileExistance('channels.json', './').then(function(result){

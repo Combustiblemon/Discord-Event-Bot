@@ -40,6 +40,6 @@ function createEvent(eventDetails, header, author) {
         author,
         false,
         [
-            new SignupOption('✅', 'Signups', false, true, [])
+            new SignupOption(EmojiService.getEmoji('default', 'Signups'), 'Signups', false, true, [])
         ])
 }

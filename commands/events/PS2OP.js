@@ -33,18 +33,18 @@ module.exports = {
  */
 function createEvent(eventDetails, header, author) {
     let signupOptions = [
-        new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
-        new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
-        new SignupOption('air:706620854934700102', 'Air', false, false, []),
-        new SignupOption('⭐', 'Squad Leaders', true, true, [])
+        new SignupOption(EmojiService.getEmoji('default', 'Infantry'), 'Infantry', false, false, []),
+        new SignupOption(EmojiService.getEmoji('default', 'Armour'), 'Armour', false, false, []),
+        new SignupOption(EmojiService.getEmoji('default', 'Air'), 'Air', false, false, []),
+        new SignupOption(EmojiService.getEmoji('default', 'Squad Leaders'), 'Squad Leaders', true, true, [])
     ];
 
     if (eventDetails.bastion){
-        signupOptions.push(new SignupOption('🛹', 'Bastion Pilot', true, true, []));
+        signupOptions.push(new SignupOption(EmojiService.getEmoji('default', 'Bastion Pilot'), 'Bastion Pilot', true, true, []));
     }
     
     if (eventDetails.colossus){
-        signupOptions.push(new SignupOption('tank:722512189067362324', 'Colossus Driver', true, true, []));
+        signupOptions.push(new SignupOption(EmojiService.getEmoji('default', 'Colossus Driver'), 'Colossus Driver', true, true, []));
     }
     
     return new Event(

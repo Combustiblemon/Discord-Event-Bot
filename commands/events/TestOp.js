@@ -3,6 +3,8 @@ const Event = require('../../src/models/Event');
 const SignupOption = require('../../src/models/SignupOption');
 const EventService = require('../../src/services/EventService');
 const EventDetailsService = require('../../src/services/EventDetailsService');
+const EmojiService = require('../../src/services/EmojiService');
+
 
 module.exports = {
     name: 'TestOp',
@@ -41,10 +43,10 @@ function createEvent(eventDetails, header, author) {
         author,
         true,
         [
-            new SignupOption('🔫', 'Infantry', false, false, []),
-            new SignupOption('🚌', 'Armour', false, false, []),
-            new SignupOption('✈️', 'Air', false, false, []),
-            new SignupOption('⭐', 'Squad Leaders', true, true, [])
+            new SignupOption(EmojiService.getEmoji('default', 'Infantry'), 'Infantry', false, false, []),
+            new SignupOption(EmojiService.getEmoji('default', 'Armour'), 'Armour', false, false, []),
+            new SignupOption(EmojiService.getEmoji('default', 'Air'), 'Air', false, false, []),
+            new SignupOption(EmojiService.getEmoji('default', 'Squad Leaders'), 'Squad Leaders', true, true, [])
         ]
     )
 }

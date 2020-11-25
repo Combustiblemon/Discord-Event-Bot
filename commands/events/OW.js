@@ -34,14 +34,14 @@ module.exports = {
  */
 function createEvent(eventDetails, header, author) {
     let signupOptions = [
-        new SignupOption('infantry:706621296812884088', 'Infantry', false, false, []),
-        new SignupOption('armour:706621296745906219', 'Armour', false, false, []),
-        new SignupOption('air:706620854934700102', 'Air', false, false, []),
-        new SignupOption('💪🏻', 'Flex', false, false, [])
+        new SignupOption(EmojiService.getEmoji('default', 'Infantry'), 'Infantry', false, false, []),
+        new SignupOption(EmojiService.getEmoji('default', 'Armour'), 'Armour', false, false, []),
+        new SignupOption(EmojiService.getEmoji('default', 'Air'), 'Air', false, false, []),
+        new SignupOption(EmojiService.getEmoji('default', 'Flex'), 'Flex', false, false, [])
     ];
 
     if(eventDetails.construction){
-        signupOptions.push(new SignupOption('⛑', 'Construction', false, false, []))
+        signupOptions.push(new SignupOption(EmojiService.getEmoji('default', 'Construction'), 'Construction', false, false, []))
     }
     
     return new Event(

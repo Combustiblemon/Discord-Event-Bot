@@ -1,0 +1,13 @@
+{
+   "default": {
+       "Infantry": "Infantry:781197131255775272",
+       "Armour": "Armor:781197187647668275",
+       "Air": "Air:781197169259708426",
+       "Colossus Driver": "tank:722512189067362324",
+       "Bastion Pilot": "🛹",
+       "Squad Leaders": "⭐",
+       "Signups":"✅",
+       "Flex": "💪🏻",
+       "Construction": "⛑"
+   }
+}
