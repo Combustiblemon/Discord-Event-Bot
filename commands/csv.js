@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const FileSystem = require('../src/services/FileSystem');
 const EventDetailsService = require('../src/services/EventDetailsService');
+const glob = require('glob');
 
 module.exports = {
     name:'csv',
@@ -17,16 +18,10 @@ module.exports = {
             return;
         }
         
-        let csvFiles = FileSystem.getCSVFilesNames();
+        let guildName = message.guild.name.replace(/[<>:"/\\|?*]/gi, '^');
+        let GuildCSVs = glob.sync('csv_files' + `/${guildName}/*.csv`);
         let user = message.author;
-        let guildName = message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
-        let GuildCSVs = [];
         let tempArray = [];
-        csvFiles.forEach(element => {
-            if(element.includes(guildName)){
-                GuildCSVs.push(element);
-            }
-        });
 
         if(!GuildCSVs.length){
             user.send(`No CSV files found.`);

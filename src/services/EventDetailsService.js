@@ -11,13 +11,15 @@ class EventDetailsService {
      * @param {string} eventType The type of event, will be added to questions for flair
      * @param {Discord.User} author The user that authored the event
      * @param {object} options The extra options available
+     * @param {boolean} repeatable If the event should be repeated
      * @param {boolean} options.bastion If the event has the posibility for a Bastion pilot signup
      * @param {boolean} options.colossus If the event has the posibility for a Colossus driver signup
      * @param {boolean} options.construction If the event has the posibility for a Construction signup  
      */
-    constructor (eventType, author, options={}) {
+    constructor (eventType, author, options={}, repeatable=true) {
         this.eventType = eventType;
         this.author = author;
+        this.repeatable = repeatable;
         this.hasBastion = options.bastion || false;
         this.hasColossus = options.colossus || false;
         this.hasConstruction = options.construction || false;
@@ -31,28 +33,34 @@ class EventDetailsService {
         let name = await this.requestEventName();
         if(name === 'no answer') return;
         let description = await this.requestEventDescription();
-        if(name === 'no answer') return null;
+        if(description === 'no answer') return null;
         let date = await this.requestEventDate();
-        if(name === 'no answer') return null;
+        if(date === 'no answer') return null;
+        if(this.repeatable){
+            var repeatableDay = await this.questionYesNo('`Should this event repeat every week?`')
+            if(repeatableDay === 'no answer') return null;
+        }
         if(this.hasBastion) {
             var bastion = await this.requestExtraEvent('Bastion pilot');
-            if(name === 'no answer') return null;
+            if(bastion === 'no answer') return null;
         }
         if(this.hasColossus) {
             var colossus = await this.requestExtraEvent('Colossus driver');
-            if(name === 'no answer') return null;
+            if(colossus === 'no answer') return null;
         }
         if(this.hasConstruction) {
             var construction = await this.requestExtraEvent('Construction');
-            if(name === 'no answer') return null;
+            if(construction === 'no answer') return null;
         }
+
+        this.author.send('`Event created successfully`')
 
         let options = {
             bastion: bastion,
             colossus: colossus, 
             construction: construction
         }
-        return new EventDetails(name, description, date, options);
+        return new EventDetails(name, description, date, repeatableDay, options);
     }
 
     /**
@@ -60,7 +68,7 @@ class EventDetailsService {
      * @returns {Promise<string>} The name for the event as answered by author
      */
     async requestEventName() {
-        let question = `What is the name of the ${this.eventType}?`;
+        let question = `\`What is the name of the ${this.eventType}?\``;
 
         
         let answer = await this.requestSingleDetail(question);
@@ -81,7 +89,7 @@ class EventDetailsService {
      * @returns {Promise<string>} The description for the event as answered by author
      */
     async requestEventDescription() {
-        let question = `Write a short description of the ${this.eventType}.`;
+        let question = `\`Write a short description of the ${this.eventType}.\``;
 
         let answer = await this.requestSingleDetail(question);
 
@@ -95,7 +103,7 @@ class EventDetailsService {
      * @returns {Promise<Date>} The date for the event as answered by author
      */
     async requestEventDate() {
-        let question = `When (in UTC and YYYY-MM-DD hh:mm format) is the ${this.eventType}?`;
+        let question = `\`When (in UTC and YYYY-MM-DD hh:mm format) is the ${this.eventType}?\``;
 
         let date;
 
@@ -116,27 +124,49 @@ class EventDetailsService {
      * @returns {Promise<boolean>} If the event will need the specific, as answered by author
      */
     async requestExtraEvent(description){
-        let question = `Will the ${this.eventType} need ${description} signup?\n \`Y/N\``;
+        let question = `\`Will the ${this.eventType} need ${description} signup?\``;
+        
 
-        let event;
-
-        while(typeof event !== "boolean"){
-            let answer = await this.requestSingleDetail(question);
-            if(!answer) return 'no answer';
-            //remove whitespace and convert to uppercase
-            answer.trim().toUpperCase();
-            if (answer == 'Y'){
-                event = true;
-            }else if (answer == 'N'){
-                event = false;
-            }
-        }
-
+        let event = await this.questionYesNo(question);
 
         return event;
     }
 
+    
 
+    async questionYesNo(question, author = null){
+        if(!author){
+            author = await this.getAuthor();
+        }
+        let event;
+        await author.send(question).then(async embed => {
+            try {
+                await embed.react('✅');
+                await embed.react('❌');
+
+            } catch (error) {
+                console.error(error);
+            }
+            const filter = (reaction, user) => {
+                return (reaction.emoji.name === '✅' || reaction.emoji.name === '❌')&& user.id === author.id;
+            };
+
+            await embed.awaitReactions(filter, { max: 1, time: 120000, errors: ['time'] })
+                .then(collected => {
+                    if (collected.firstKey(1) == '✅'){
+                        event = true;
+                    }else if (collected.firstKey(1) == '❌'){
+                        event = false;
+                    }
+                })
+                .catch(collected => {
+                    console.warn(collected)
+                    event = 'no answer';
+                });
+        });
+
+        return event;
+    }
 
     /**
      * 
@@ -145,17 +175,11 @@ class EventDetailsService {
      * @returns {Promise<string>} The answer to the question
      */
     async requestSingleDetail(question, message = null) {
-        let questionMessage;
-        let messageFilter;
-        if (!message){
-            questionMessage = await this.author.send(question);
-
-            messageFilter = m => m.author.id === this.author.id;
-        }else{
-            questionMessage = await message.author.send(question);
-
-            messageFilter = m => m.author.id === message.author.id;
-        }
+        let msgAuthor = await this.getAuthor(message);
+        //let questionMessage;
+        //let messageFilter;
+        let questionMessage = await msgAuthor.send(question);
+        let messageFilter = m => m.author.id === msgAuthor.id;
         
         let messages = await questionMessage.channel.awaitMessages(
             messageFilter, 
@@ -166,7 +190,7 @@ class EventDetailsService {
             }
         ).catch(() =>{
             console.error('Message timeout. No message after question.');
-            questionMessage.channel.send('No answer was given. Please use the command again.');
+            questionMessage.channel.send('`No answer was given. Please use the command again.`');
         });
 
         if(!messages.first().content) return null;
@@ -194,6 +218,14 @@ class EventDetailsService {
         }
     }
 
+    getAuthor(message = null){
+        if (!message){
+            return this.author;
+        }else{
+            return message.author;
+        }
+    }
+
 }
 
-module.exports = EventDetailsService;
+    module.exports = EventDetailsService;

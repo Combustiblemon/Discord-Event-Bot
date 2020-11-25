@@ -6,7 +6,9 @@ const BotEvent = require('../models/Event');
 const Errors = require('../models/error');
 const EventDetailsService = require('./EventDetailsService');
 
-let embedsInMemoryID = [];
+let embedsInMemory = new Object()
+embedsInMemory.ID = [];
+embedsInMemory.Name = new Object();
 let embedsInMemoryName = [];
 let csvFilesInMemory = [];
 
@@ -21,7 +23,10 @@ class FileSystem {
      * @param {string} mode The mode to use: 'embed'|'event'|'both'
      */
     async writeJSON(event, embed, mode) {
-        let name = this.getFileNameForEvent(event);
+        let name = `${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/${this.getFileNameForEvent(event)}`
+
+        this.ensureDirectoryExistence(`embeds/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
+        this.ensureDirectoryExistence(`events/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
 
         if (mode == 'embed') {
             this.writeData(embed, name, 'embeds/');
@@ -59,7 +64,7 @@ class FileSystem {
      * @param {string} folder The folder where the file is
      * @returns {Discord.Message}
      */
-    readJSON(name, folder) {
+    readJSON(name, folder='') {
         if (name.includes('.json')) {
             let rawdata = fs.readFileSync(`${folder}${name}`);
             let message = JSON.parse(rawdata);
@@ -99,7 +104,7 @@ class FileSystem {
         let records = this.createCSVRecords(event);
 
         //remove illegal characters from the server name
-        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '');
+        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '^');
         
         let name = this.getFileNameForEvent(event);
         
@@ -186,7 +191,7 @@ class FileSystem {
      * @param {string} id The id of the embed
      */
     addEmbedID(id){
-        embedsInMemoryID.push(id);
+        embedsInMemory.ID.push(id);
     }
 
     /**
@@ -195,48 +200,64 @@ class FileSystem {
      */
     removeEmbedID(id){
         const isName = (element) => element === id;
-        let index = embedsInMemoryID.findIndex(isName)
+        let index = embedsInMemory.ID.findIndex(isName)
         if(index === -1){
             console.error(new Errors.arrayLookupFail(''));
             return;
         }
-        embedsInMemoryID.splice(index, 1)
+        embedsInMemory.ID.splice(index, 1)
     }
+
+    initializeEmbedName(serverNames){
+        for (const server of serverNames){
+            embedsInMemory.Name[server] = []
+        }
+
+        //finds the names in the given object
+        /* var result = ''
+        for (var i in embedsInMemory.Name) {
+            // obj.hasOwnProperty() is used to filter out properties from the object's prototype chain
+            if (embedsInMemory.Name.hasOwnProperty(i)) {
+              result += `embedsInMemory.Name.${i} = ${embedsInMemory.Name[i]}\n`;
+            }
+          }
+        console.log(result); */
+    }
+
 
     /**
      * @param {string} name The name of the embed
      */
-    addEmbedName(name){
-        embedsInMemoryName.push(name);
+    addEmbedName(name, server){
+        embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].push(name);
     }
-
 
     /**
      * 
      * @param {string} name The name of the embed
      */
-    removeEmbedName(name){
+    removeEmbedName(name, server){
         const isName = (element) => element.includes(name);
-        let index = embedsInMemoryName.findIndex(isName)
+        let index = embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].findIndex(isName)
         if(index === -1){
             console.error(new Errors.arrayLookupFail(''));
             return;
         }
-        embedsInMemoryName.splice(index, 1);
+        embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].splice(index, 1);
     }
 
     /**
      * @returns {Array}
      */
     getEmbedIDs(){
-        return Array.from(embedsInMemoryID);
+        return Array.from(embedsInMemory.ID);
     }
 
     /**
      * @returns {Array}
      */
-    getEmbedNames(){
-        return Array.from(embedsInMemoryName);
+    getEmbedNames(server){
+        return Array.from(embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]);
     }
 
     /**
@@ -244,9 +265,9 @@ class FileSystem {
      * @param  {string} name The name of the embed to be converted to ID
      * @return {string} 
      */
-    getEmbedID(name){
-        if(this.embedNameExists(name)){
-            let embed = this.readJSON(name, 'embeds/');
+    getEmbedID(name, server){
+        if(this.embedNameExists(name, server.replace(/[<>:"/\\|?*]/gi, '^'))){
+            let embed = this.readJSON(name, `embeds/${server.replace(/[<>:"/\\|?*]/gi, '^')}/`);
             return embed.id;
         }
 
@@ -259,9 +280,9 @@ class FileSystem {
      * @param  {string} name The name of the embed to return the channel of
      * @return {string} 
      */
-    getEmbedChannel(name){
-        if(this.embedNameExists(name)){
-            let embed = this.readJSON(name, 'embeds/');
+    getEmbedChannel(name, server){
+        if(this.embedNameExists(name, server)){
+            let embed = this.readJSON(name, `embeds/${server.replace(/[<>:"/\\|?*]/gi, '^')}/`);
             return embed.channelID;
         }
 
@@ -274,8 +295,8 @@ class FileSystem {
      * @param {string} name The name of the embed to be checked
      * @return {Promise<boolean>}
      */
-    embedNameExists(name){
-        return embedsInMemoryName.includes(name);
+    embedNameExists(name, server){
+        return embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].includes(name);
     }
     //#endregion
 
