@@ -167,17 +167,6 @@ bot.on('message', message => {
                 }
                 
             break;
-            
-            case 'channel':
-                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                    if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
-                        bot.commands
-                            .get('channel')
-                            .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
-                    }else {
-                        message.author.send('You are lacking the required permissions.');
-                    }});
-            break;
 
             case 'csv':
                 message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
@@ -211,6 +200,17 @@ bot.on('message', message => {
                 }else {
                     message.author.send('You are lacking the required permissions. You need the \`Administrator\` permission.');
                 }
+        break;
+
+        case 'channel':
+                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                    if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
+                        bot.commands
+                            .get('channel')
+                            .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
+                    }else {
+                        message.author.send('You are lacking the required permissions.');
+                    }});
         break;
     }
     //#endregion
