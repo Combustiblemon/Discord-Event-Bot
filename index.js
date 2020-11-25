@@ -12,7 +12,7 @@ var CronJob = require('cron').CronJob;
 const glob = require('glob');
 const bot = new Discord.Client({ partials: ['USER', 'GUILD_MEMBER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 const Event = require('./src/models/Event');
-const EventScheduler = require('./src/services/EventScheduler');
+//const EventScheduler = require('./src/services/EventScheduler');
 const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
@@ -74,9 +74,9 @@ for (const server of savedServers){
         let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate), event.repeatableDay), event.header, event.author, tempSignupOption);
         EventService.saveEventForMessageId(tempEvent, embed.id);
 
-        if (event.repeatableDay > -1){
+        /* if (event.repeatableDay > -1){
             EventScheduler.addEventToCheck(file.replace(/.json/gi, '').trim(), event.repeatableDay);
-        }
+        } */
     }
 }
 //#endregion

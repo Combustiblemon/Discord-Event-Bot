@@ -3,7 +3,7 @@ const FileSystem = require('../src/services/FileSystem');
 const nullEmbedID = require('../src/models/error');
 const EventDetailsService = require('../src/services/EventDetailsService');
 const fs = require('fs');
-const EventScheduler = require('../src/services/EventScheduler');
+//const EventScheduler = require('../src/services/EventScheduler');
 
 const messageTimeout = 600_000;
 
