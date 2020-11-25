@@ -93,7 +93,7 @@ bot.on("ready", () => {
     setInterval(() => {
         bot.user.setPresence({ activity: { name: `${PREFIX}help`, type: 'LISTENING' }, status: 'active' })
         .catch(console.error);
-    }, 3,600,000);
+    }, 3600000);
 });
 
 bot.on('message', message => {
@@ -180,14 +180,13 @@ bot.on('message', message => {
             break;
 
             case 'role':
-                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                    if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
-                        bot.commands
-                            .get('role')
-                            .execute(bot, message, roles, subCommand);
-                    }else {
-                        message.author.send('You are lacking the required permissions.');
-                    }});
+                if (message.member.hasPermission("ADMINISTRATOR")) {
+                    bot.commands
+                        .get('role')
+                        .execute(bot, message, roles, subCommand);
+                }else {
+                    message.author.send('You are lacking the required permissions. You need the \`Administrator\` permission.');
+                }
             break;
 
             case 'csv':
