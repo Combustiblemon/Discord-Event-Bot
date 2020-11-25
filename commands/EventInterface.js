@@ -28,7 +28,6 @@ function createEmbed(events){
             }
             embed.addField(`${events[i][0]} events:`, text);
         }
-        console.log(events[0])
     
     return embed;
 }

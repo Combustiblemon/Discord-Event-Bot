@@ -114,7 +114,9 @@ bot.on('message', message => {
     
     // args[0] is the first word($ping)
     let command = args[0].toLowerCase();
-    let subCommand = args[1].toLowerCase();
+    let subCommand = ''
+    if(args[1]) subCommand = args[1].toLowerCase();
+    
 
     if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
         if (serverIndex === -1 && `${command} ${subCommand}` != 'role add'){
