@@ -142,7 +142,7 @@ bot.on('message', message => {
                             bot.commands.get('PS2OP').execute(bot, message);
                         break;
 
-                        case 'training':
+                        case 'single':
                             bot.commands.get('Single').execute(bot, message);
                         break;
 
