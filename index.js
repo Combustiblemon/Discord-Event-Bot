@@ -135,32 +135,38 @@ bot.on('message', message => {
                     if(!subCommand) {
                         bot.commands.get('EventInterface').execute(bot, message, EventList.getEvents());
                         //message.author.send('You need to enter a second argument. For a list of commands write $help.');
-                        
+                        break;
                     }
-                    else if(subCommand === 'ps2op') {
-                        bot.commands.get('PS2OP').execute(bot, message);
-                    }
-                    else if(subCommand === 'training') {
-                        bot.commands.get('PS2Training').execute(bot, message);
-                    }
-                    else if(subCommand === 'testop') {
-                        bot.commands.get('TestOp').execute(bot, message); 
-                    }else if(subCommand === 'ow'){
-                        bot.commands.get('OW').execute(bot, message); 
-                    }
-                    else if(subCommand === 'delete'){
-                        message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
-                            if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
-                                bot.commands.get('delete').execute(bot, message);
-                            }else {
-                                message.author.send('You are lacking the required permissions.');
-                            }
-                        });
-                    }
-                    else {
-                        message.author.send(`No command \"$${command} ${subCommand}\". For a list of commands write $help.`)
-                    }
+                    switch(subCommand){
+                        case 'ps2op':
+                            bot.commands.get('PS2OP').execute(bot, message);
+                        break;
 
+                        case 'training':
+                            bot.commands.get('PS2Training').execute(bot, message);
+                        break;
+
+                        case 'testop':
+                            bot.commands.get('TestOp').execute(bot, message); 
+                        break;
+
+                        case 'ow':
+                            bot.commands.get('OW').execute(bot, message); 
+                        break;
+
+                        case 'delete':
+                            message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                                if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
+                                    bot.commands.get('delete').execute(bot, message);
+                                }else {
+                                    message.author.send('You are lacking the required permissions.');
+                                }
+                            });
+                        break;
+                        
+                        default:
+                            message.author.send(`No command \"$${command} ${subCommand}\". For a list of commands write $help.`)
+                    }
                 }
                 else {
                     message.author.send('Please use the command in a server channel.');
