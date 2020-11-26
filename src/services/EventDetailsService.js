@@ -36,8 +36,9 @@ class EventDetailsService {
         if(description === 'no answer') return null;
         let date = await this.requestEventDate();
         if(date === 'no answer') return null;
+        let repeatableDay = false
         if(this.repeatable){
-            var repeatableDay = await this.questionYesNo('`Should this event repeat every week?`')
+            //var repeatableDay = await this.questionYesNo('`Should this event repeat every week?`')
             if(repeatableDay === 'no answer') return null;
         }
         if(this.hasBastion) {

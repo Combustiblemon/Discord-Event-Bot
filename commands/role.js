@@ -73,9 +73,11 @@ function addRole(message, serverIndex, roles) {
             const tempArray = [message.guild.name, answer];
             roles.push(tempArray);
             FileSystem.writeData(roles, 'roles', './');
+            FileSystem.addServerName(message.guild.name)
             author.send('Role Added.');
-        }).catch(() => {
-            console.error('No role ID was entered.');
+        }).catch(err => {
+            console.error('No role ID was entered.\n');
+            console.error(err)
             author.send('No ID was entered.');
         })
     }).catch(() => {

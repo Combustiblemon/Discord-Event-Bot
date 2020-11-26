@@ -17,6 +17,7 @@ const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
 
+
 let savedServers = []
 fs.readdirSync('./embeds/').forEach(file => {
     if(file != '.gitignore'){
@@ -25,7 +26,6 @@ fs.readdirSync('./embeds/').forEach(file => {
 });
 
 EventList.initialize()
-FileSystem.initializeEmbedName(savedServers)
 
 /* let cronJob = new CronJob('0 0 5 * * *', function() {
     console.log('hello :3');
@@ -71,7 +71,7 @@ for (const server of savedServers){
             tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
         }
         let tempDate = `${event.date.substring(0,10)}T${event.date.substring(11,16)}Z`;
-        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate), event.repeatableDay), event.header, event.author, tempSignupOption);
+        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate), event.repeatableDay), event.header, event.author, event.csv, tempSignupOption);
         EventService.saveEventForMessageId(tempEvent, embed.id);
 
         /* if (event.repeatableDay > -1){
@@ -143,7 +143,7 @@ bot.on('message', message => {
                         break;
 
                         case 'training':
-                            bot.commands.get('PS2Training').execute(bot, message);
+                            bot.commands.get('Single').execute(bot, message);
                         break;
 
                         case 'testop':
