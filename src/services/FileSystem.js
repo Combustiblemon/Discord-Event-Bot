@@ -257,7 +257,10 @@ class FileSystem {
      * @returns {Array}
      */
     getEmbedNames(server){
-        return Array.from(embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]);
+        if(embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]){
+            return Array.from(embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]);
+        }
+        return null
     }
 
     /**
