@@ -6,12 +6,17 @@ const BotEvent = require('../models/Event');
 const Errors = require('../models/error');
 const EventDetailsService = require('./EventDetailsService');
 
+let savedServers = JSON.parse(fs.readFileSync("./servers.json", 'utf8'));
 let embedsInMemory = new Object()
 embedsInMemory.ID = [];
 embedsInMemory.Name = new Object();
-let embedsInMemoryName = [];
+//let embedsInMemoryName = [];
 let csvFilesInMemory = [];
 
+//make the object, i should just save the object in a file
+for (const server of savedServers.Names){
+    embedsInMemory.Name[server] = []
+}
 class FileSystem {
 
     //#region JSON logic
@@ -111,12 +116,12 @@ class FileSystem {
         let header = event.getHeader();
         // Add additional roles to header
         header = header.concat(event.signupOptions.filter(x => x.isAdditionalRole).map(x => x.name));        
-
         const csvWriter = createCsvWriter({
             header: header,
             path: (`csv_files/${guildName}/${name}.csv`)
         });
-
+        
+        this.ensureDirectoryExistence(`csv_files/${guildName}/${name}.csv`)
         csvWriter.writeRecords(records);
         console.log(`Done writing file: ${name}.csv`);
     }
@@ -208,10 +213,8 @@ class FileSystem {
         embedsInMemory.ID.splice(index, 1)
     }
 
-    initializeEmbedName(serverNames){
-        for (const server of serverNames){
-            embedsInMemory.Name[server] = []
-        }
+    initializeServerName(serverNames){
+        
 
         //finds the names in the given object
         /* var result = ''
@@ -224,11 +227,19 @@ class FileSystem {
         console.log(result); */
     }
 
+    addServerName(serverName){
+        embedsInMemory.Name[serverName.replace(/[<>:"/\\|?*]/gi, '^')] = []
+        savedServers.Names.push(serverName.replace(/[<>:"/\\|?*]/gi, '^'))
+        this.writeData(savedServers, 'servers.json', './')
+    }
 
     /**
      * @param {string} name The name of the embed
      */
     addEmbedName(name, server){
+        if(!embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]){
+            this.addServerName(server);
+        }
         embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].push(name);
     }
 

@@ -251,7 +251,7 @@ class EventService {
                         reactionUser.send('\`Event deleted.\`')
                     }
                     else reactionUser.send('\`Event not deleted.\`')
-                    
+                    reaction.users.remove(user.id);
                     return;
                     
                 }else {
