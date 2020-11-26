@@ -3,10 +3,11 @@ const Event = require('../../src/models/Event');
 const SignupOption = require('../../src/models/SignupOption');
 const EventService = require('../../src/services/EventService');
 const EventDetailsService = require('../../src/services/EventDetailsService');
+const EmojiService = require('../../src/services/EmojiService');
 
 module.exports = {
-    name: 'PS2Training',
-    description: 'Sets up a PS2 training event archetype.',
+    name: 'Single',
+    description: 'Sets up an event with a single signup.',
     /**
      * 
      * @param {Discord.Client} bot 

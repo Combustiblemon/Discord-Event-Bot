@@ -3,6 +3,7 @@ const Event = require('../../src/models/Event');
 const SignupOption = require('../../src/models/SignupOption');
 const EventService = require('../../src/services/EventService');
 const EventDetailsService = require('../../src/services/EventDetailsService');
+const EmojiService = require('../../src/services/EmojiService');
 
 module.exports = {
     name: 'PS2OP',
