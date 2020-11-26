@@ -195,7 +195,7 @@ bot.on('message', message => {
         case 'help':
             bot.commands
                 .get('help')
-                .execute(bot, message);
+                .execute(bot, message, subCommand);
         break;
 
         case 'role':
