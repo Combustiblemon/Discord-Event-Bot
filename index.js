@@ -154,6 +154,10 @@ bot.on('message', message => {
                             bot.commands.get('OW').execute(bot, message); 
                         break;
 
+                        case 'foxop':
+                            bot.commands.get('FoxOp').execute(bot, message); 
+                        break;
+
                         case 'delete':
                             message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
                                 if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {

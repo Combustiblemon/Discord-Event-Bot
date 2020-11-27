@@ -6,7 +6,9 @@ eventList.games = new Object();
 
 class EventList{
     initialize(){
-        eventList.games['PS2'] = ['**(Single)** Single signup option', '**(PS2OP)** PS2 OP multiple signup options', '**(OW)** Similar to PS2OP, but set up for Outfit Wars']
+        eventList.games['Generic'] = ['**(Single)** Single signup option.']
+        eventList.games['PS2'] = ['**(PS2OP)** PS2 OP, multiple signup options.', '**(OW)** Similar to PS2OP, but set up for Outfit Wars.']
+        eventList.games['Foxhole'] = ['**(FoxOp)** Foxhole OP, multiple signup options.']
     }
 
     getEvents(){
