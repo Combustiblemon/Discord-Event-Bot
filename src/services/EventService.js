@@ -63,6 +63,7 @@ class EventService {
                     await embed.react(deleteEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
                     await FileSystem.createCSV(event, embed.guild.name);
+                    console.log(`${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
                 } catch (error) {
                     console.error(error);
                 }
@@ -226,7 +227,7 @@ class EventService {
         let event = this.getEventForMessageId(message.id);
 
         if (!event) {
-            console.log('No event found for message: ' + message.id);
+            //console.warn('No event found for message: ' + message.id);
             return;
         }
 
@@ -238,7 +239,6 @@ class EventService {
         
         let signupOption = event.getSingupOptionForEmoji(emoji);
         let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
-        // for some reason the :wastebucket: emoji is %F0%9F%97%91
         if(signupOption == deleteEmoji){
             let roles = index.GetRoles();
             var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
@@ -249,6 +249,7 @@ class EventService {
                     if(answer){
                         DeleteEvent.deleteEmbed(`${event.date.toISOString().substring(0,10)}_${event.name.replace(/ /gi, "_")}`, reaction.message);
                         reactionUser.send('\`Event deleted.\`')
+                        console.log(`${username} deleted ${event.name}. Server: ${message.guild.name}`);
                     }
                     else reactionUser.send('\`Event not deleted.\`')
                     reaction.users.remove(user.id);
@@ -272,6 +273,7 @@ class EventService {
                         (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
                     ]});
                     reaction.users.remove(user.id);
+                    console.log(`${username} got csv for ${event.name}. Server: ${message.guild.name}`);
                     return;
                     
                 }else {
@@ -327,7 +329,7 @@ class EventService {
         let event = this.getEventForMessageId(message.id);
 
         if (!event) {
-            console.log('No event found for message: ' + message.id);
+            //console.warn('No event found for message: ' + message.id);
             return;
         }
 
