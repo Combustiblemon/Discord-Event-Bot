@@ -18,7 +18,7 @@ module.exports = {
 function createEmbed(events){
     let embed = new Discord.MessageEmbed()
         .setTitle('List of Events.')
-        .setDescription('Use \`$event (event code)\` in the desired channel to create an event.\nClick 🗑 to delete a specific event or use \`$event delete\` to delete created events.')
+        .setDescription('Use \`$event (event code)\` in the desired channel to create an event.\nExample: \`$event Single\`\nClick 🗑 to delete a specific event or use \`$event delete\` to delete created events from a list.')
         .setColor(0xF1C40F);
 
         for (let i = 0; i < events.length; i++){

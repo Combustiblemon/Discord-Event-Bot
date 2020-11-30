@@ -39,7 +39,6 @@ module.exports = {
 
 const description = `For any extra help or bug reports message CombustibleLemon#6917.
                      The time of the event should be in YYYY-MM-DD hh:mm format (e.g. 2020-05-17 17:00).
-                     After the event is over use command '$event delete' to delete your event.
                      [You can help with the hosting costs.](https://www.paypal.com/donate/?hosted_button_id=3AW5RFTZVUY3E)`
 
 const commands =`**($help)**               Displays this help message.

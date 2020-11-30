@@ -43,9 +43,9 @@ function createEvent(eventDetails, header, author) {
         author,
         true,
         [
-            new SignupOption(EmojiService.getEmoji('default', 'Infantry'), 'Infantry', false, false, []),
-            new SignupOption(EmojiService.getEmoji('default', 'Armour'), 'Armour', false, false, []),
-            new SignupOption(EmojiService.getEmoji('default', 'Air'), 'Air', false, false, []),
+            new SignupOption(EmojiService.getEmoji('default', 'Infantry'), 'Infantry', false, true, []),
+            new SignupOption(EmojiService.getEmoji('default', 'Armour'), 'Armour', false, true, []),
+            new SignupOption(EmojiService.getEmoji('default', 'Air'), 'Air', false, true, []),
             new SignupOption(EmojiService.getEmoji('default', 'Squad Leaders'), 'Squad Leaders', true, true, [])
         ]
     )
