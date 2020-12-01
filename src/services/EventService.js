@@ -235,7 +235,7 @@ class EventService {
         let emoji = reaction.emoji;
         let username = reactionUser.displayName;
 
-        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
+        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
         
         let signupOption = event.getSingupOptionForEmoji(emoji);
         let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
@@ -249,7 +249,7 @@ class EventService {
                     if(answer){
                         DeleteEvent.deleteEmbed(`${event.date.toISOString().substring(0,10)}_${event.name.replace(/ /gi, "_")}`, reaction.message);
                         reactionUser.send('\`Event deleted.\`')
-                        console.log(`${username} deleted ${event.name}. Server: ${message.guild.name}`);
+                        console.log(`${reactionUser.user.tag} deleted ${event.name}. Server: ${message.guild.name}`);
                     }
                     else reactionUser.send('\`Event not deleted.\`')
                     reaction.users.remove(user.id);
@@ -273,7 +273,7 @@ class EventService {
                         (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
                     ]});
                     reaction.users.remove(user.id);
-                    console.log(`${username} got csv for ${event.name}. Server: ${message.guild.name}`);
+                    console.log(`${reactionUser.user.tag} got csv for ${event.name}. Server: ${message.guild.name}`);
                     return;
                     
                 }else {
@@ -293,7 +293,7 @@ class EventService {
 
         if (signupOption.isAdditionalRole) {
             if (signupOption.signups.find(s => s == username)) {
-                console.log(`User ${username} is already signed up for ${event.name} as ${signupOption.name}`);
+                console.log(`User ${reactionUser.user.tag} is already signed up for ${event.name} as ${signupOption.name}`);
                 return;
             }
         }   
@@ -304,7 +304,7 @@ class EventService {
                 .flat(1);
 
             if (allSignups.find(s => s == username)) {
-                console.log('User ' + username + ' is already signed up for ' + event.name);
+                console.log('User ' + reactionUser.user.tag + ' is already signed up for ' + event.name);
                 reaction.users.remove(user.id);
                 return;
             }
@@ -337,7 +337,7 @@ class EventService {
         let emoji = reaction.emoji;
         let username = reactionUser.displayName;
 
-        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
+        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
         
@@ -351,7 +351,7 @@ class EventService {
         }
 
         if (!signupOption.signups.find(s => s == username)) {
-            console.log('User ' + username + ' is not signed up for ' + event.name);
+            console.log('User ' + reactionUser.user.tag + ' is not signed up for ' + event.name);
             return;
         }
 

@@ -69,6 +69,7 @@ function addRole(message, serverIndex, roles) {
                 return;
             }
             
+            console.log(`${message.author.tag} added roleID (${answer}) server: (${message.guild.name})`)
             answer = answer.trim();
             const tempArray = [message.guild.name, answer];
             roles.push(tempArray);
@@ -104,10 +105,10 @@ function removeRole(message, serverIndex, roles) {
         question.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(collected => {
             let answer = collected.first().content;
             if (typeof roles[serverIndex][1] !== 'undefined' && roles[serverIndex][1] === answer) {
+                console.log(`${message.author.tag} removed roleID (${roles[serverIndex][1]}) from (${roles[serverIndex][0]})`)
                 roles.splice(serverIndex, 1);
                 FileSystem.writeData(roles, 'roles', './')
                 author.send('Role removed.');
-
                 return;
             }
             
