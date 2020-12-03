@@ -228,9 +228,11 @@ class FileSystem {
     }
 
     addServerName(serverName){
-        embedsInMemory.Name[serverName.replace(/[<>:"/\\|?*]/gi, '^')] = []
-        savedServers.Names.push(serverName.replace(/[<>:"/\\|?*]/gi, '^'))
-        this.writeData(savedServers, 'servers.json', './')
+        if(!embedsInMemory.Name[serverName.replace(/[<>:"/\\|?*]/gi, '^')]){
+            embedsInMemory.Name[serverName.replace(/[<>:"/\\|?*]/gi, '^')] = []
+            savedServers.Names.push(serverName.replace(/[<>:"/\\|?*]/gi, '^'))
+            this.writeData(savedServers, 'servers.json', './')
+        }
     }
 
     /**

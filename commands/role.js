@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
+const EventDetailsService = require('../src/services/EventDetailsService');
 const FileSystem = require('../src/services/FileSystem');
+const { getRolesAsFormattedString, getRoleIDFromName, checkIfRoleExistsInGuild } = require('../src/services/RoleService');
 
 module.exports = {
     name: 'role',
@@ -55,31 +57,50 @@ module.exports = {
  * @param {string} serverIndex
  * @param {Array} roles
  */
-function addRole(message, serverIndex, roles) {
+async function addRole(message, serverIndex, roles) {
     let author = message.author;
-    let text = "```Type the ID of the role you want to add as a new minimum:\nHint: enable discord developer mode and right click the role to get the ID.```";
+    let text = await getRolesAsFormattedString(message.guild)
     let filter = m => m.author.id === author.id;
 
-    author.send(text).then(msg => {
-        msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(collected => {
-            let answer = collected.first().content;
-            if (serverIndex !== -1 && roles[serverIndex][1] === answer) {
-                author.send('This role is already the minimum.');
+    if(serverIndex !== -1 ){
+        message.author.send(`\`\`\`There is already a minimum role for ${roles[serverIndex][0]} (${roles[serverIndex][2]}).\nPlease use $role remove before adding a new role.\`\`\``)
+        return
+    }
 
-                return;
-            }
-            
-            answer = answer.trim();
-            const tempArray = [message.guild.name, answer];
-            roles.push(tempArray);
-            FileSystem.writeData(roles, 'roles', './');
-            FileSystem.addServerName(message.guild.name)
-            author.send('Role Added.');
-        }).catch(err => {
-            console.error('No role ID was entered.\n');
-            console.error(err)
-            author.send('No ID was entered.');
-        })
+    author.send(`\`\`\`${text}\`\`\``)
+    author.send(`\`\`\`Copy paste from above the role you want to be the minimum able to make events.\n**WARNING** CASE SENSITIVE **WARNING**\`\`\``).then(msg => {
+            msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(async collected => {
+                let answer = collected.first().content;
+                if(!answer.includes(':::')){
+                    author.send('\`\`\`Wrong format entered. Please run the command again.\`\`\`')
+                    return
+                }
+                answer = answer.trim().split(':::');
+                if (serverIndex !== -1 && roles[serverIndex][2] === answer[0]) {
+                    author.send('`This role is already the minimum.`');
+                    return;
+                }
+                let exists = await checkIfRoleExistsInGuild(message.guild, answer[0], answer[1])
+                if(!exists){
+                    author.send(`\`"${answer[0]}" is not a role in ${message.guild.name}. Please try the command again and make sure you are copying correctly.\``);
+                    return
+                }
+
+                
+                let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
+                console.log(`${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
+                const tempArray = [message.guild.name, roleID, answer[0]];
+                roles.push(tempArray);
+                FileSystem.writeData(roles, 'roles', './');
+                FileSystem.addServerName(message.guild.name)
+                author.send('`Role Added.`');
+                return
+            }).catch(err => {
+                //console.error('Nothing was entered.\n');
+                console.error(err)
+                author.send('Nothing was entered.');
+                return
+            })
     }).catch(() => {
         console.error(new Error('An error occurred'));
         message.author.send('An error occurred');
@@ -95,34 +116,15 @@ function addRole(message, serverIndex, roles) {
  * @param {Array} roles
  * @returns {Promise}
  */
-function removeRole(message, serverIndex, roles) {
-    let author = message.author;
-    let text = "```Type the ID of the role you want to remove:```";
-    let filter = m => m.author.id === author.id;
-
-    author.send(text).then(question => {
-        question.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(collected => {
-            let answer = collected.first().content;
-            if (typeof roles[serverIndex][1] !== 'undefined' && roles[serverIndex][1] === answer) {
-                roles.splice(serverIndex, 1);
-                FileSystem.writeData(roles, 'roles', './')
-                author.send('Role removed.');
-
-                return;
-            }
-            
-            message.guild.roles.fetch(answer).then(role => {
-                message.author.send('The roleID does not exist in the database.');
-
-                return;
-            });
-        }).catch(() => {
-            console.error('No role ID was entered.');
-            message.author.send('No ID was entered.');
-        });
-    }).catch(() => {
-        cconsole.error(new Error('An error occurred'));
-        message.author.send('An error occurred');
-    });
+async function removeRole(message, serverIndex, roles) {
+    let answer = await EventDetailsService.prototype.questionYesNo(`\`\`\`Are you sure you want to remove "${roles[serverIndex][2]}" as minimum role from ${roles[serverIndex][0]}\`\`\``,  message.author);
+    if(answer === true && answer != 'no answer') {
+        console.log(`${message.author.tag} removed role "${roles[serverIndex][2]}"(${roles[serverIndex][1]}) from (${roles[serverIndex][0]})`)
+        roles.splice(serverIndex, 1);
+        FileSystem.writeData(roles, 'roles', './')
+        message.author.send('\`Role removed.\`');
+        return;
+    }
+    return
 }
 //#endregion

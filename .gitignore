@@ -3,3 +3,4 @@ channels.json
 roles.json
 TO-DO.txt
 .gitignore
+node_modules/

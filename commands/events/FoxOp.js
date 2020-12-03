@@ -34,9 +34,9 @@ module.exports = {
  */
 function createEvent(eventDetails, header, author) {
     let signupOptions = [
-        new SignupOption(EmojiService.getEmoji('Foxhole', 'Infantry'), 'Infantry', false, false, []),
-        new SignupOption(EmojiService.getEmoji('Foxhole', 'Armour'), 'Armour', false, false, []),
-        new SignupOption(EmojiService.getEmoji('Foxhole', 'Logi'), 'Logi', false, false, []),
+        new SignupOption(EmojiService.getEmoji('Foxhole', 'Infantry'), 'Infantry', false, true, []),
+        new SignupOption(EmojiService.getEmoji('Foxhole', 'Armour'), 'Armour', false, true, []),
+        new SignupOption(EmojiService.getEmoji('Foxhole', 'Logi'), 'Logi', false, true, []),
     ];
     
     return new Event(

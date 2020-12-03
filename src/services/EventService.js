@@ -63,6 +63,7 @@ class EventService {
                     await embed.react(deleteEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
                     await FileSystem.createCSV(event, embed.guild.name);
+                    console.log(`${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
                 } catch (error) {
                     console.error(error);
                 }
@@ -226,7 +227,7 @@ class EventService {
         let event = this.getEventForMessageId(message.id);
 
         if (!event) {
-            console.log('No event found for message: ' + message.id);
+            //console.warn('No event found for message: ' + message.id);
             return;
         }
 
@@ -234,11 +235,10 @@ class EventService {
         let emoji = reaction.emoji;
         let username = reactionUser.displayName;
 
-        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
+        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
         
         let signupOption = event.getSingupOptionForEmoji(emoji);
         let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
-        // for some reason the :wastebucket: emoji is %F0%9F%97%91
         if(signupOption == deleteEmoji){
             let roles = index.GetRoles();
             var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
@@ -249,6 +249,7 @@ class EventService {
                     if(answer){
                         DeleteEvent.deleteEmbed(`${event.date.toISOString().substring(0,10)}_${event.name.replace(/ /gi, "_")}`, reaction.message);
                         reactionUser.send('\`Event deleted.\`')
+                        console.log(`${reactionUser.user.tag} deleted ${event.name}. Server: ${message.guild.name}`);
                     }
                     else reactionUser.send('\`Event not deleted.\`')
                     reaction.users.remove(user.id);
@@ -272,6 +273,7 @@ class EventService {
                         (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
                     ]});
                     reaction.users.remove(user.id);
+                    console.log(`${reactionUser.user.tag} got csv for ${event.name}. Server: ${message.guild.name}`);
                     return;
                     
                 }else {
@@ -291,7 +293,7 @@ class EventService {
 
         if (signupOption.isAdditionalRole) {
             if (signupOption.signups.find(s => s == username)) {
-                console.log(`User ${username} is already signed up for ${event.name} as ${signupOption.name}`);
+                console.log(`User ${reactionUser.user.tag} is already signed up for ${event.name} as ${signupOption.name}`);
                 return;
             }
         }   
@@ -302,7 +304,7 @@ class EventService {
                 .flat(1);
 
             if (allSignups.find(s => s == username)) {
-                console.log('User ' + username + ' is already signed up for ' + event.name);
+                console.log('User ' + reactionUser.user.tag + ' is already signed up for ' + event.name);
                 reaction.users.remove(user.id);
                 return;
             }
@@ -327,7 +329,7 @@ class EventService {
         let event = this.getEventForMessageId(message.id);
 
         if (!event) {
-            console.log('No event found for message: ' + message.id);
+            //console.warn('No event found for message: ' + message.id);
             return;
         }
 
@@ -335,7 +337,7 @@ class EventService {
         let emoji = reaction.emoji;
         let username = reactionUser.displayName;
 
-        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + username);
+        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
 
         let signupOption = event.getSingupOptionForEmoji(emoji);
         
@@ -349,7 +351,7 @@ class EventService {
         }
 
         if (!signupOption.signups.find(s => s == username)) {
-            console.log('User ' + username + ' is not signed up for ' + event.name);
+            console.log('User ' + reactionUser.user.tag + ' is not signed up for ' + event.name);
             return;
         }
 

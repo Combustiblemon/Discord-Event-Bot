@@ -19,7 +19,7 @@ module.exports = {
 
 
 
-        let eventDetailsService = new EventDetailsService('Training', message.author);
+        let eventDetailsService = new EventDetailsService('event', message.author);
         let eventDetails = await eventDetailsService.requestEventDetails();
         if(!eventDetails) return;
 
