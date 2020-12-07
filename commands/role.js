@@ -68,43 +68,44 @@ async function addRole(message, serverIndex, roles) {
     }
 
     author.send(`\`\`\`${text}\`\`\``)
-    author.send(`\`\`\`Copy paste from above the role you want to be the minimum able to make events.\n**WARNING** CASE SENSITIVE **WARNING**\`\`\``).then(msg => {
-            msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] }).then(async collected => {
-                let answer = collected.first().content;
-                if(!answer.includes(':::')){
-                    author.send('\`\`\`Wrong format entered. Please run the command again.\`\`\`')
-                    return
-                }
-                answer = answer.trim().split(':::');
-                if (serverIndex !== -1 && roles[serverIndex][2] === answer[0]) {
-                    author.send('`This role is already the minimum.`');
-                    return;
-                }
-                let exists = await checkIfRoleExistsInGuild(message.guild, answer[0], answer[1])
-                if(!exists){
-                    author.send(`\`"${answer[0]}" is not a role in ${message.guild.name}. Please try the command again and make sure you are copying correctly.\``);
-                    return
-                }
-
-                
-                let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
-                console.log(`${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
-                const tempArray = [message.guild.name, roleID, answer[0]];
-                roles.push(tempArray);
-                FileSystem.writeData(roles, 'roles', './');
-                FileSystem.addServerName(message.guild.name)
-                author.send('`Role Added.`');
-                return
-            }).catch(err => {
-                //console.error('Nothing was entered.\n');
-                console.error(err)
-                author.send('Nothing was entered.');
-                return
-            })
-    }).catch(() => {
-        console.error(new Error('An error occurred'));
-        message.author.send('An error occurred');
-    })
+    let msg = await author.send(`\`\`\`Copy paste from above the role you want to be the minimum able to make events.\n**WARNING** CASE SENSITIVE **WARNING**\`\`\``)
+    let completed = false
+    while(completed == false){
+        try {
+            let collected = await msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] })
+            let answer = collected.first().content;
+            if(!answer.includes(':::')){
+                author.send('\`\`\`Wrong format entered. Please try again.\`\`\`')
+                continue
+            }
+            answer = answer.trim().split(':::');
+            if (serverIndex !== -1 && roles[serverIndex][2] === answer[0]) {
+                author.send('```This role is already the minimum.```');
+                completed = true
+                return;
+            }
+            let exists = await checkIfRoleExistsInGuild(message.guild, answer[0], answer[1])
+            if(!exists){
+                author.send(`\`\`\`"${answer[0]}" is not a role in ${message.guild.name}. Please try again.\`\`\``);
+                continue
+            }
+        
+            let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
+            console.log(`${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
+            const tempArray = [message.guild.name, roleID, answer[0]];
+            roles.push(tempArray);
+            FileSystem.writeData(roles, 'roles', './');
+            FileSystem.addServerName(message.guild.name)
+            completed = true
+            author.send('```Role Added.```');
+            return    
+        } catch (error) {
+            console.error(err)
+            completed = true
+            author.send('```Nothing was entered.```');
+            return
+        }
+    }
 }
 //#endregion
 
