@@ -4,3 +4,5 @@ roles.json
 TO-DO.txt
 .gitignore
 node_modules/
+testing.js
+blacklist.json
