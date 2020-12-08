@@ -39,8 +39,9 @@ function createEvent(eventDetails, header, author) {
         eventDetails,
         header,
         author,
-        false,
         [
             new SignupOption(EmojiService.getEmoji('default', 'Signups'), 'Signups', false, true, [])
-        ])
+        ],
+        false
+        )
 }

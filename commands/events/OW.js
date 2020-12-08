@@ -48,7 +48,7 @@ function createEvent(eventDetails, header, author) {
     return new Event(
         eventDetails,
         header,
-        author,
-        true, 
-        signupOptions)
+        author, 
+        signupOptions,
+        true)
 }
