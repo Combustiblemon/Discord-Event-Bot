@@ -203,6 +203,10 @@ bot.on('message', message => {
                 .execute(bot, message, subCommand);
         break;
 
+        case 'notify':
+            EventService.messageUserBlacklist(message.author)
+        break;
+
         case 'role':
                 if (message.member.hasPermission("ADMINISTRATOR")) {
                     bot.commands

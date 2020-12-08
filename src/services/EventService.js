@@ -12,6 +12,8 @@ const botUserId = process.env.DISCORD_BOT_USER_ID;
 
 let csvEmoji = '📋';
 const deleteEmoji = "🗑";
+let blacklist = JSON.parse(fs.readFileSync('blacklist.json', 'utf8'));
+
 
 class EventService {
     
@@ -227,6 +229,31 @@ class EventService {
 
     /**
      * 
+     * @param {Event} event 
+     * @param {String} guildName
+     * @param {boolean} signup 
+     */
+    async createEmbedForSignup(event, guildName, signup){
+        let color = 0xffffff
+        let text = ''
+        if(signup){
+            color = 0x1ce1e8
+            text = `You have signed up for event \`${event.name}\` in \`${guildName}\``
+        }else{
+            color = 0xde2410
+            text = `You have removed your signup for event \`${event.name}\` in \`${guildName}\``
+        }
+
+        let embed = new Discord.MessageEmbed()
+            .setDescription(text)
+            .setColor(color)
+            .setFooter('To stop getting these messages send me `$notify`');
+
+        return embed
+    }
+
+    /**
+     * 
      * @param {Discord.MessageReaction} reaction 
      * @param {Discord.User} user 
      */
@@ -323,8 +350,11 @@ class EventService {
         }
 
         signupOption.addSignup(username);
-    
+        
         this.editEmbedForEvent(message, event);
+        if(blacklist.IDs.indexOf(reactionUser.id) == -1){
+            reactionUser.send(await this.createEmbedForSignup(event, message.guild.name, true))
+        }
     }
     
     /**
@@ -368,8 +398,27 @@ class EventService {
         }
 
         signupOption.removeSignup(username);
-    
+        
         this.editEmbedForEvent(message, event);
+        if(blacklist.IDs.indexOf(reactionUser.id) == -1){
+            reactionUser.send(await this.createEmbedForSignup(event, message.guild.name, false))
+        }
+    }
+
+    /**
+     * 
+     * @param {Discord.User} user 
+     */
+    messageUserBlacklist(user){
+        let index = blacklist.IDs.indexOf(user.id)
+        if(index > -1){
+            blacklist.IDs.splice(index, 1)
+            user.send('```You will now receive messages when you sign up to an event.\nTo revert send me \'$notify\' again.```')
+        }else{
+            blacklist.IDs.push(user.id);
+            user.send('```You will not receive messages when you sign up to an event.\nTo revert send me \'$notify\' again.```')
+        }
+        FileSystem.writeData(blacklist, 'blacklist.json', '')
     }
 }
 
