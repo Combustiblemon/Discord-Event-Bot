@@ -1,5 +1,5 @@
 const fs = require('fs')
-let emojis = require('../models/emojis.json')
+let emojis = JSON.parse(fs.readFileSync('src/models/emojis.json', 'utf8'));
 
 module.exports={
     name: "EmojiService",
