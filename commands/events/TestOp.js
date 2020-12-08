@@ -21,7 +21,7 @@ module.exports = {
 
 
         //let eventDetailsService = new EventDetailsService('TestOp', message.author);
-        let eventDetails = {name: 'test', description: 'test', date: date = new Date('2040-11-11 11:11')};
+        let eventDetails = {name: 'test', description: 'test', date: date = new Date('2040-11-11 11:11'), authorID: message.author.id};
         eventDetails.name =  await EventDetailsService.prototype.requestSingleDetail('name:', message);
 
         let event = createEvent(eventDetails, ['Aspect Test', 'Name Test'], message.member.displayName);
@@ -41,12 +41,12 @@ function createEvent(eventDetails, header, author) {
         eventDetails,
         header,
         author,
-        true,
         [
             new SignupOption(EmojiService.getEmoji('default', 'Infantry'), 'Infantry', false, true, []),
             new SignupOption(EmojiService.getEmoji('default', 'Armour'), 'Armour', false, true, []),
             new SignupOption(EmojiService.getEmoji('default', 'Air'), 'Air', false, true, []),
             new SignupOption(EmojiService.getEmoji('default', 'Squad Leaders'), 'Squad Leaders', true, true, [])
-        ]
+        ],
+        true
     )
 }

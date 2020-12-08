@@ -54,14 +54,12 @@ class EventDetailsService {
             if(construction === 'no answer') return null;
         }
 
-        this.author.send('`Event created successfully`')
-
         let options = {
             bastion: bastion,
             colossus: colossus, 
             construction: construction
         }
-        return new EventDetails(name, description, date, repeatableDay, options);
+        return new EventDetails(name, description, date, repeatableDay, options, this.author.id);
     }
 
     /**
@@ -134,7 +132,11 @@ class EventDetailsService {
     }
 
     
-
+    /**
+     * @description Returns 'no answer' if there is no answer
+     * @param {String} question 
+     * @param {Discord.Author} author 
+     */
     async questionYesNo(question, author = null){
         if(!author){
             author = await this.getAuthor();

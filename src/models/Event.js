@@ -11,7 +11,7 @@ module.exports = class Event {
      * @param {int} repeatableDay
      * @param {SignupOption[]} signupOptions
      */
-    constructor(eventDetails, header=[], author, csv=false, signupOptions) {
+    constructor(eventDetails, header=[], author, signupOptions, csv=false) {
         this.name = eventDetails.name;
         this.description = eventDetails.description;
         this.date = eventDetails.date;
@@ -19,6 +19,7 @@ module.exports = class Event {
         this.header = header;
         this.signupOptions = signupOptions;
         this.author = author;
+        this.authorID = eventDetails.authorID;
         this.csv = csv;
         this.bastion = eventDetails.bastion;
         this.colossus = eventDetails.colossus;

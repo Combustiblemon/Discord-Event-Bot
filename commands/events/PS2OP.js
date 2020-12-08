@@ -52,7 +52,7 @@ function createEvent(eventDetails, header, author) {
         eventDetails,
         header, 
         author,
-        true,
-        signupOptions
+        signupOptions,
+        true
     )
 }
