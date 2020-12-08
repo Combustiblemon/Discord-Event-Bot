@@ -214,8 +214,6 @@ class FileSystem {
     }
 
     initializeServerName(serverNames){
-        
-
         //finds the names in the given object
         /* var result = ''
         for (var i in embedsInMemory.Name) {

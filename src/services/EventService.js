@@ -6,6 +6,7 @@ const fs = require('fs');
 const index = require('../../index');
 const EventDetailsService = require('./EventDetailsService');
 const DeleteEvent = require('../../commands/delete');
+const { getRoleToPing } = require('./RoleService');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
@@ -33,20 +34,30 @@ class EventService {
     newEvent(bot, channel, event) {
         this.setupListeners(bot);
 
-        this.postEmbedForEvent(channel, event);
+        this.postEmbedForEvent(channel, event, bot);
     }
 
     /**
      * 
      * @param {Discord.TextChannel} channel
      * @param {BotEvent} event 
+     * @param {Discord.Client} bot
      */
-    async postEmbedForEvent(channel, event) {
+    async postEmbedForEvent(channel, event, bot) {
         const embed = this.createEmbedForEvent(event);
-        
+        let author = await bot.users.fetch(event.authorID)
+        let roleIDtoPing = await getRoleToPing(channel.guild, author)
+        let text = ''
+        if(roleIDtoPing){
+            if(roleIDtoPing == '@everyone' || roleIDtoPing == '@here'){
+                text = roleIDtoPing
+            }else{
+                text = `<@&${roleIDtoPing}>`
+            }
+        }
         
 
-        await channel.send(embed)
+        await channel.send(text, {embed:embed})
             .then(async embed => {
                 let fileName = FileSystem.getFileNameForEvent(event);
 
@@ -64,6 +75,7 @@ class EventService {
                     await FileSystem.writeJSON(event, embed, 'both');
                     await FileSystem.createCSV(event, embed.guild.name);
                     console.log(`${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
+                    author.send(`\`\`\`Event created successfully.\`\`\``)
                 } catch (error) {
                     console.error(error);
                 }
