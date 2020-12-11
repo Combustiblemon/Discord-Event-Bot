@@ -284,11 +284,15 @@ class EventService {
             message.guild.roles.fetch(roles[serverIndex][1]).then(async role=>{
                 if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     let answer = await EventDetailsService.prototype.questionYesNo(`\`Are you sure you want to delete "${event.name}"?\``, reactionUser);
-                    if(answer == 'no answer') reactionUser.send('\`Event not deleted.\`')
+                    if(answer == 'no answer'){ 
+                        reactionUser.send('\`Event not deleted.\`')
+                        return
+                    }
                     if(answer){
                         DeleteEvent.deleteEmbed(`${event.date.toISOString().substring(0,10)}_${event.name.replace(/ /gi, "_")}`, reaction.message);
                         reactionUser.send('\`Event deleted.\`')
                         console.log(`${reactionUser.user.tag} deleted ${event.name}. Server: ${message.guild.name}`);
+                        return
                     }
                     else reactionUser.send('\`Event not deleted.\`')
                     reaction.users.remove(user.id);
