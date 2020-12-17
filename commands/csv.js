@@ -18,7 +18,7 @@ module.exports = {
             return;
         }
         
-        let guildName = message.guild.name.replace(/[<>:"/\\|?*]/gi, '^');
+        let guildName = message.guild.id;
         let GuildCSVs = glob.sync('csv_files' + `/${guildName}/*.csv`);
         let user = message.author;
         let tempArray = [];

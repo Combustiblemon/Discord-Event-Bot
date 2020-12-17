@@ -31,7 +31,7 @@ module.exports = {
         }
 
         // Find the server index in the array
-        let serverIndex = roles.findIndex(x => x.includes(message.guild.name));
+        let serverIndex = roles.findIndex(x => x.includes(message.guild.id));
         
         if (subCommand == 'add') {
             addRole(message, serverIndex, roles);
@@ -63,7 +63,7 @@ async function addRole(message, serverIndex, roles) {
     let filter = m => m.author.id === author.id;
 
     if(serverIndex !== -1 ){
-        message.author.send(`\`\`\`There is already a minimum role for ${roles[serverIndex][0]} (${roles[serverIndex][2]}).\nPlease use $role remove before adding a new role.\`\`\``)
+        message.author.send(`\`\`\`There is already a minimum role for ${roles[serverIndex][3]} (${roles[serverIndex][2]}).\nPlease use $role remove before adding a new role.\`\`\``)
         return
     }
 
@@ -92,10 +92,10 @@ async function addRole(message, serverIndex, roles) {
         
             let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
             console.log(`${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
-            const tempArray = [message.guild.name, roleID, answer[0]];
+            const tempArray = [message.guild.id, roleID, answer[0], message.guild.name];
             roles.push(tempArray);
             FileSystem.writeData(roles, 'roles', './');
-            FileSystem.addServerName(message.guild.name)
+            FileSystem.addServerName(message.guild.id)
             completed = true
             author.send('```Role Added.```');
             return    
@@ -118,9 +118,9 @@ async function addRole(message, serverIndex, roles) {
  * @returns {Promise}
  */
 async function removeRole(message, serverIndex, roles) {
-    let answer = await EventDetailsService.prototype.questionYesNo(`\`\`\`Are you sure you want to remove "${roles[serverIndex][2]}" as minimum role from ${roles[serverIndex][0]}\`\`\``,  message.author);
+    let answer = await EventDetailsService.prototype.questionYesNo(`\`\`\`Are you sure you want to remove "${roles[serverIndex][2]}" as minimum role from ${roles[serverIndex][3]}\`\`\``,  message.author);
     if(answer === true && answer != 'no answer') {
-        console.log(`${message.author.tag} removed role "${roles[serverIndex][2]}"(${roles[serverIndex][1]}) from (${roles[serverIndex][0]})`)
+        console.log(`${message.author.tag} removed role "${roles[serverIndex][2]}"(${roles[serverIndex][1]}) from (${roles[serverIndex][3]})`)
         roles.splice(serverIndex, 1);
         FileSystem.writeData(roles, 'roles', './')
         message.author.send('\`Role removed.\`');

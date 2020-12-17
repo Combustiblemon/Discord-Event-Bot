@@ -58,7 +58,7 @@ module.exports = {
      */
     deleteEmbed(answer, message){
         //convert the embed name into ID
-        let msgID = FileSystem.getEmbedID(answer, message.guild.name);
+        let msgID = FileSystem.getEmbedID(answer, message.guild.id);
         if (!msgID){
             console.error(new nullEmbedID('Embed does not exist in memory'));
             return;
@@ -68,11 +68,11 @@ module.exports = {
         message.channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.error(error)});
         
         //remove references to embed
-        FileSystem.removeEmbedID(FileSystem.getEmbedID(answer, message.guild.name));
+        FileSystem.removeEmbedID(FileSystem.getEmbedID(answer, message.guild.id));
         FileSystem.removeEmbedName(answer, message.guild.name);
         //EventScheduler.removeEventFromCheck(answer);
 
-        this.removeFiles(answer, message.guild.name.replace(/[<>:"/\\|?*]/gi, '^'));
+        this.removeFiles(answer, message.guild.id);
     },
 
     /**
@@ -94,7 +94,6 @@ module.exports = {
     },
 
     removeFiles(filename, server){
-        server = server.replace(/[<>:"/\\|?*]/gi, '^');
 
         //remove the files
         fs.unlink(`./embeds/${server}/` + filename + '.json', (err) => {
