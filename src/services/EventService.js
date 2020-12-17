@@ -72,10 +72,12 @@ class EventService {
                         embed.react(signupOption.emoji);
                     });
 
-                    if(event.csv) await embed.react(csvEmoji);
+                    if(event.csv) {
+                        await embed.react(csvEmoji);
+                        await FileSystem.createCSV(event, embed.guild.id);
+                    }
                     await embed.react(deleteEmoji);
                     await FileSystem.writeJSON(event, embed, 'both');
-                    await FileSystem.createCSV(event, embed.guild.name);
                     console.log(`${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
                     author.send(`\`\`\`Event created successfully.\`\`\``)
                 } catch (error) {
@@ -280,7 +282,7 @@ class EventService {
         let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
         if(signupOption == deleteEmoji){
             let roles = index.GetRoles();
-            var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+            var serverIndex = roles.findIndex(x=>x.includes(message.guild.id));
             message.guild.roles.fetch(roles[serverIndex][1]).then(async role=>{
                 if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     let answer = await EventDetailsService.prototype.questionYesNo(`\`Are you sure you want to delete "${event.name}"?\``, reactionUser);
@@ -309,7 +311,7 @@ class EventService {
 
         if(signupOption == csvEmoji){
             let roles = index.GetRoles();
-            var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+            var serverIndex = roles.findIndex(x=>x.includes(message.guild.id));
             message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
                 if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     user.send('CSV file for ' + event.name +'.\n', {files: [

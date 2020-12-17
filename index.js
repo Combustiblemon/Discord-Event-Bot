@@ -103,7 +103,7 @@ bot.on('message', message => {
     if(!message.content.startsWith(PREFIX)) return;
     if(!(message.guild === null)) {
         //find the server position in memory
-        var serverIndex = roles.findIndex(x=>x.includes(message.guild.name));
+        var serverIndex = roles.findIndex(x=>x.includes(message.guild.id));
         //delete the command message
         message.channel.bulkDelete(1).catch(console.error);
     }

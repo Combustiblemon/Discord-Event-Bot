@@ -14,7 +14,7 @@ embedsInMemory.Name = new Object();
 let csvFilesInMemory = [];
 
 //make the object, i should just save the object in a file
-for (const server of savedServers.Names){
+for (const server of savedServers.servers){
     embedsInMemory.Name[server] = []
 }
 class FileSystem {
@@ -28,10 +28,10 @@ class FileSystem {
      * @param {string} mode The mode to use: 'embed'|'event'|'both'
      */
     async writeJSON(event, embed, mode) {
-        let name = `${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/${this.getFileNameForEvent(event)}`
+        let name = `${embed.guild.id}/${this.getFileNameForEvent(event)}`
 
-        this.ensureDirectoryExistence(`embeds/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
-        this.ensureDirectoryExistence(`events/${embed.guild.name.replace(/[<>:"/\\|?*]/gi, '^')}/test.json`)
+        this.ensureDirectoryExistence(`embeds/${embed.guild.id}/test.json`)
+        this.ensureDirectoryExistence(`events/${embed.guild.id}/test.json`)
 
         if (mode == 'embed') {
             this.writeData(embed, name, 'embeds/');
@@ -105,11 +105,8 @@ class FileSystem {
      * @param {BotEvent} event The event to find the signups from.
      * @param {string} guildName The name of the server the event is in.
      */
-    async createCSV(event, guildName) {
+    async createCSV(event, guildID) {
         let records = this.createCSVRecords(event);
-
-        //remove illegal characters from the server name
-        guildName = guildName.replace(/[<>:"/\\|?*]/gi, '^');
         
         let name = this.getFileNameForEvent(event);
         
@@ -118,10 +115,10 @@ class FileSystem {
         header = header.concat(event.signupOptions.filter(x => x.isAdditionalRole).map(x => x.name));        
         const csvWriter = createCsvWriter({
             header: header,
-            path: (`csv_files/${guildName}/${name}.csv`)
+            path: (`csv_files/${guildID}/${name}.csv`)
         });
         
-        this.ensureDirectoryExistence(`csv_files/${guildName}/${name}.csv`)
+        this.ensureDirectoryExistence(`csv_files/${guildID}/${name}.csv`)
         csvWriter.writeRecords(records);
         console.log(`Done writing file: ${name}.csv`);
     }
@@ -225,10 +222,10 @@ class FileSystem {
         console.log(result); */
     }
 
-    addServerName(serverName){
-        if(!embedsInMemory.Name[serverName.replace(/[<>:"/\\|?*]/gi, '^')]){
-            embedsInMemory.Name[serverName.replace(/[<>:"/\\|?*]/gi, '^')] = []
-            savedServers.Names.push(serverName.replace(/[<>:"/\\|?*]/gi, '^'))
+    addServerName(serverID){
+        if(!embedsInMemory.Name[serverID]){
+            embedsInMemory.Name[serverID] = []
+            savedServers.servers.push(serverID)
             this.writeData(savedServers, 'servers.json', './')
         }
     }
@@ -236,25 +233,25 @@ class FileSystem {
     /**
      * @param {string} name The name of the embed
      */
-    addEmbedName(name, server){
-        if(!embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]){
-            this.addServerName(server);
+    addEmbedName(name, serverID){
+        if(!embedsInMemory.Name[serverID]){
+            this.addServerName(serverID);
         }
-        embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].push(name);
+        embedsInMemory.Name[serverID].push(name);
     }
 
     /**
      * 
      * @param {string} name The name of the embed
      */
-    removeEmbedName(name, server){
+    removeEmbedName(name, serverID){
         const isName = (element) => element.includes(name);
-        let index = embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].findIndex(isName)
+        let index = embedsInMemory.Name[serverID].findIndex(isName)
         if(index === -1){
             console.error(new Errors.arrayLookupFail(''));
             return;
         }
-        embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].splice(index, 1);
+        embedsInMemory.Name[serverID].splice(index, 1);
     }
 
     /**
@@ -268,8 +265,8 @@ class FileSystem {
      * @returns {Array}
      */
     getEmbedNames(server){
-        if(embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]){
-            return Array.from(embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')]);
+        if(embedsInMemory.Name[serverID]){
+            return Array.from(embedsInMemory.Name[serverID]);
         }
         return null
     }
@@ -279,9 +276,9 @@ class FileSystem {
      * @param  {string} name The name of the embed to be converted to ID
      * @return {string} 
      */
-    getEmbedID(name, server){
-        if(this.embedNameExists(name, server.replace(/[<>:"/\\|?*]/gi, '^'))){
-            let embed = this.readJSON(name, `embeds/${server.replace(/[<>:"/\\|?*]/gi, '^')}/`);
+    getEmbedID(name, serverID){
+        if(this.embedNameExists(name, serverID)){
+            let embed = this.readJSON(name, `embeds/${serverID}/`);
             return embed.id;
         }
 
@@ -296,7 +293,7 @@ class FileSystem {
      */
     getEmbedChannel(name, server){
         if(this.embedNameExists(name, server)){
-            let embed = this.readJSON(name, `embeds/${server.replace(/[<>:"/\\|?*]/gi, '^')}/`);
+            let embed = this.readJSON(name, `embeds/${serverID}/`);
             return embed.channelID;
         }
 
@@ -309,8 +306,8 @@ class FileSystem {
      * @param {string} name The name of the embed to be checked
      * @return {Promise<boolean>}
      */
-    embedNameExists(name, server){
-        return embedsInMemory.Name[server.replace(/[<>:"/\\|?*]/gi, '^')].includes(name);
+    embedNameExists(name, serverID){
+        return embedsInMemory.Name[serverID].includes(name);
     }
     //#endregion
 
