@@ -10,11 +10,11 @@
   "author": "CombustibleLemon, Thisuren",
   "license": "ISC",
   "dependencies": {
-    "cron": "^1.8.2",
     "csv": "^5.3.2",
     "csv-writer": "^1.6.0",
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
-    "glob": "^7.1.6"
+    "glob": "^7.1.6",
+    "node-cron": "^2.0.3"
   }
 }
