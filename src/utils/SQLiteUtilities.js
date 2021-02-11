@@ -138,13 +138,64 @@ class SQLiteUtilities{
 
         return result
     }
+
+    /**
+     * 
+     * @param {JSON} columns A JSON object that describes the columns to grab the data from and the name in the returned object. {columnName: returnName}
+     * @param {String} tableName The name of the table.
+     * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
+     * @param {Boolean} distinct Wether to use the DISTINCT keyword.
+     */
+    async getDataAll(columns, tableName, query=null, distinct=false){
+        //create the columns for the SELECT
+        let columnArray = Object.entries(columns);
+        let selectText = '';
+        if(columnArray.length > 1){
+            columnArray.forEach(element => {
+                selectText += `, ${element[0]} ${element[1]}`;
+            });
+        }else{
+            selectText = `,${columnArray[0][0]} ${columnArray[0][1]}`;
+        }
+
+        let dist = '';
+        if(distinct){
+            dist = 'DISTINCT ';
+        }
+
+        let where = '';
+        let parameters = [];
+        if(query){
+            where = `WHERE ${query.query}`
+            //map the values out
+            parameters = [...Object.values(query.values)];
+        }
+
+        //remove the first comma (,)
+        selectText = selectText.substring(2);
+
+        //make the SQL query
+        const sql = `SELECT ${dist}${selectText} FROM ${tableName} ${where}`
+
+        //open the DB connection.
+        let db = this.connectToDB();
+
+        //run the command
+        let result = await allCommand(db, sql, parameters)
+        
+
+        //close the DB connection.
+        this.closeConnection(db);
+
+        return result
+    }
 }
 
 
 /**
  * @description Returns ALL rows and places the on memory. 
  */
-function getCommand(db, sql){
+function allCommand(db, sql, data){
     return new Promise((resolve,reject) => {
         db.all(sql, data, (err, rows) => {
             if (err) {
@@ -154,7 +205,6 @@ function getCommand(db, sql){
             resolve(rows);
         });
     });
-    
 }
 
 /**
@@ -170,7 +220,6 @@ function getCommand(db, sql, data){
             resolve(row);
         });
     });
-    
 }
 
 function runCommand(db, sql, data){
@@ -178,8 +227,6 @@ function runCommand(db, sql, data){
         if (err) {
           return printError(err);
         }
-        // get the last insert id
-        //console.log(`A row has been inserted with rowid ${this.lastID}`);
     });
 }
 
