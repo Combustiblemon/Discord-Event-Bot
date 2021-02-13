@@ -6,3 +6,5 @@ TO-DO.txt
 node_modules/
 testing.js
 blacklist.json
+servers.json
+NEBD_Readme.md
