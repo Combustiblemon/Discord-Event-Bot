@@ -2,23 +2,23 @@
 
 
 let eventList = new Object();
-eventList.games = new Object();
+eventList.events = new Object();
 
 class EventList{
     initialize(){
-        eventList.games['Generic'] = ['**(Single)** Single signup option.']
-        eventList.games['PS2'] = ['**(PS2OP)** PS2 OP, multiple signup options.', '**(OW)** Similar to PS2OP, but set up for Outfit Wars.']
-        eventList.games['Foxhole'] = ['**(FoxOp)** Foxhole OP, multiple signup options.']
+        eventList.events['Generic'] = ['**(Single)** Single signup option.']
+        eventList.events['PS2'] = ['**(PS2OP)** PS2 OP, multiple signup options.', '**(OW)** Similar to PS2OP, but set up for Outfit Wars.']
+        eventList.events['Foxhole'] = ['**(FoxOp)** Foxhole OP, multiple signup options.']
     }
 
     getEvents(){
         var result = []
         let index = 0
-        for (var i in eventList.games) {
+        for (var i in eventList.events) {
             result.push([i])
             // obj.hasOwnProperty() is used to filter out properties from the object's prototype chain
-            if (eventList.games.hasOwnProperty(i)) {
-                result[index].push(eventList.games[i]);
+            if (eventList.events.hasOwnProperty(i)) {
+                result[index].push(eventList.events[i]);
             }
             index+=1
         }

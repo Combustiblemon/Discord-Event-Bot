@@ -10,20 +10,23 @@ module.exports = class Event {
      * @param {string} author
      * @param {int} repeatableDay
      * @param {SignupOption[]} signupOptions
+     * @param {Boolean} csv
+     * @param {Array} signupsIDs
      */
-    constructor(eventDetails, header=[], author, signupOptions, csv=false) {
+    constructor(eventDetails, header=[], author, signupOptions, csv=false, signupsIDs = []) {
         this.name = eventDetails.name;
         this.description = eventDetails.description;
         this.date = eventDetails.date;
         this.repeatableDay = eventDetails.repeatableDay;
+        this.bastion = eventDetails.bastion;
+        this.colossus = eventDetails.colossus;
+        this.construction = eventDetails.construction;
         this.header = header;
         this.signupOptions = signupOptions;
         this.author = author;
         this.authorID = eventDetails.authorID;
         this.csv = csv;
-        this.bastion = eventDetails.bastion;
-        this.colossus = eventDetails.colossus;
-        this.construction = eventDetails.construction;
+        this.signupsIDs = signupsIDs;
     }
 
     /**

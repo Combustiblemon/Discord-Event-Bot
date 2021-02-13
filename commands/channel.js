@@ -64,7 +64,7 @@ async function addChannel( message, serverRoleID) {
         await FileSystem.ensureDirectoryExistence(`./csv_files/${message.guild.name.replace(/[<>:"/\\|?*]/gi, '')}/test.csv`);
 
         FileSystem.addChannelToWhitelist(message.channel.id, message.guild.id);
-        console.log(new Date(), `User "${message.author.username}" whitelisted channel "${message.channel.name}"(${message.channel.id}) in "${message.guild.name}"`);
+        console.log(new Date(), `User "${message.author.tag}" whitelisted channel "${message.channel.name}"(${message.channel.id}) in "${message.guild.name}"`);
         author.send('```Channel added to whitelist.```');
     });
 }
@@ -93,7 +93,7 @@ function removeChannel( message, serverRoleID) {
         }
         
         FileSystem.removeChannelFromWhitelist(message.channel.id);
-        console.log(new Date(), `User "${message.author.username}" dewhitelisted channel "${message.channel.name}"(${message.channel.id}) in "${message.guild.name}"`);
+        console.log(new Date(), `User "${message.author.tag}" dewhitelisted channel "${message.channel.name}"(${message.channel.id}) in "${message.guild.name}"`);
         author.send('```Channel removed from whitelist.```');
     });
 }

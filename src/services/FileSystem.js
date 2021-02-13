@@ -5,6 +5,7 @@ const path = require('path');
 const BotEvent = require('../models/Event');
 const Errors = require('../models/error');
 const EventDetailsService = require('./EventDetailsService');
+const SQLiteUtilities = require('../utils/SQLiteUtilities');
 
 let savedServers = JSON.parse(fs.readFileSync("./servers.json", 'utf8'));
 let embedsInMemory = new Object()
@@ -53,11 +54,11 @@ class FileSystem {
         let embedData = JSON.stringify(data, null, 2);
         
         if(name.includes('.json')){
-            fs.writeFileSync(`${folder}${name}`, embedData);
-            console.log(`Done writing file: ${folder}${name}`);
+            writeFileSync(`${folder}${name}`, embedData);
+            console.log(new Date(), `Done writing file: ${folder}${name}`);
         }else{
-            fs.writeFileSync(`${folder}${name}.json`, embedData);
-            console.log(`Done writing file: ${folder}${name}.json`);
+            writeFileSync(`${folder}${name}.json`, embedData);
+            console.log(new Date(), `Done writing file: ${folder}${name}.json`);
         }
         
         
@@ -110,7 +111,7 @@ class FileSystem {
         
         let name = this.getFileNameForEvent(event);
         
-        let header = event.getHeader();
+        let header = event.header;
         // Add additional roles to header
         header = header.concat(event.signupOptions.filter(x => x.isAdditionalRole).map(x => x.name));        
         const csvWriter = createCsvWriter({
@@ -120,7 +121,7 @@ class FileSystem {
         
         this.ensureDirectoryExistence(`csv_files/${guildID}/${name}.csv`)
         csvWriter.writeRecords(records);
-        console.log(`Done writing file: ${name}.csv`);
+        console.log(new Date(), `Done writing file: ${name}.csv`);
     }
 
     /**
@@ -192,34 +193,40 @@ class FileSystem {
      * 
      * @param {string} id The id of the embed
      */
-    addEmbedID(id){
+    /*addEmbedID(id){
         embedsInMemory.ID.push(id);
+    }*/
+
+    /**
+     * 
+     * @param {BotEvent} event 
+     * @param {Discord.Message} embed 
+     * @param {JSON} options 
+     */
+    saveEvent(event, embed, options = null){
+        //Columns go in this order:
+        //{server_id, event_name, embed_id, event_date, event_channel, options, event, embed}
+        SQLiteUtilities.insertData('EVENTS', [embed.channel.guild.id, event.name, embed.id, event.date.toISOString(), embed.channel.id, options, JSON.stringify(event), JSON.stringify(embed)])
     }
 
     /**
      * 
-     * @param {string} id The id of the embed
+     * @param {BotEvent} event 
+     * @param {Discord.Message} embed 
+     * @param {JSON} options 
      */
-    removeEmbedID(id){
-        const isName = (element) => element === id;
-        let index = embedsInMemory.ID.findIndex(isName)
-        if(index === -1){
-            console.error(new Errors.arrayLookupFail(''));
-            return;
-        }
-        embedsInMemory.ID.splice(index, 1)
+    updateEvent(event, embed, options=null){
+        //EVENT table columns
+        //{server_id, event_name, embed_id, event_date, event_channel, options, event, embed}
+        SQLiteUtilities.updateData('EVENTS', {event_name: event.name, event_date: event.date.toISOString(), options, event: JSON.stringify(event), embed:  JSON.stringify(embed)}, {query: 'embed_id = ?', values: [embed.id]})
     }
 
-    initializeServerName(serverNames){
-        //finds the names in the given object
-        /* var result = ''
-        for (var i in embedsInMemory.Name) {
-            // obj.hasOwnProperty() is used to filter out properties from the object's prototype chain
-            if (embedsInMemory.Name.hasOwnProperty(i)) {
-              result += `embedsInMemory.Name.${i} = ${embedsInMemory.Name[i]}\n`;
-            }
-          }
-        console.log(result); */
+    /**
+     * 
+     * @param {String} embedID 
+     */
+    removeEvent(embedID){
+        SQLiteUtilities.deleteData('EVENTS', {query: 'embed_id = ?', values: [embedID]});
     }
 
     addServerName(serverID){
@@ -248,7 +255,7 @@ class FileSystem {
         const isName = (element) => element.includes(name);
         let index = embedsInMemory.Name[serverID].findIndex(isName)
         if(index === -1){
-            console.error(new Errors.arrayLookupFail(''));
+            console.error(new Date(), new arrayLookupFail(''));
             return;
         }
         embedsInMemory.Name[serverID].splice(index, 1);
@@ -272,11 +279,86 @@ class FileSystem {
     }
 
     /**
+     * @description Returns {name, date, embedID, channelID}.
+     * 
+     * @param {String} serverID The id of the server.
+     */
+    async getEmbedDataFromServerID(serverID){
+        let data = await SQLiteUtilities.getDataAll({event_name: 'name', event_date: 'date', embed_id: 'embedID', event_channel: 'channelID'}, 'EVENTS', {query: 'server_id = ?', values: [serverID]});
+        data.forEach(element => {
+            element.date = new Date(element.date);
+        });
+
+        return data
+    }
+
+    /**
+     * @param {String} msgID 
+     */
+    async getEventFromMsgID(msgID){
+        let data = await SQLiteUtilities.getDataSingle({event: 'event'}, 'EVENTS', {query: 'embed_id = ?', values: [`${msgID}`]});
+        data = JSON.parse(data.event);
+        data.date = new Date(data.date);
+        return data
+    }
+
+    /**
+     * 
+     * @param {String} serverID 
+     */
+    async getRoleIdFromServerId(serverID){
+        return (await SQLiteUtilities.getDataSingle({role_id: 'roleID'}, 'ROLES', {query: 'server_id = ?', values: [`${serverID}`]})).roleID;
+    }
+
+    /**
+     * 
+     * @param {String} roleID 
+     * @param {String} serverID 
+     */
+    saveRoleToDB(roleID, serverID){
+        SQLiteUtilities.insertData('ROLES', [serverID, roleID]);
+    }
+
+    /**
+     * 
+     * @param {String} roleID 
+     * @param {String} serverID 
+     */
+    removeRoleFromDB(roleID, serverID){
+        SQLiteUtilities.deleteData('ROLES', {query: 'role_id = ? AND server_id = ?', values: [roleID, serverID]});
+    }
+
+    /**
+     * 
+     * @param {String} channelID
+     * @param {String} serverID
+     */
+    addChannelToWhitelist(channelID, serverID){
+        SQLiteUtilities.insertData('WHITELISTED_CHANNELS', [channelID, serverID]);
+    }
+
+    /**
+     * 
+     * @param {String} channelID 
+     */
+    removeChannelFromWhitelist(channelID){
+        SQLiteUtilities.deleteData('WHITELISTED_CHANNELS', {query: 'channel_id = ?', values: [channelID]});
+    }
+
+    /**
+     * 
+     * @param {String} channelID 
+     */
+    async getWhitelistedChannel(channelID){
+        return await SQLiteUtilities.getDataSingle({channel_id: 'channelID'}, 'WHITELISTED_CHANNELS', {query: 'channel_id = ?', values: [channelID]})
+    }
+
+    /**
      * 
      * @param  {string} name The name of the embed to be converted to ID
      * @return {string} 
      */
-    getEmbedID(name, serverID){
+    /*getEmbedID(name, serverID){
         if(this.embedNameExists(name, serverID)){
             let embed = this.readJSON(name, `embeds/${serverID}/`);
             return embed.id;
@@ -284,31 +366,16 @@ class FileSystem {
 
         return null;
 
-    }
-
-    /**
-     * 
-     * @param  {string} name The name of the embed to return the channel of
-     * @return {string} 
-     */
-    getEmbedChannel(name, server){
-        if(this.embedNameExists(name, server)){
-            let embed = this.readJSON(name, `embeds/${serverID}/`);
-            return embed.channelID;
-        }
-
-        return null;
-
-    }
+    }*/
 
     /**
      * 
      * @param {string} name The name of the embed to be checked
      * @return {Promise<boolean>}
      */
-    embedNameExists(name, serverID){
+    /*embedNameExists(name, serverID){
         return embedsInMemory.Name[serverID].includes(name);
-    }
+    }*/
     //#endregion
 
     /**
@@ -332,8 +399,8 @@ class FileSystem {
         }
         
         //if the path doesn't exist write it
-        fs.mkdirSync(path.dirname(filePath));
-        console.log(`Created path: ${filePath}`);
+        mkdirSync(_dirname(filePath));
+        console.log(new Date(), `Created path: ${filePath}`);
         return true;
     }
 

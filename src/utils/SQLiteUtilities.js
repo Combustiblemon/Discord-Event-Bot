@@ -6,7 +6,7 @@ databasePath = `${process.env.DATABASE_FILEPATH}`;
 class SQLiteUtilities{
 
     /**
-     * @returns Returns a connected DB object.
+     * @returns {Database} Returns a connected DB object.
      */
     connectToDB(){
         return new sqlite3.Database(databasePath, (err) => {
@@ -19,7 +19,7 @@ class SQLiteUtilities{
 
     /**
      * @description Closes the DB connection of the db object passed.
-     * @param {Object} db The db object to close. 
+     * @param {Database} db The db object to close. 
      */
     closeConnection(db){
         db.close((err) => {
@@ -99,20 +99,25 @@ class SQLiteUtilities{
      * @param {String} tableName The name of the table.
      * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
      */
-    async getDataSingle(columns, tableName, query){
+    async getDataSingle(columns=null, tableName, query){
         //create the columns for the SELECT
-        let columnArray = Object.entries(columns);
         let selectText = '';
-        if(columnArray.length > 1){
-            columnArray.forEach(element => {
-                selectText += `, ${element[0]} ${element[1]}`;
-            });
+        if (!columns){
+            selectText = '.*';
         }else{
-            selectText = `,${columnArray[0][0]} ${columnArray[0][1]}`;
+            
+            let columnArray = Object.entries(columns);
+            if(columnArray.length > 1){
+                columnArray.forEach(element => {
+                    selectText += `, ${element[0]} ${element[1]}`;
+                });
+            }else{
+                selectText = `, ${columnArray[0][0]} ${columnArray[0][1]}`;
+            }
         }
 
         //remove the first comma (,)
-        selectText = selectText.substring(2);
+        selectText = selectText.substring(1);
 
         //make the SQL query
         const sql = `SELECT ${selectText} FROM ${tableName} WHERE ${query.query}`
@@ -125,11 +130,6 @@ class SQLiteUtilities{
         let db = this.connectToDB();
 
         //run the command
-        /* let promise = new Promise((resolve, reject) =>{
-            let result = getCommand(db, sql, parameters)
-            if(result) resolve(result)
-            else reject(null)
-        }) */
         let result = await getCommand(db, sql, parameters)
         
 
@@ -146,11 +146,14 @@ class SQLiteUtilities{
      * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
      * @param {Boolean} distinct Wether to use the DISTINCT keyword.
      */
-    async getDataAll(columns, tableName, query=null, distinct=false){
+    async getDataAll(columns=null, tableName, query=null, distinct=false){
         //create the columns for the SELECT
         let columnArray = Object.entries(columns);
         let selectText = '';
-        if(columnArray.length > 1){
+        if (!columns){
+            selectText = '..*';
+        }
+        else if(columnArray.length > 1){
             columnArray.forEach(element => {
                 selectText += `, ${element[0]} ${element[1]}`;
             });
