@@ -104,7 +104,7 @@ const EventDetailsService = require('./EventDetailsService');
                 return await getRoleIDFromName(guild, answer[0], parseInt(answer[1]))
                   
             } catch (error) {
-                console.error(error)
+                console.error(new Date(), error)
                 completed = true
                 author.send('```Nothing was entered.```');
                 return null

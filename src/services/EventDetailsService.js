@@ -148,7 +148,7 @@ class EventDetailsService {
                 await embed.react('❌');
 
             } catch (error) {
-                console.error(error);
+                console.error(new Date(), error);
             }
             const filter = (reaction, user) => {
                 return (reaction.emoji.name === '✅' || reaction.emoji.name === '❌')&& user.id === author.id;
@@ -163,7 +163,7 @@ class EventDetailsService {
                     }
                 })
                 .catch(collected => {
-                    console.warn(collected)
+                    console.warn(new Date(), collected)
                     event = 'no answer';
                 });
         });
@@ -192,7 +192,7 @@ class EventDetailsService {
                 errors: ['time'] 
             }
         ).catch(() =>{
-            console.error('Message timeout. No message after question.');
+            console.error(new Date(), 'Message timeout. No message after question.');
             questionMessage.channel.send('`No answer was given. Please use the command again.`');
         });
 

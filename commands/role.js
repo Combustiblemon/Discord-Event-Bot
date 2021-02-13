@@ -91,7 +91,7 @@ async function addRole(message, serverIndex, roles) {
             }
         
             let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
-            console.log(`${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
+            console.log(new Date(), `${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
             const tempArray = [message.guild.id, roleID, answer[0], message.guild.name];
             roles.push(tempArray);
             FileSystem.writeData(roles, 'roles', './');
@@ -100,7 +100,7 @@ async function addRole(message, serverIndex, roles) {
             author.send('```Role Added.```');
             return    
         } catch (error) {
-            console.error(err)
+            console.error(new Date(), err)
             completed = true
             author.send('```Nothing was entered.```');
             return
@@ -120,7 +120,7 @@ async function addRole(message, serverIndex, roles) {
 async function removeRole(message, serverIndex, roles) {
     let answer = await EventDetailsService.prototype.questionYesNo(`\`\`\`Are you sure you want to remove "${roles[serverIndex][2]}" as minimum role from ${roles[serverIndex][3]}\`\`\``,  message.author);
     if(answer === true && answer != 'no answer') {
-        console.log(`${message.author.tag} removed role "${roles[serverIndex][2]}"(${roles[serverIndex][1]}) from (${roles[serverIndex][3]})`)
+        console.log(new Date(), `${message.author.tag} removed role "${roles[serverIndex][2]}"(${roles[serverIndex][1]}) from (${roles[serverIndex][3]})`)
         roles.splice(serverIndex, 1);
         FileSystem.writeData(roles, 'roles', './')
         message.author.send('\`Role removed.\`');
