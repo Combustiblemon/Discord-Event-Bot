@@ -314,8 +314,6 @@ class EventService {
         }
 
         if(emoji.name === csvEmoji){
-            //let roles = index.GetRoles();
-            //varserverIndex = roles.findIndex(x=>x.includes(message.guild.id));
             message.guild.roles.fetch(await FileSystem.getRoleIdFromServerId(message.guild.id)).then(role=>{
                 if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     user.send('CSV file for ' + event.name +'.\n', {files: [

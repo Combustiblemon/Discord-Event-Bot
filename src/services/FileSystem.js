@@ -191,14 +191,6 @@ class FileSystem {
 
     /**
      * 
-     * @param {string} id The id of the embed
-     */
-    /*addEmbedID(id){
-        embedsInMemory.ID.push(id);
-    }*/
-
-    /**
-     * 
      * @param {BotEvent} event 
      * @param {Discord.Message} embed 
      * @param {JSON} options 
@@ -219,14 +211,6 @@ class FileSystem {
         //EVENT table columns
         //{server_id, event_name, embed_id, event_date, event_channel, options, event, embed}
         SQLiteUtilities.updateData('EVENTS', {event_name: event.name, event_date: event.date.toISOString(), options, event: JSON.stringify(event), embed:  JSON.stringify(embed)}, {query: 'embed_id = ?', values: [embed.id]})
-    }
-
-    /**
-     * 
-     * @param {String} embedID 
-     */
-    removeEvent(embedID){
-        SQLiteUtilities.deleteData('EVENTS', {query: 'embed_id = ?', values: [embedID]});
     }
 
     addServerName(serverID){
@@ -377,30 +361,6 @@ class FileSystem {
         if (a) return true
         else return false
     }
-
-    /**
-     * 
-     * @param  {string} name The name of the embed to be converted to ID
-     * @return {string} 
-     */
-    /*getEmbedID(name, serverID){
-        if(this.embedNameExists(name, serverID)){
-            let embed = this.readJSON(name, `embeds/${serverID}/`);
-            return embed.id;
-        }
-
-        return null;
-
-    }*/
-
-    /**
-     * 
-     * @param {string} name The name of the embed to be checked
-     * @return {Promise<boolean>}
-     */
-    /*embedNameExists(name, serverID){
-        return embedsInMemory.Name[serverID].includes(name);
-    }*/
     //#endregion
 
     /**

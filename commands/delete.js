@@ -43,11 +43,7 @@ module.exports = {
         let events = [];
         let eventList = '';
         let text;
-        /* tempArray.forEach((element, index) => {
-            text = `${element.date.toISOString().substring(0, 10)} ${element.name}`;
-            events.push(text, element.embedID);
-            eventList += `${text}\n     `;
-        });*/
+    
 
         tempArray.sort(sortFunction);
 
@@ -62,8 +58,6 @@ module.exports = {
         let answer = await EventDetailsService.prototype.requestSingleDetail(question, message);
         if (!answer) return;
         
-        //replace the ' ' in the answer with '_' so it matches the file naming structure 
-        //answer = answer.replace(/ /gi, '_');
         //check if the the name exists
         let eventIndex = findEventIndex(events, answer);
         if(eventIndex){
@@ -89,23 +83,6 @@ module.exports = {
         //remove references to embed
         //FileSystem.removeEmbedName(answer, message.guild.name);
         //EventScheduler.removeEventFromCheck(answer);
-    },
-
-    
-    
-
-    removeFiles(filename, server){
-
-        //remove the files
-        fs.unlink(`./embeds/${server}/` + filename + '.json', (err) => {
-            if (err) throw err;
-            console.log(new Date(), `embeds/${server}/${filename}.json was deleted.`);
-        });
-
-        fs.unlink(`./events/${server}/` + filename + '.json', (err) => {
-            if (err) throw err;
-            console.log(new Date(), `events/${server}/${filename}.json was deleted.`);
-        });
     }
 }
 

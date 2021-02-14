@@ -18,25 +18,7 @@ const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
 
-
-let savedServers = []
-fs.readdirSync('./embeds/').forEach(file => {
-    if(file != '.gitignore'){
-        savedServers.push(file)
-    }
-});
-
 EventList.initialize()
-
-/* let cronJob = new CronJob('0 0 5 * * *', function() {
-    console.log('hello :3');
-}, null, true, 'UTC')
-cronJob.start(); */
-
-//read the files from disk, if they don't exist write them
-let roles = FileSystem.ensureFileExistance('roles.json', './').then(function(result){
-    roles = result;
-});
 
 bot.commands = new Discord.Collection();
 var commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
@@ -54,32 +36,6 @@ for (const file of commandFiles) {
     
     bot.commands.set(command.name, command);
 }
-
- /*for (const server of savedServers){
-    var embedFiles = fs.readdirSync(`./embeds/${server}`).filter(file => file.endsWith('.json'));
-    for (const file of embedFiles) {
-        const embed = JSON.parse(fs.readFileSync(`./embeds/${server}/${file}`, 'utf8'));
-        const event = JSON.parse(fs.readFileSync(`./events/${server}/${file}`, 'utf8'));
-        
-        //FileSystem.addEmbedID(embed.id);
-        //FileSystem.addEmbedName(file.replace(/.json/gi, '').trim(), server);
-        
-        let tempSignupOption = [];
-        for (let position of event.signupOptions) {
-            tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
-        }
-        let tempDate = `${event.date.substring(0,10)}T${event.date.substring(11,16)}Z`;
-        let tempOptions = {bastion: event.bastion, colossus: event.colossus, construction: event.construction}
-        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate), event.repeatableDay, tempOptions, event.authorID), event.header, event.author, tempSignupOption, event.csv);
-        EventService.saveEventForMessageId(tempEvent, embed.id);
-
-         //if (event.repeatableDay > -1){
-        //    EventScheduler.addEventToCheck(file.replace(/.json/gi, '').trim(), event.repeatableDay);
-        //} 
-    }
-} */
-//#endregion
-
 
 
 bot.on("ready", () => {
@@ -100,8 +56,6 @@ bot.on('message', async message => {
     //if the message doesn't start with PREFIX return
     if(!message.content.startsWith(PREFIX)) return;
     if(!(message.guild === null)) {
-        //find the server position in memory
-        //varserverIndex = roles.findIndex(x=>x.includes(message.guild.id));
         //get role data from DB.
         //returns {role_id, server_id}
         var serverRole = await SQLiteUtilities.getDataSingle(null, 'ROLES', {query: 'server_id = ?', values: [`${message.guild.id}`]});
@@ -238,11 +192,3 @@ bot.on('message', async message => {
 
 
 bot.login(token);
-
-
-
-
-function GetRoles(){
-    return Array.from(roles);
-}
-

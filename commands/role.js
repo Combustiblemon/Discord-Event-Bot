@@ -74,28 +74,16 @@ async function addRole(message, serverRole) {
         try {
             let collected = await msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] })
             let answer = collected.first().content;
-            /* if(!answer.includes(':::')){
-                author.send('\`\`\`Wrong format entered. Please try again.\`\`\`')
-                continue
-            } */
-            answer = answer.trim()//.split(':::');
-            /* if (serverRoleID && roles[serverIndex][2] === answer[0]) {
-                author.send('```This role is already the minimum.```');
-                completed = true
-                return;
-            } */
+            
+            answer = answer.trim()
+            
             let exists = await checkIfRoleExistsInGuild(message.guild, answer)
             if(!exists){
                 author.send(`\`\`\`"${answer}" is not a role ID in ${message.guild.name}. Please try copying the ID again.\`\`\``);
                 continue
             }
         
-            //let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
             console.log(new Date(), `${message.author.tag} set role (${(await message.guild.roles.fetch(answer)).name}){${answer}} as minimum. server: (${message.guild.name})`)
-            //const tempArray = [message.guild.id, roleID, answer[0], message.guild.name];
-            //roles.push(tempArray);
-            //FileSystem.writeData(roles, 'roles', './');
-            //FileSystem.addServerName(message.guild.id)
             FileSystem.saveRoleToDB(answer, message.guild.id);
             completed = true
             author.send('```Role Added.```');
