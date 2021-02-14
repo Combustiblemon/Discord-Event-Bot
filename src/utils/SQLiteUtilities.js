@@ -1,3 +1,5 @@
+const { Database } = require('sqlite3');
+
 const sqlite3 = require('sqlite3').verbose();
 
 databasePath = `${process.env.DATABASE_FILEPATH}`;
@@ -32,7 +34,7 @@ class SQLiteUtilities{
 
     /**
      * @param {String} tableName The name of the table.
-     * @param {Array} data Array of the data to be added. The array should map out to the columns.
+     * @param {Array<String>} data Array of the data to be added. The array should map out to the columns.
      */
     insertData(tableName, data){
         
@@ -56,7 +58,7 @@ class SQLiteUtilities{
      * @param {JSON} data An object that maps the column names to the values. {columnName: value}
      * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
      */
-    updateData(tableName, data, query){
+    async updateData(tableName, data, query){
         //map the data out to the query
         const sql = `Update ${tableName} SET ` + Object.keys(data).map(key => `${key} = ?`).join(", ") + ` WHERE ${query.query}`;
         //map the values out
@@ -66,10 +68,12 @@ class SQLiteUtilities{
         let db = this.connectToDB();
 
         //run the command
-        runCommand(db, sql, parameters)
+        let result = await runCommand(db, sql, parameters)
 
         //close the DB connection.
         this.closeConnection(db);
+
+        return result
     }
 
     /**
@@ -77,7 +81,7 @@ class SQLiteUtilities{
      * @param {String} tableName The name of the table.
      * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
      */
-    deleteData(tableName, query){
+    async deleteData(tableName, query){
         //create the SQL
         const sql = `DELETE FROM ${tableName} WHERE ${query.query}`;
         //map the values out
@@ -87,10 +91,12 @@ class SQLiteUtilities{
         let db = this.connectToDB();
 
         //run the command
-        runCommand(db, sql, parameters)
+        let result = await runCommand(db, sql, parameters)
 
         //close the DB connection.
         this.closeConnection(db);
+
+        return result
     }
 
     /**
@@ -98,6 +104,7 @@ class SQLiteUtilities{
      * @param {JSON} columns A JSON object that describes the columns to grab the data from and the name in the returned object. {columnName: returnName}
      * @param {String} tableName The name of the table.
      * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
+     * @returns {Object}
      */
     async getDataSingle(columns=null, tableName, query){
         //create the columns for the SELECT
@@ -145,6 +152,7 @@ class SQLiteUtilities{
      * @param {String} tableName The name of the table.
      * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
      * @param {Boolean} distinct Wether to use the DISTINCT keyword.
+     * @returns {Object}
      */
     async getDataAll(columns=null, tableName, query=null, distinct=false){
         //create the columns for the SELECT
@@ -192,11 +200,64 @@ class SQLiteUtilities{
 
         return result
     }
+
+    /**
+     * 
+     * @param {int} mode The mode to run the sql in. 1: .all() 2: .get 3: .run
+     * @param {String} sql The sql statement to run
+     * @param {Array<String>} data An array of the values in the same order as they appear in the sql.
+     * @returns {Promise}
+     */
+    runCustomSQL( mode, sql, data = []){
+        //open the DB connection.
+        let db = this.connectToDB();
+        let result;
+        if (mode === 1) {
+            result = new Promise((resolve,reject) => {
+                db.all(sql, data, (err, rows) => {
+                    if (err) {
+                      printError(err);
+                      reject(err);
+                    }
+                    resolve(rows);
+                });
+            });
+        }else if (mode === 2) {
+            result = new Promise((resolve,reject) => {
+                db.get(sql, data, (err, row) => {
+                    if (err) {
+                      printError(err);
+                      reject(err);
+                    }
+                    resolve(row);
+                });
+            });
+        }else if (mode === 3) {
+            result = new Promise((resolve,reject) => {
+                db.run(sql, data, function(err) {
+                    if (err) {
+                    return printError(err);
+                    }
+                    resolve(this.changes);
+                });
+            });
+        }else{
+            throw new Error('MODE_ERROR: Mode was not set.')
+        }
+
+
+        //close the DB connection.
+        this.closeConnection(db);
+
+        return result
+    }
 }
 
 
 /**
  * @description Returns ALL rows and places the on memory. 
+ * @param {Database} db
+ * @returns {Promise}
  */
 function allCommand(db, sql, data){
     return new Promise((resolve,reject) => {
@@ -212,6 +273,8 @@ function allCommand(db, sql, data){
 
 /**
  * @description Only returns the first result of the query. 
+ * @param {Database} db
+ * @returns {Promise}
  */
 function getCommand(db, sql, data){
     return new Promise((resolve,reject) => {
@@ -225,11 +288,20 @@ function getCommand(db, sql, data){
     });
 }
 
+/**
+ * 
+ * @param {Database} db
+ * @returns {Promise}
+ */
 function runCommand(db, sql, data){
-    db.run(sql, data, function(err) {
-        if (err) {
-          return printError(err);
-        }
+    return new Promise((resolve,reject) => {
+        db.run(sql, data, function(err) {
+            if (err) {
+            return printError(err);
+            }
+            console.log()
+            resolve(this.changes);
+        });
     });
 }
 
