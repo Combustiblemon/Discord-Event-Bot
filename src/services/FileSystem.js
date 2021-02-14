@@ -355,6 +355,31 @@ class FileSystem {
 
     /**
      * 
+     * @param {String} userID 
+     */
+    async ignoreUser(userID){
+        let a = await SQLiteUtilities.deleteData('IGNORE_USERS', {query: 'user_id = ?', values: [userID]});
+        if (a === 0) {
+            SQLiteUtilities.insertData('IGNORE_USERS', [userID]);
+            console.log(new Date(), `User "${userID}" now ignored.`)
+            return
+        }
+        console.log(new Date(), `User "${userID}" no longer ignored.`)
+    }
+
+    /**
+     * 
+     * @param {String} userID 
+     * @returns {Boolean}
+     */
+    async isIgnoredUser(userID){
+        let a = await SQLiteUtilities.getDataSingle(null, 'IGNORE_USERS', {query: 'user_id = ?', values: [userID]});
+        if (a) return true
+        else return false
+    }
+
+    /**
+     * 
      * @param  {string} name The name of the embed to be converted to ID
      * @return {string} 
      */

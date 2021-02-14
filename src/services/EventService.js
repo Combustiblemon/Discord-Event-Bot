@@ -7,6 +7,8 @@ const index = require('../../index');
 const EventDetailsService = require('./EventDetailsService');
 const DeleteEvent = require('../../commands/delete');
 const { getRoleToPing } = require('./RoleService');
+const { deleteEmbed } = require('../../commands/delete');
+const SQLiteUtilities = require('../utils/SQLiteUtilities');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
@@ -98,7 +100,7 @@ class EventService {
                     }
                     await embed.react(deleteEmoji);
                     //await FileSystem.writeJSON(event, embed, 'both');
-                    FileSystem.saveEvent(event, embed)
+                    FileSystem.saveEvent(event, embed);
                     console.log(new Date(), `${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
                     author.send(`\`\`\`Event created successfully.\`\`\``)
                 } catch (error) {
@@ -293,8 +295,8 @@ class EventService {
                         return
                     }
                     if(answer){
-                        FileSystem.removeEvent(message.id);
-                        reactionUser.send('\`Event deleted.\`')
+                        deleteEmbed(message.id, message);
+                        reactionUser.send('\`Event deleted.\`');
                         console.log(new Date(), `${reactionUser.user.tag} deleted ${event.name}. Server: ${message.guild.name}`);
                         return
                     }
@@ -361,7 +363,7 @@ class EventService {
         event.signupOptions[signupOptionIndex].signups.push([reactionUser.displayName, reactionUser.id]);
         
         this.editEmbedForEvent(message, event);
-        if(blacklist.IDs.indexOf(reactionUser.id) == -1){
+        if(!(await FileSystem.isIgnoredUser(reactionUser.id))){
             reactionUser.send(await this.createEmbedForSignup(event, message.guild.name, true))
         }
     }
@@ -410,7 +412,7 @@ class EventService {
         //console.log(new Date(), 'Event: ' + event.name + ', Remove Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
         
         this.editEmbedForEvent(message, event);
-        if(blacklist.IDs.indexOf(reactionUser.id) == -1){
+        if(!(await FileSystem.isIgnoredUser(reactionUser.id))){
             reactionUser.send(await this.createEmbedForSignup(event, message.guild.name, false))
         }
     }

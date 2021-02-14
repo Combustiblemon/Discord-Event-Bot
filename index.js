@@ -207,7 +207,7 @@ bot.on('message', async message => {
         break;
 
         case 'notify':
-            //messageUserBlacklist(message.author)
+            FileSystem.ignoreUser(message.author.id);
         break;
 
         case 'role':
