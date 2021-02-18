@@ -33,28 +33,36 @@ const EventDetailsService = require('./EventDetailsService');
     async function getRolesAsFormattedString(guild){
         if(!isGuildAvailable(guild)) return null
         let roles = await guild.roles.fetch();
-        let text = ''
-        let rolesPosition = []
+        let text = [];
+        let rolesPosition = [];
         roles.cache.forEach((Role) =>{
-            rolesPosition.push([Role.name, Role.rawPosition])
+            rolesPosition.push([Role.name, Role.rawPosition, Role.id]);
             
-        })
-        
-        for(const item of rolesPosition.sort(compareSecondColumn)){
-            text += `${item[0]}:::${item[1]}\n`
-        }
+        });
 
-        return text
+        let temp = '';
+        let index = 0;
+        text.push(temp);
+        for(const item of rolesPosition.sort(compareSecondColumn)){
+            if(temp.length > 1994){
+                temp = '';
+                index++;
+                text[index] = temp;
+            }
+            text[index] += `${item[1]}) ${item[0]}:   ${item[2]}\n`;
+        };
+
+        return text;
     }
 
     /**
      * 
      * @param {Discord.Guild} guild 
-     * @param {String} roleName 
+     * @param {String} roleID the id of the role. 
      */
-    async function checkIfRoleExistsInGuild(guild, roleName, position){
+    async function checkIfRoleExistsInGuild(guild, roleID){
         if(!isGuildAvailable(guild)) return null
-        let role = guild.roles.cache.find(x => x.name === roleName && x.rawPosition == position);
+        let role = guild.roles.cache.find(x => x.id === roleID);
         if (typeof role === 'undefined') {
             return false
         } else {
@@ -66,7 +74,7 @@ const EventDetailsService = require('./EventDetailsService');
         let question = `\`\`\`Would you like to ping a role for the event?\`\`\``
         let answer = await EventDetailsService.prototype.questionYesNo(question, author)
         if(answer && answer != 'no answer'){
-            let question = `\`\`\`Copy paste from above the role you would like to Ping for the event. if you want to ping @everyone or @here type the corresponding below.\n***WARNING*** CASE SENSITIVE ***WARNING***\`\`\``
+            let question = `\`\`\`Copy paste from above the role ID you would like to Ping for the event. if you want to ping @everyone or @here type the corresponding below.\n***WARNING*** ONLY COPY THE ID ***WARNING***\`\`\``
             return await selectRoleFromServer(question, guild, author)
         }
         return null
@@ -80,7 +88,10 @@ const EventDetailsService = require('./EventDetailsService');
         let text = await getRolesAsFormattedString(guild)
         let filter = m => m.author.id === author.id;
 
-        author.send(`\`\`\`${text}\`\`\``)
+        text.forEach(element => {
+            author.send(`\`\`\`${element}\`\`\``)
+        });
+        
         let msg = await author.send(question)
         let completed = false
         while(completed == false){
@@ -90,28 +101,24 @@ const EventDetailsService = require('./EventDetailsService');
                 if(answer == '@everyone' || answer == '@here'){
                     return answer
                 }
-                if(!answer.includes(':::')){
-                    author.send('\`\`\`Wrong format entered. Please try again.\`\`\`')
-                    continue
-                }
-                answer = answer.trim().split(':::');
-                let exists = await checkIfRoleExistsInGuild(guild, answer[0], answer[1])
+                //answer = answer.trim().split(':::');
+                let exists = await checkIfRoleExistsInGuild(guild, answer);
                 if(!exists){
-                    author.send(`\`\`\`"${answer[0]}" is not a role in ${guild.name}. Please try again.\`\`\``);
+                    author.send(`\`\`\`"${answer}" is not a role in ${guild.name}. Please try again.\`\`\``);
                     continue
                 }
                 completed = true
-                return await getRoleIDFromName(guild, answer[0], parseInt(answer[1]))
+                return answer
                   
             } catch (error) {
-                console.error(error)
+                console.error(new Date(), error)
                 completed = true
                 author.send('```Nothing was entered.```');
                 return null
             }
         }
     }
-    
+
 
     module.exports.getRoleNameFromID = getRoleNameFromID;
     module.exports.getRolesAsFormattedString = getRolesAsFormattedString;

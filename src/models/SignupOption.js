@@ -21,23 +21,23 @@ module.exports = class SignupOption {
      * 
      * @param {string} name 
      */
-    addSignup(name) {
-        this.signups.push(name);
+    addSignup(name, signupOption=this) {
+        signupOption.signups.push(name);
     }
 
     /**
      * 
      * @param {string} name 
      */
-    removeSignup(name) {
+    removeSignup(name, signupOption=this) {
         const isName = (element) => element === name;
-        this.signups.splice(this.signups.findIndex(isName), 1);
+        signupOption.signups.splice(signupOption.signups.findIndex(isName), 1);
     }
 
     /**
      * @returns {int}
      */
-    getNumberOfSignups() {
-        return this.signups.length;
+    getNumberOfSignups(signupOption=this) {
+        return signupOption.signups.length;
     }
 }

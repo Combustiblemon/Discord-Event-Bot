@@ -7,6 +7,8 @@ const index = require('../../index');
 const EventDetailsService = require('./EventDetailsService');
 const DeleteEvent = require('../../commands/delete');
 const { getRoleToPing } = require('./RoleService');
+const { deleteEmbed } = require('../../commands/delete');
+const SQLiteUtilities = require('../utils/SQLiteUtilities');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 
@@ -41,6 +43,26 @@ class EventService {
 
     /**
      * 
+     * @param {Discord.Client} bot
+     */
+    setupListeners(bot) {
+        if (this.didSetupListeners) return;
+    
+        bot.on('messageReactionAdd', async (reaction, user) => {
+            if (reaction.message.partial) await reaction.message.fetch();
+            this.messageReactionAdded(reaction, user);
+        })
+        
+        bot.on('messageReactionRemove', async (reaction, user) => {
+            if (reaction.message.partial) await reaction.message.fetch();
+            this.messageReactionRemoved(reaction, user);
+        })
+    
+        this.didSetupListeners = true;
+    }
+
+    /**
+     * 
      * @param {Discord.TextChannel} channel
      * @param {BotEvent} event 
      * @param {Discord.Client} bot
@@ -64,8 +86,8 @@ class EventService {
                 let fileName = FileSystem.getFileNameForEvent(event);
 
                 FileSystem.addEmbedName(fileName, channel.guild.name);
-                this.saveEventForMessageId(event, embed.id);
-                FileSystem.addEmbedID(embed.id);
+                //this.saveEventForMessageId(event, embed.id);
+                //FileSystem.addEmbedID(embed.id);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
@@ -77,11 +99,12 @@ class EventService {
                         await FileSystem.createCSV(event, embed.guild.id);
                     }
                     await embed.react(deleteEmoji);
-                    await FileSystem.writeJSON(event, embed, 'both');
-                    console.log(`${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
+                    //await FileSystem.writeJSON(event, embed, 'both');
+                    FileSystem.saveEvent(event, embed);
+                    console.log(new Date(), `${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
                     author.send(`\`\`\`Event created successfully.\`\`\``)
                 } catch (error) {
-                    console.error(error);
+                    console.error(new Date(), error);
                 }
 
             })
@@ -97,8 +120,9 @@ class EventService {
         
         embed = await message.edit(message.embeds[0] = embed);
         
-        FileSystem.createCSV(event, message.guild.name);
-        FileSystem.writeJSON(event, embed, 'event');
+        FileSystem.createCSV(event, message.guild.id);
+        //FileSystem.writeJSON(event, embed, 'event');
+        FileSystem.updateEvent(event, embed);
     }
 
     /**
@@ -144,12 +168,12 @@ class EventService {
                 displayEmoji = `<:${signupOption.emoji}>`;
             }
                 
-            signupOptionsField.field += `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}\n`;
+            signupOptionsField.field += `${displayEmoji} ${signupOption.name}: ${signupOption.signups.length}\n`;
             signupOptionsField.count += 1;
         });
 
         if(signupOptionsField.count > 0){
-            signupOptionsField.field += `Total: ${ event.getTotalSignups()}\n`
+            signupOptionsField.field += `Total: ${ EventFunctions.getTotalSignups(event)}\n`
             embed.addField(
                 `Signups:`, 
                 signupOptionsField.field
@@ -165,7 +189,7 @@ class EventService {
             }
 
             embed.addField(
-                `${displayEmoji} ${signupOption.name}: ${signupOption.getNumberOfSignups()}`,
+                `${displayEmoji} ${signupOption.name}: ${signupOption.signups.length}`,
                 this.createMembersListFromSignups(signupOption.signups),
                 signupOption.isInline
             );
@@ -185,7 +209,9 @@ class EventService {
         var members = '';
     
         for (let i = 0; i < signups.length; i++) {
-            members += signups[i] + '\n';
+            if((members + signups[i][0] + '\n').length < 1024){
+                members += signups[i][0] + '\n';
+            }
         }
     
         return members;
@@ -205,28 +231,8 @@ class EventService {
      * @param {string} messageId
      * @returns {Event} 
      */
-    getEventForMessageId(messageId) {
-        return this.events[messageId];
-    }
-
-    /**
-     * 
-     * @param {Discord.Client} bot
-     */
-    setupListeners(bot) {
-        if (this.didSetupListeners) return;
-    
-        bot.on('messageReactionAdd', async (reaction, user) => {
-            if (reaction.message.partial) await reaction.message.fetch();
-            this.messageReactionAdded(reaction, user);
-        })
-        
-        bot.on('messageReactionRemove', async (reaction, user) => {
-            if (reaction.message.partial) await reaction.message.fetch();
-            this.messageReactionRemoved(reaction, user);
-        })
-    
-        this.didSetupListeners = true;
+    async getEventForMessageId(messageId) {
+        return await FileSystem.getEventFromMsgID(messageId);
     }
 
     /**
@@ -249,7 +255,8 @@ class EventService {
         let embed = new Discord.MessageEmbed()
             .setDescription(text)
             .setColor(color)
-            .setFooter('To stop getting these messages send me `$notify`');
+            .setFooter('To stop getting these messages send me `$notify`.\nEvent date:')
+            .setTimestamp(event.date);
 
         return embed
     }
@@ -265,7 +272,7 @@ class EventService {
         if (message.channel.type == 'dm') return;
         if (message.guild.member(user.id) == botUserId) return;
         
-        let event = this.getEventForMessageId(message.id);
+        let event = await this.getEventForMessageId(message.id);
 
         if (!event) {
             //console.warn('No event found for message: ' + message.id);
@@ -276,14 +283,11 @@ class EventService {
         let emoji = reaction.emoji;
         let username = reactionUser.displayName;
 
-        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
         
-        let signupOption = event.getSingupOptionForEmoji(emoji);
-        let guildname = reaction.message.guild.name.replace(/[<>:"/\\|?*]/gi, '');
-        if(signupOption == deleteEmoji){
-            let roles = index.GetRoles();
-            var serverIndex = roles.findIndex(x=>x.includes(message.guild.id));
-            message.guild.roles.fetch(roles[serverIndex][1]).then(async role=>{
+
+        let signupOptionIndex = event.signupOptions.findIndex(s => s.emoji === emoji.name || s.emoji === emoji.id || s.emoji === emoji.identifier);
+        if(emoji.name === deleteEmoji){
+            message.guild.roles.fetch(await FileSystem.getRoleIdFromServerId(message.guild.id)).then(async role=>{
                 if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     let answer = await EventDetailsService.prototype.questionYesNo(`\`Are you sure you want to delete "${event.name}"?\``, reactionUser);
                     if(answer == 'no answer'){ 
@@ -291,9 +295,9 @@ class EventService {
                         return
                     }
                     if(answer){
-                        DeleteEvent.deleteEmbed(`${event.date.toISOString().substring(0,10)}_${event.name.replace(/ /gi, "_")}`, reaction.message);
-                        reactionUser.send('\`Event deleted.\`')
-                        console.log(`${reactionUser.user.tag} deleted ${event.name}. Server: ${message.guild.name}`);
+                        deleteEmbed(message.id, message);
+                        reactionUser.send('\`Event deleted.\`');
+                        console.log(new Date(), `${reactionUser.user.tag} deleted ${event.name}. Server: ${message.guild.name}`);
                         return
                     }
                     else reactionUser.send('\`Event not deleted.\`')
@@ -309,16 +313,14 @@ class EventService {
             return;
         }
 
-        if(signupOption == csvEmoji){
-            let roles = index.GetRoles();
-            var serverIndex = roles.findIndex(x=>x.includes(message.guild.id));
-            message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+        if(emoji.name === csvEmoji){
+            message.guild.roles.fetch(await FileSystem.getRoleIdFromServerId(message.guild.id)).then(role=>{
                 if (reactionUser.roles.highest.comparePositionTo(role) >= 0 || reactionUser.hasPermission('ADMINISTRATOR')) {
                     user.send('CSV file for ' + event.name +'.\n', {files: [
-                        (`./csv_files/${guildname}/${FileSystem.getFileNameForEvent(event)}.csv`)
+                        (`./csv_files/${message.guild.id}/${FileSystem.getFileNameForEvent(event)}.csv`)
                     ]});
                     reaction.users.remove(user.id);
-                    console.log(`${reactionUser.user.tag} got csv for ${event.name}. Server: ${message.guild.name}`);
+                    console.log(new Date(), `${reactionUser.user.tag} got csv for ${event.name}. Server: ${message.guild.name}`);
                     return;
                     
                 }else {
@@ -330,15 +332,15 @@ class EventService {
             return;
         }
 
-        if (!signupOption) {
-            console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
+        if (signupOptionIndex === -1) {
+            console.log(new Date(), reaction.message.author.tag + '   No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
             reaction.users.remove(user.id);
             return;
         }
 
-        if (signupOption.isAdditionalRole) {
-            if (signupOption.signups.find(s => s == username)) {
-                console.log(`User ${reactionUser.user.tag} is already signed up for ${event.name} as ${signupOption.name}`);
+        if (event.signupOptions[signupOptionIndex].isAdditionalRole) {
+            if (event.signupOptions[signupOptionIndex].signups.find(s => s == reactionUser.id)) {
+                //console.log(new Date(), `User ${reactionUser.user.tag} is already signed up for ${event.name} as ${signupOption.name}`);
                 return;
             }
         }   
@@ -348,17 +350,18 @@ class EventService {
                 .map(so => so.signups)
                 .flat(1);
 
-            if (allSignups.find(s => s == username)) {
-                console.log('User ' + reactionUser.user.tag + ' is already signed up for ' + event.name);
+            if (allSignups.find(s => s === reactionUser.id)) {
+                //console.log(new Date(), 'User ' + reactionUser.user.tag + ' is already signed up for ' + event.name);
                 reaction.users.remove(user.id);
                 return;
             }
         }
 
-        signupOption.addSignup(username);
+        //console.log(new Date(), 'Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
+        event.signupOptions[signupOptionIndex].signups.push([reactionUser.displayName, reactionUser.id]);
         
         this.editEmbedForEvent(message, event);
-        if(blacklist.IDs.indexOf(reactionUser.id) == -1){
+        if(!(await FileSystem.isIgnoredUser(reactionUser.id))){
             reactionUser.send(await this.createEmbedForSignup(event, message.guild.name, true))
         }
     }
@@ -374,7 +377,7 @@ class EventService {
         if (message.channel.type == 'dm') return;
         if (message.guild.member(user.id) == botUserId) return;
         
-        let event = this.getEventForMessageId(message.id);
+        let event = await this.getEventForMessageId(message.id);
 
         if (!event) {
             //console.warn('No event found for message: ' + message.id);
@@ -385,28 +388,29 @@ class EventService {
         let emoji = reaction.emoji;
         let username = reactionUser.displayName;
 
-        console.log('Event: ' + event.name + ', Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
-
-        let signupOption = event.getSingupOptionForEmoji(emoji);
         
-        if(signupOption == csvEmoji || signupOption == deleteEmoji){
+
+        let signupOptionIndex = event.signupOptions.findIndex(s => s.emoji === emoji.name || s.emoji === emoji.id || s.emoji === emoji.identifier);
+        
+        if(emoji.name === csvEmoji || emoji.name === deleteEmoji){
             return;
         }
 
-        if (!signupOption) {
-            console.log('No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
+        if (signupOptionIndex === -1) {
+            console.log(new Date(), 'No signup option for emoji: ' + emoji.name + ', ' + emoji.identifier + ', ' + emoji.id);
             return;
         }
 
-        if (!signupOption.signups.find(s => s == username)) {
-            console.log('User ' + reactionUser.user.tag + ' is not signed up for ' + event.name);
+        if (!event.signupOptions[signupOptionIndex].signups.find(s => s[1] === reactionUser.id)) {
+            console.log(new Date(), 'User ' + reactionUser.user.tag + ' is not signed up for ' + event.name);
             return;
         }
 
-        signupOption.removeSignup(username);
+        event.signupOptions[signupOptionIndex].signups.splice(event.signupOptions[signupOptionIndex].signups.findIndex(s => s[1] === reactionUser.id), 1)
+        //console.log(new Date(), 'Event: ' + event.name + ', Remove Signup: ' + emoji.name + ', User: ' + reactionUser.user.tag);
         
         this.editEmbedForEvent(message, event);
-        if(blacklist.IDs.indexOf(reactionUser.id) == -1){
+        if(!(await FileSystem.isIgnoredUser(reactionUser.id))){
             reactionUser.send(await this.createEmbedForSignup(event, message.guild.name, false))
         }
     }

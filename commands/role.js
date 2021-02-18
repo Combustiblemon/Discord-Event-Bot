@@ -10,10 +10,10 @@ module.exports = {
      * 
      * @param {Discord.Client} bot 
      * @param {Discord.Message} message 
-     * @param {Array} roles
+     * @param {JSON} serverRole
      * @param {string} subCommand 
      */
-    execute(bot, message, roles, subCommand) {
+    execute(bot, message, serverRole, subCommand) {
         if (message.guild === null) {
             message.author.send('Please use the command in a server channel.');
             return;
@@ -29,21 +29,18 @@ module.exports = {
             message.author.send('You need to enter a second argument. For a list of commands write $help.');   
             return;                    
         }
-
-        // Find the server index in the array
-        let serverIndex = roles.findIndex(x => x.includes(message.guild.id));
         
         if (subCommand == 'add') {
-            addRole(message, serverIndex, roles);
+            addRole(message, serverRole);
         } 
         else if (subCommand == 'remove') {
-            if (serverIndex === -1) {
+            if (!serverRole) {
                 message.author.send('There is no role for this server.');
 
                 return;
             }
 
-            removeRole(message, serverIndex, roles);
+            removeRole(message, serverRole);
         }
 
         return;
@@ -54,53 +51,45 @@ module.exports = {
 /**
  * 
  * @param {Discord.Message} message
- * @param {string} serverIndex
+ * @param {JSON} serverRole The role object as gotten from the DB. {role_id, server_id}
  * @param {Array} roles
  */
-async function addRole(message, serverIndex, roles) {
+async function addRole(message, serverRole) {
     let author = message.author;
     let text = await getRolesAsFormattedString(message.guild)
     let filter = m => m.author.id === author.id;
 
-    if(serverIndex !== -1 ){
-        message.author.send(`\`\`\`There is already a minimum role for ${roles[serverIndex][3]} (${roles[serverIndex][2]}).\nPlease use $role remove before adding a new role.\`\`\``)
+    if(serverRole){
+        message.author.send(`\`\`\`There is already a minimum role for ${message.guild.name} (${(await message.guild.roles.fetch(serverRole.role_id)).name}).\nPlease use $role remove before adding a new role.\`\`\``)
         return
     }
 
-    author.send(`\`\`\`${text}\`\`\``)
-    let msg = await author.send(`\`\`\`Copy paste from above the role you want to be the minimum able to make events.\n**WARNING** CASE SENSITIVE **WARNING**\`\`\``)
+    text.forEach(element => {
+        author.send(`\`\`\`${element}\`\`\``)
+    });
+    
+    let msg = await author.send(`\`\`\`Copy paste from above the role ID you want to be the minimum able to make events.\n**WARNING** ONLY COPY THE ID **WARNING**\`\`\``)
     let completed = false
     while(completed == false){
         try {
             let collected = await msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] })
             let answer = collected.first().content;
-            if(!answer.includes(':::')){
-                author.send('\`\`\`Wrong format entered. Please try again.\`\`\`')
-                continue
-            }
-            answer = answer.trim().split(':::');
-            if (serverIndex !== -1 && roles[serverIndex][2] === answer[0]) {
-                author.send('```This role is already the minimum.```');
-                completed = true
-                return;
-            }
-            let exists = await checkIfRoleExistsInGuild(message.guild, answer[0], answer[1])
+            
+            answer = answer.trim()
+            
+            let exists = await checkIfRoleExistsInGuild(message.guild, answer)
             if(!exists){
-                author.send(`\`\`\`"${answer[0]}" is not a role in ${message.guild.name}. Please try again.\`\`\``);
+                author.send(`\`\`\`"${answer}" is not a role ID in ${message.guild.name}. Please try copying the ID again.\`\`\``);
                 continue
             }
         
-            let roleID = await getRoleIDFromName(message.guild, answer[0], parseInt(answer[1]))
-            console.log(`${message.author.tag} added role (${answer[0]}){${roleID}} as minimum. server: (${message.guild.name})`)
-            const tempArray = [message.guild.id, roleID, answer[0], message.guild.name];
-            roles.push(tempArray);
-            FileSystem.writeData(roles, 'roles', './');
-            FileSystem.addServerName(message.guild.id)
+            console.log(new Date(), `${message.author.tag} set role (${(await message.guild.roles.fetch(answer)).name}){${answer}} as minimum. server: (${message.guild.name})`)
+            FileSystem.saveRoleToDB(answer, message.guild.id);
             completed = true
             author.send('```Role Added.```');
             return    
         } catch (error) {
-            console.error(err)
+            console.error(new Date(), err)
             completed = true
             author.send('```Nothing was entered.```');
             return
@@ -113,17 +102,16 @@ async function addRole(message, serverIndex, roles) {
 /**
  * 
  * @param {Discord.Message} message
- * @param {string} serverIndex
- * @param {Array} roles
+ * @param {JSON} serverRole The role object as gotten from the DB. {role_id, server_id}
  * @returns {Promise}
  */
-async function removeRole(message, serverIndex, roles) {
-    let answer = await EventDetailsService.prototype.questionYesNo(`\`\`\`Are you sure you want to remove "${roles[serverIndex][2]}" as minimum role from ${roles[serverIndex][3]}\`\`\``,  message.author);
+async function removeRole(message, serverRole) {
+    let roleName = (await message.guild.roles.fetch(serverRole.role_id)).name;
+    let answer = await EventDetailsService.prototype.questionYesNo(`\`\`\`Are you sure you want to remove "${roleName}" as minimum role from ${message.guild.name}\`\`\``,  message.author);
     if(answer === true && answer != 'no answer') {
-        console.log(`${message.author.tag} removed role "${roles[serverIndex][2]}"(${roles[serverIndex][1]}) from (${roles[serverIndex][3]})`)
-        roles.splice(serverIndex, 1);
-        FileSystem.writeData(roles, 'roles', './')
-        message.author.send('\`Role removed.\`');
+        console.log(new Date(), `${message.author.tag} removed role "${roleName}"(${serverRole.role_id}) from (${message.guild.name})`)
+        FileSystem.removeRoleFromDB(serverRole.role_id, serverRole.server_id);
+        message.author.send('```Role removed.```');
         return;
     }
     return

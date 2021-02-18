@@ -8,8 +8,9 @@ const EventService = require('./src/services/EventService');
 const EventDetails = require('./src/models/EventDetails');
 const SignupOption = require('./src/models/SignupOption');
 const EventList = require('./src/models/EventList');
-var CronJob = require('cron').CronJob;
-const glob = require('glob');
+const SQLiteUtilities = require('./src/utils/SQLiteUtilities');
+//var CronJob = require('cron').CronJob;
+//const glob = require('glob');
 const bot = new Discord.Client({ partials: ['USER', 'GUILD_MEMBER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 const Event = require('./src/models/Event');
 //const EventScheduler = require('./src/services/EventScheduler');
@@ -17,28 +18,7 @@ const token = process.env.DISCORD_BOT_TOKEN;
 const PREFIX = '$';
 
 
-
-let savedServers = []
-fs.readdirSync('./embeds/').forEach(file => {
-    if(file != '.gitignore'){
-        savedServers.push(file)
-    }
-});
-
 EventList.initialize()
-
-/* let cronJob = new CronJob('0 0 5 * * *', function() {
-    console.log('hello :3');
-}, null, true, 'UTC')
-cronJob.start(); */
-
-//read the files from disk, if they don't exist write them
-let allowedChannels = FileSystem.ensureFileExistance('channels.json', './').then(function(result){
-    allowedChannels = result;
-});
-let roles = FileSystem.ensureFileExistance('roles.json', './').then(function(result){
-    roles = result;
-});
 
 bot.commands = new Discord.Collection();
 var commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
@@ -57,58 +37,33 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
-for (const server of savedServers){
-    var embedFiles = fs.readdirSync(`./embeds/${server}`).filter(file => file.endsWith('.json'));
-    for (const file of embedFiles) {
-        const embed = JSON.parse(fs.readFileSync(`./embeds/${server}/${file}`, 'utf8'));
-        const event = JSON.parse(fs.readFileSync(`./events/${server}/${file}`, 'utf8'));
-        
-        FileSystem.addEmbedID(embed.id);
-        FileSystem.addEmbedName(file.replace(/.json/gi, '').trim(), server);
-        
-        let tempSignupOption = [];
-        for (let position of event.signupOptions) {
-            tempSignupOption.push(new SignupOption(position.emoji, position.name, position.isAdditionalRole, position.isInline, position.signups));
-        }
-        let tempDate = `${event.date.substring(0,10)}T${event.date.substring(11,16)}Z`;
-        let tempOptions = {bastion: event.bastion, colossus: event.colossus, construction: event.construction}
-        let tempEvent = new Event(new EventDetails(event.name, event.description, new Date(tempDate), event.repeatableDay, tempOptions, event.authorID), event.header, event.author, tempSignupOption, event.csv);
-        EventService.saveEventForMessageId(tempEvent, embed.id);
-
-        /* if (event.repeatableDay > -1){
-            EventScheduler.addEventToCheck(file.replace(/.json/gi, '').trim(), event.repeatableDay);
-        } */
-    }
-}
-//#endregion
-
-
 
 bot.on("ready", () => {
     //sets up the status message
     bot.user.setPresence({ activity: { name: `${PREFIX}help`, type: 'LISTENING' }, status: 'active' })
-    .catch(console.error);
+    .catch(err => {console.error(new Date(), err)});
     //sets up the reaction listeners
     EventService.setupListeners(bot);
-    console.log('This bot is online.');
+    console.log(new Date(), 'This bot is online.');
     setInterval(() => {
         bot.user.setPresence({ activity: { name: `${PREFIX}help`, type: 'LISTENING' }, status: 'active' })
-        .catch(console.error);
+        .catch(err => {console.error(new Date(), err)});
     }, 3600000);
 });
 
-bot.on('message', message => {
+bot.on('message', async message => {
     
     //if the message doesn't start with PREFIX return
     if(!message.content.startsWith(PREFIX)) return;
     if(!(message.guild === null)) {
-        //find the server position in memory
-        var serverIndex = roles.findIndex(x=>x.includes(message.guild.id));
+        //get role data from DB.
+        //returns {role_id, server_id}
+        var serverRole = await SQLiteUtilities.getDataSingle(null, 'ROLES', {query: 'server_id = ?', values: [`${message.guild.id}`]});
         //delete the command message
-        message.channel.bulkDelete(1).catch(console.error);
+        message.channel.bulkDelete(1).catch(err => {console.error(new Date(), err)});
     }
     
-    let filter = m => m.author.id === message.author.id;
+    
 
     // args is what a person types after the prefix
     let args = message.content.substring(PREFIX.length).split(' ');
@@ -119,8 +74,8 @@ bot.on('message', message => {
     if(args[1]) subCommand = args[1].toLowerCase();
     
 
-    if(allowedChannels.includes(message.channel.id) || message.channel.type == "dm"){
-        if (serverIndex === -1 && `${command} ${subCommand}` != 'role add'){
+    if(await FileSystem.getWhitelistedChannel(message.channel.id) || message.channel.type === "dm"){
+        if (!serverRole && `${command} ${subCommand}` !== 'role add' && message.channel.type !== "dm"){
             message.author.send(`Please use \`$role add\` before using \`$${command} ${subCommand}\`.`);
             return;
         }
@@ -128,7 +83,9 @@ bot.on('message', message => {
         //#region command event
         switch(command) {
             case 'test':
-                bot.commands.get('test').execute(bot, message);
+                if (message.author.id === '107852471136686080') {
+                    bot.commands.get('test').execute(bot, message, args);
+                }
             break;
             
             case 'event':
@@ -160,7 +117,7 @@ bot.on('message', message => {
                         break;
 
                         case 'delete':
-                            message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                            message.guild.roles.fetch(serverRole.role_id).then(role=>{
                                 if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
                                     bot.commands.get('delete').execute(bot, message);
                                 }else {
@@ -180,7 +137,7 @@ bot.on('message', message => {
             break;
 
             case 'csv':
-                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                message.guild.roles.fetch(serverRole.role_id).then(role=>{
                     if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
                         bot.commands
                             .get('csv')
@@ -204,25 +161,25 @@ bot.on('message', message => {
         break;
 
         case 'notify':
-            EventService.messageUserBlacklist(message.author)
+            FileSystem.ignoreUser(message.author.id);
         break;
 
         case 'role':
                 if (message.member.hasPermission("ADMINISTRATOR")) {
                     bot.commands
                         .get('role')
-                        .execute(bot, message, roles, subCommand);
+                        .execute(bot, message, serverRole, subCommand);
                 }else {
                     message.author.send('You are lacking the required permissions. You need the \`Administrator\` permission.');
                 }
         break;
 
         case 'channel':
-                message.guild.roles.fetch(roles[serverIndex][1]).then(role=>{
+                message.guild.roles.fetch(serverRole.role_id).then(role=>{
                     if (message.member.roles.highest.comparePositionTo(role) >= 0 || message.member.hasPermission("ADMINISTRATOR")) {
                         bot.commands
                             .get('channel')
-                            .execute(bot, message, subCommand, allowedChannels, roles, serverIndex);
+                            .execute(bot, message, subCommand, serverRole.role_id);
                     }else {
                         message.author.send('You are lacking the required permissions.');
                     }});
@@ -235,12 +192,3 @@ bot.on('message', message => {
 
 
 bot.login(token);
-
-
-
-
-function GetRoles(){
-    return Array.from(roles);
-}
-
-exports.GetRoles = GetRoles;
