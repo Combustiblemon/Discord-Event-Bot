@@ -7,17 +7,11 @@ const Errors = require('../models/error');
 const EventDetailsService = require('./EventDetailsService');
 const SQLiteUtilities = require('../utils/SQLiteUtilities');
 
-let savedServers = JSON.parse(fs.readFileSync("./servers.json", 'utf8'));
 let embedsInMemory = new Object()
 embedsInMemory.ID = [];
 embedsInMemory.Name = new Object();
 //let embedsInMemoryName = [];
 let csvFilesInMemory = [];
-
-//make the object, i should just save the object in a file
-for (const server of savedServers.servers){
-    embedsInMemory.Name[server] = []
-}
 class FileSystem {
 
     //#region JSON logic
