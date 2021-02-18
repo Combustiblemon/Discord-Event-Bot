@@ -16,6 +16,7 @@
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "glob": "^7.1.6",
+    "human-interval": "^2.0.1",
     "node-cron": "^2.0.3",
     "sqlite3": "^5.0.1"
   }
