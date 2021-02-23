@@ -329,7 +329,7 @@ class FileSystem {
         }
         
         //if the path doesn't exist write it
-        fs.mkdirSync(_dirname(filePath));
+        fs.mkdirSync(path.dirname(filePath));
         console.log(new Date(), `Created path: ${filePath}`);
         return true;
     }
