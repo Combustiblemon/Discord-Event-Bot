@@ -33,8 +33,8 @@ class FileSystem {
         } else if (mode == 'event') {
             this.writeData(event, name, 'events/');
         } else if (mode == 'both') {
-            await this.writeData(embed, name, 'embeds/');
-            await this.writeData(event, name, 'events/');
+            this.writeData(embed, name, 'embeds/');
+            this.writeData(event, name, 'events/');
         }
     }
 
@@ -48,10 +48,10 @@ class FileSystem {
         let embedData = JSON.stringify(data, null, 2);
         
         if(name.includes('.json')){
-            writeFileSync(`${folder}${name}`, embedData);
+            fs.writeFileSync(`${folder}${name}`, embedData);
             console.log(new Date(), `Done writing file: ${folder}${name}`);
         }else{
-            writeFileSync(`${folder}${name}.json`, embedData);
+            fs.writeFileSync(`${folder}${name}.json`, embedData);
             console.log(new Date(), `Done writing file: ${folder}${name}.json`);
         }
         
@@ -329,7 +329,7 @@ class FileSystem {
         }
         
         //if the path doesn't exist write it
-        mkdirSync(_dirname(filePath));
+        fs.mkdirSync(_dirname(filePath));
         console.log(new Date(), `Created path: ${filePath}`);
         return true;
     }
