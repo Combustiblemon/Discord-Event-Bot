@@ -207,55 +207,6 @@ class FileSystem {
         SQLiteUtilities.updateData('EVENTS', {event_name: event.name, event_date: event.date.toISOString(), options, event: JSON.stringify(event), embed:  JSON.stringify(embed)}, {query: 'embed_id = ?', values: [embed.id]})
     }
 
-    addServerName(serverID){
-        if(!embedsInMemory.Name[serverID]){
-            embedsInMemory.Name[serverID] = []
-            savedServers.servers.push(serverID)
-            this.writeData(savedServers, 'servers.json', './')
-        }
-    }
-
-    /**
-     * @param {string} name The name of the embed
-     */
-    addEmbedName(name, serverID){
-        if(!embedsInMemory.Name[serverID]){
-            this.addServerName(serverID);
-        }
-        embedsInMemory.Name[serverID].push(name);
-    }
-
-    /**
-     * 
-     * @param {string} name The name of the embed
-     */
-    removeEmbedName(name, serverID){
-        const isName = (element) => element.includes(name);
-        let index = embedsInMemory.Name[serverID].findIndex(isName)
-        if(index === -1){
-            console.error(new Date(), new arrayLookupFail(''));
-            return;
-        }
-        embedsInMemory.Name[serverID].splice(index, 1);
-    }
-
-    /**
-     * @returns {Array}
-     */
-    getEmbedIDs(){
-        return Array.from(embedsInMemory.ID);
-    }
-
-    /**
-     * @returns {Array}
-     */
-    getEmbedNames(server){
-        if(embedsInMemory.Name[serverID]){
-            return Array.from(embedsInMemory.Name[serverID]);
-        }
-        return null
-    }
-
     /**
      * @description Returns {name, date, embedID, channelID}.
      * 

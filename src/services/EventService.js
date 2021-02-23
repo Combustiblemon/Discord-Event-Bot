@@ -85,9 +85,6 @@ class EventService {
             .then(async embed => {
                 let fileName = FileSystem.getFileNameForEvent(event);
 
-                FileSystem.addEmbedName(fileName, channel.guild.name);
-                //this.saveEventForMessageId(event, embed.id);
-                //FileSystem.addEmbedID(embed.id);
 
                 try {
                     await event.signupOptions.forEach(signupOption => {
@@ -99,7 +96,7 @@ class EventService {
                         await FileSystem.createCSV(event, embed.guild.id);
                     }
                     await embed.react(deleteEmoji);
-                    //await FileSystem.writeJSON(event, embed, 'both');
+
                     FileSystem.saveEvent(event, embed);
                     console.log(new Date(), `${event.author} created event ${event.name}. Server: ${channel.guild.name}`)
                     author.send(`\`\`\`Event created successfully.\`\`\``)
