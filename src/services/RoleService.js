@@ -101,10 +101,10 @@ const EventDetailsService = require('./EventDetailsService');
                 if(answer == '@everyone' || answer == '@here'){
                     return answer
                 }
-                //answer = answer.trim().split(':::');
+                
                 let exists = await checkIfRoleExistsInGuild(guild, answer);
                 if(!exists){
-                    author.send(`\`\`\`"${answer}" is not a role in ${guild.name}. Please try again.\`\`\``);
+                    author.send(`\`\`\`"${answer}" is not a role ID in ${guild.name}. Please try again.\nMake sure to only copy the ID (only the numbers).\`\`\``);
                     continue
                 }
                 completed = true

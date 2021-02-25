@@ -203,8 +203,12 @@ class FileSystem {
      */
     updateEvent(event, embed, options=null){
         //EVENT table columns
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'embed_id = ?';
+        queryObject.values.push(embed.id);
+
         //{server_id, event_name, embed_id, event_date, event_channel, options, event, embed}
-        SQLiteUtilities.updateData('EVENTS', {event_name: event.name, event_date: event.date.toISOString(), options, event: JSON.stringify(event), embed:  JSON.stringify(embed)}, {query: 'embed_id = ?', values: [embed.id]})
+        SQLiteUtilities.updateData('EVENTS', {event_name: event.name, event_date: event.date.toISOString(), options, event: JSON.stringify(event), embed:  JSON.stringify(embed)}, queryObject);
     }
 
     /**
@@ -213,7 +217,11 @@ class FileSystem {
      * @param {String} serverID The id of the server.
      */
     async getEmbedDataFromServerID(serverID){
-        let data = await SQLiteUtilities.getDataAll({event_name: 'name', event_date: 'date', embed_id: 'embedID', event_channel: 'channelID'}, 'EVENTS', {query: 'server_id = ?', values: [serverID]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'server_id = ?';
+        queryObject.values.push(serverID);
+
+        let data = await SQLiteUtilities.getDataAll({event_name: 'name', event_date: 'date', embed_id: 'embedID', event_channel: 'channelID'}, 'EVENTS', queryObject);
         data.forEach(element => {
             element.date = new Date(element.date);
         });
@@ -225,7 +233,11 @@ class FileSystem {
      * @param {String} msgID 
      */
     async getEventFromMsgID(msgID){
-        let data = await SQLiteUtilities.getDataSingle({event: 'event'}, 'EVENTS', {query: 'embed_id = ?', values: [`${msgID}`]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'embed_id = ?';
+        queryObject.values.push(msgID);
+
+        let data = await SQLiteUtilities.getDataSingle({event: 'event'}, 'EVENTS', queryObject);
         data = JSON.parse(data.event);
         data.date = new Date(data.date);
         return data
@@ -236,7 +248,11 @@ class FileSystem {
      * @param {String} serverID 
      */
     async getRoleIdFromServerId(serverID){
-        return (await SQLiteUtilities.getDataSingle({role_id: 'roleID'}, 'ROLES', {query: 'server_id = ?', values: [`${serverID}`]})).roleID;
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'server_id = ?';
+        queryObject.values.push(serverID);
+
+        return (await SQLiteUtilities.getDataSingle({role_id: 'roleID'}, 'ROLES', queryObject)).roleID;
     }
 
     /**
@@ -254,7 +270,11 @@ class FileSystem {
      * @param {String} serverID 
      */
     removeRoleFromDB(roleID, serverID){
-        SQLiteUtilities.deleteData('ROLES', {query: 'role_id = ? AND server_id = ?', values: [roleID, serverID]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'role_id = ? AND server_id = ?';
+        queryObject.values.push(roleID, serverID)
+
+        SQLiteUtilities.deleteData('ROLES', queryObject);
     }
 
     /**
@@ -271,7 +291,11 @@ class FileSystem {
      * @param {String} channelID 
      */
     removeChannelFromWhitelist(channelID){
-        SQLiteUtilities.deleteData('WHITELISTED_CHANNELS', {query: 'channel_id = ?', values: [channelID]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'channel_id = ?';
+        queryObject.values.push(channelID)
+
+        SQLiteUtilities.deleteData('WHITELISTED_CHANNELS', queryObject);
     }
 
     /**
@@ -279,7 +303,11 @@ class FileSystem {
      * @param {String} channelID 
      */
     async getWhitelistedChannel(channelID){
-        return await SQLiteUtilities.getDataSingle({channel_id: 'channelID'}, 'WHITELISTED_CHANNELS', {query: 'channel_id = ?', values: [channelID]})
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'channel_id = ?';
+        queryObject.values.push(channelID)
+
+        return await SQLiteUtilities.getDataSingle({channel_id: 'channelID'}, 'WHITELISTED_CHANNELS', queryObject)
     }
 
     /**
@@ -287,7 +315,11 @@ class FileSystem {
      * @param {String} userID 
      */
     async ignoreUser(userID){
-        let a = await SQLiteUtilities.deleteData('IGNORE_USERS', {query: 'user_id = ?', values: [userID]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'user_id = ?';
+        queryObject.values.push(userID)
+
+        let a = await SQLiteUtilities.deleteData('IGNORE_USERS', queryObject);
         if (a === 0) {
             SQLiteUtilities.insertData('IGNORE_USERS', [userID]);
             console.log(new Date(), `User "${userID}" now ignored.`)
@@ -302,7 +334,11 @@ class FileSystem {
      * @returns {Boolean}
      */
     async isIgnoredUser(userID){
-        let a = await SQLiteUtilities.getDataSingle(null, 'IGNORE_USERS', {query: 'user_id = ?', values: [userID]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'user_id = ?';
+        queryObject.values.push(userID);
+
+        let a = await SQLiteUtilities.getDataSingle(null, 'IGNORE_USERS', queryObject);
         if (a) return true
         else return false
     }
@@ -337,7 +373,7 @@ class FileSystem {
     /**
      * 
      * @param {string} name The name of the file to check.
-     * @param {string=} folder The folder the file is in.
+     * @param {string} folder The folder the file is in.
      */
     async ensureFileExistance(name, folder){
         if(fs.existsSync(`${folder}${name}`)){

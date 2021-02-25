@@ -13,17 +13,17 @@ module.exports = {
      */
     execute(bot, message, subCommand, serverRoleID) {
         if (message.guild === null) {
-            message.author.send('Please use this command in a server channel.');
+            message.author.send('```Please use this command in a server channel.```');
             return;
         }
 
         if (!subCommand) { 
-            message.author.send('You need to enter a second argument. For a list of commands write $help.');   
+            message.author.send('```You need to enter a second argument. For a list of commands write $help.```');   
             return;                    
         }
 
         if (!serverRoleID) {
-            message.author.send("You need to add at least one role for the server first.\n`$role add`");
+            message.author.send("```You need to add at least one role for the server first.\n($role add)```");
             return;
         }
 

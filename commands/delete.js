@@ -78,7 +78,11 @@ module.exports = {
         //delete the message
         message.channel.messages.fetch(msgID).then(msg =>{ msg.delete()}).catch(error => {console.error(new Date(), error)});
         //delete the event in database
-        SQLiteUtilities.deleteData('EVENTS', {query: 'embed_id = ?', values: [msgID]});
+        var queryObject = SQLiteUtilities.queryObject;
+        queryObject.query = 'embed_id = ?';
+        queryObject.values.push(msgID)
+
+        SQLiteUtilities.deleteData('EVENTS', queryObject);
         
         //remove references to embed
         //FileSystem.removeEmbedName(answer, message.guild.name);

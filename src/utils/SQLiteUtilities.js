@@ -56,7 +56,7 @@ class SQLiteUtilities{
      * 
      * @param {String} tableName The name of the table.
      * @param {JSON} data An object that maps the column names to the values. {columnName: value}
-     * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
+     * @param {JSON} query An object that contains the query and the query value. Use SQLiteUtilities.queryObject
      */
     async updateData(tableName, data, query){
         //map the data out to the query
@@ -79,7 +79,7 @@ class SQLiteUtilities{
     /**
      * 
      * @param {String} tableName The name of the table.
-     * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
+     * @param {JSON} query An object that contains the query and the query value. Use SQLiteUtilities.queryObject
      */
     async deleteData(tableName, query){
         //create the SQL
@@ -103,7 +103,7 @@ class SQLiteUtilities{
      * 
      * @param {JSON} columns A JSON object that describes the columns to grab the data from and the name in the returned object. {columnName: returnName}
      * @param {String} tableName The name of the table.
-     * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
+     * @param {JSON} query An object that contains the query and the query value. Use SQLiteUtilities.queryObject
      * @returns {Object}
      */
     async getDataSingle(columns=null, tableName, query){
@@ -150,7 +150,7 @@ class SQLiteUtilities{
      * 
      * @param {JSON} columns A JSON object that describes the columns to grab the data from and the name in the returned object. {columnName: returnName}
      * @param {String} tableName The name of the table.
-     * @param {JSON} query An object that contains the query and the query value. {query: string, values: [ ]} 
+     * @param {JSON} query An object that contains the query and the query value. Use SQLiteUtilities.queryObject
      * @param {Boolean} distinct Wether to use the DISTINCT keyword.
      * @returns {Object}
      */
@@ -250,6 +250,16 @@ class SQLiteUtilities{
         this.closeConnection(db);
 
         return result
+    }
+
+    
+    #queryObject = {
+        query: new String,
+        values: []
+    }
+
+    get queryObject(){
+        return JSON.parse(JSON.stringify(this.#queryObject))
     }
 }
 
