@@ -13,6 +13,7 @@
    "Foxhole":{
        "Infantry": "🪖",
        "Armour": "Armour:781197096396783657",
-       "Logi": "🛠️"
+       "Logi": "🛠️",
+       "Artillery": "artillery:815980148254834688"
    }
 }

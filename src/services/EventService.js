@@ -9,6 +9,7 @@ const DeleteEvent = require('../../commands/delete');
 const { getRoleToPing } = require('./RoleService');
 const { deleteEmbed } = require('../../commands/delete');
 const SQLiteUtilities = require('../utils/SQLiteUtilities');
+const EventFunctions = require('./EventFunctions');
 
 const botUserId = process.env.DISCORD_BOT_USER_ID;
 

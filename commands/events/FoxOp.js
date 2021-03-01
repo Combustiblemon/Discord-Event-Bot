@@ -37,6 +37,7 @@ function createEvent(eventDetails, header, author) {
         new SignupOption(EmojiService.getEmoji('Foxhole', 'Infantry'), 'Infantry', false, true, []),
         new SignupOption(EmojiService.getEmoji('Foxhole', 'Armour'), 'Armour', false, true, []),
         new SignupOption(EmojiService.getEmoji('Foxhole', 'Logi'), 'Logi', false, true, []),
+        new SignupOption(EmojiService.getEmoji('Foxhole', 'Artillery'), 'Artillery', false, true, [])
     ];
     
     return new Event(
